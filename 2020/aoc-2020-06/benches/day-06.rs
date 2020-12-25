@@ -1,0 +1,39 @@
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+
+use aoc_2020_06::{part_one, part_two, DEFAULT_INPUT_PATH};
+use aoc_2020_common::input::load_input;
+
+criterion_group!(benches, part_one, part_two);
+criterion_main!(benches);
+
+fn part_one(c: &mut Criterion) {
+    let input = load_input(DEFAULT_INPUT_PATH);
+
+    c.bench_with_input(
+        BenchmarkId::new("day-06-p01|iter", ""),
+        &input.as_str(),
+        |b, i| b.iter(|| black_box(part_one::solve_iter(i))),
+    );
+
+    c.bench_with_input(
+        BenchmarkId::new("day-06-p01|loop", ""),
+        &input.as_bytes(),
+        |b, i| b.iter(|| black_box(part_one::solve_loops(i))),
+    );
+}
+
+fn part_two(c: &mut Criterion) {
+    let input = load_input(DEFAULT_INPUT_PATH);
+
+    c.bench_with_input(
+        BenchmarkId::new("day-06-p02-iterative", ""),
+        &input.as_str(),
+        |b, i| b.iter(|| black_box(part_two::solve_iter(i))),
+    );
+
+    c.bench_with_input(
+        BenchmarkId::new("day-06-p02-loop", ""),
+        &input.as_bytes(),
+        |b, i| b.iter(|| black_box(part_two::solve_loops(i))),
+    );
+}

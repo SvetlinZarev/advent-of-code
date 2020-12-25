@@ -1,0 +1,18 @@
+[package]
+name = "aoc-2020-06"
+version = "0.1.0"
+authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
+edition = "2018"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+aoc-2020-common = { path = "../aoc-2020-common" }
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "day-06"
+harness = false

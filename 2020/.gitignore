@@ -1,0 +1,7 @@
+### Ignore
+**/target
+**/.*
+
+
+### Exceptions
+!.gitignore

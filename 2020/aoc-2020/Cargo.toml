@@ -1,0 +1,37 @@
+[package]
+name = "aoc-2020"
+version = "0.1.0"
+authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
+edition = "2018"
+
+[[bin]]
+name = "aoc"
+
+[dependencies]
+aoc-2020-common = { path = "../aoc-2020-common" }
+aoc-2020-01 = { path = "../aoc-2020-01" }
+aoc-2020-02 = { path = "../aoc-2020-02" }
+aoc-2020-03 = { path = "../aoc-2020-03" }
+aoc-2020-04 = { path = "../aoc-2020-04" }
+aoc-2020-05 = { path = "../aoc-2020-05" }
+aoc-2020-06 = { path = "../aoc-2020-06" }
+aoc-2020-07 = { path = "../aoc-2020-07" }
+aoc-2020-08 = { path = "../aoc-2020-08" }
+aoc-2020-09 = { path = "../aoc-2020-09" }
+aoc-2020-10 = { path = "../aoc-2020-10" }
+aoc-2020-11 = { path = "../aoc-2020-11" }
+aoc-2020-12 = { path = "../aoc-2020-12" }
+aoc-2020-13 = { path = "../aoc-2020-13" }
+aoc-2020-14 = { path = "../aoc-2020-14" }
+aoc-2020-15 = { path = "../aoc-2020-15" }
+aoc-2020-16 = { path = "../aoc-2020-16" }
+aoc-2020-17 = { path = "../aoc-2020-17" }
+aoc-2020-18 = { path = "../aoc-2020-18" }
+aoc-2020-19 = { path = "../aoc-2020-19" }
+aoc-2020-20 = { path = "../aoc-2020-20" }
+aoc-2020-21 = { path = "../aoc-2020-21" }
+aoc-2020-22 = { path = "../aoc-2020-22" }
+aoc-2020-23 = { path = "../aoc-2020-23" }
+aoc-2020-24 = { path = "../aoc-2020-24" }
+aoc-2020-25 = { path = "../aoc-2020-25" }
+
