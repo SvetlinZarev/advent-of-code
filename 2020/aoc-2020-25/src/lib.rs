@@ -20,14 +20,14 @@ pub fn demo<P: AsRef<Path>>(path: P) {
 pub fn solve_v2(input: &[usize]) -> usize {
     assert_eq!(2, input.len());
 
-    let pub_key_a = input[0];
-    let pub_key_b = input[1];
+    let pub_key_a = input[0].max(input[1]);
+    let pub_key_b = input[0].min(input[1]);
 
-    let mut pkey = 1;
+    let mut pub_key = 1;
     let mut encryption_key = 1;
 
-    while pkey != pub_key_a {
-        pkey = (pkey * SUBJECT_NUMBER) % KEY_DIV;
+    while pub_key != pub_key_a {
+        pub_key = (pub_key * SUBJECT_NUMBER) % KEY_DIV;
         encryption_key = (encryption_key * pub_key_b) % KEY_DIV;
     }
 
@@ -37,11 +37,11 @@ pub fn solve_v2(input: &[usize]) -> usize {
 pub fn solve_v1(input: &[usize]) -> usize {
     assert_eq!(2, input.len());
 
-    let pkey_a = input[0];
-    let pkey_b = input[1];
+    let pub_key_a = input[0].max(input[1]);
+    let pub_key_b = input[0].min(input[1]);
 
-    let ls = derive_loop_size(pkey_a, SUBJECT_NUMBER);
-    derive_encryption_key(ls, pkey_b)
+    let ls = derive_loop_size(pub_key_a, SUBJECT_NUMBER);
+    derive_encryption_key(ls, pub_key_b)
 }
 
 fn derive_loop_size(pkey: usize, sn: usize) -> usize {
@@ -49,8 +49,7 @@ fn derive_loop_size(pkey: usize, sn: usize) -> usize {
     let mut loop_size = 0;
 
     while public_key != pkey {
-        public_key *= sn;
-        public_key %= KEY_DIV;
+        public_key = (public_key * sn) % KEY_DIV;
         loop_size += 1;
     }
 
@@ -61,8 +60,7 @@ fn derive_encryption_key(ls: usize, sn: usize) -> usize {
     let mut encryption_key = 1;
 
     for _ in 0..ls {
-        encryption_key *= sn;
-        encryption_key %= KEY_DIV;
+        encryption_key = (encryption_key * sn) % KEY_DIV;
     }
 
     encryption_key
