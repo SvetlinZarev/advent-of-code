@@ -163,7 +163,7 @@ fn match_rule(rules: &[Rule], msg: &[u8], rule: Rule, midx: usize) -> Option<Vec
                         return None;
                     }
 
-                    // duplicate offsets will will result in the same three
+                    // duplicate offsets will will result in the same tree
                     // being visited many times
                     result.sort_unstable();
                     result.dedup();
@@ -186,7 +186,7 @@ fn match_rule(rules: &[Rule], msg: &[u8], rule: Rule, midx: usize) -> Option<Vec
             let mut matches = ga.unwrap();
             matches.extend_from_slice(&gb.unwrap());
 
-            // duplicate offsets will will result in the same three
+            // duplicate offsets will will result in the same tree
             // being visited many times
             matches.sort_unstable();
             matches.dedup();
