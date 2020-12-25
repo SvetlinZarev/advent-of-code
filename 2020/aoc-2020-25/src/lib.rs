@@ -13,10 +13,28 @@ pub fn demo<P: AsRef<Path>>(path: P) {
     let input = load_input(path);
     let data = parse_lines_as_usize(&input);
 
-    measure_solution(25, 1, "", || solve(&data));
+    measure_solution(25, 1, "two loops", || solve_v1(&data));
+    measure_solution(25, 1, "one loop", || solve_v2(&data));
 }
 
-pub fn solve(input: &[usize]) -> usize {
+pub fn solve_v2(input: &[usize]) -> usize {
+    assert_eq!(2, input.len());
+
+    let pub_key_a = input[0];
+    let pub_key_b = input[1];
+
+    let mut pkey = 1;
+    let mut encryption_key = 1;
+
+    while pkey != pub_key_a {
+        pkey = (pkey * SUBJECT_NUMBER) % KEY_DIV;
+        encryption_key = (encryption_key * pub_key_b) % KEY_DIV;
+    }
+
+    encryption_key
+}
+
+pub fn solve_v1(input: &[usize]) -> usize {
     assert_eq!(2, input.len());
 
     let pkey_a = input[0];
@@ -71,11 +89,20 @@ mod tests {
     }
 
     #[test]
-    fn test_part_one() {
+    fn test_part_one_v1() {
         let input = load_input(DEFAULT_INPUT_PATH);
         let data = parse_lines_as_usize(&input);
 
-        let solution = solve(&data);
+        let solution = solve_v1(&data);
+        assert_eq!(11328376, solution);
+    }
+
+    #[test]
+    fn test_part_one_v2() {
+        let input = load_input(DEFAULT_INPUT_PATH);
+        let data = parse_lines_as_usize(&input);
+
+        let solution = solve_v2(&data);
         assert_eq!(11328376, solution);
     }
 }
