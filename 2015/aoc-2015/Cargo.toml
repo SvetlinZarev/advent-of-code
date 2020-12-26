@@ -1,0 +1,18 @@
+[package]
+name = "aoc-2015"
+version = "0.1.0"
+authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
+edition = "2018"
+
+[[bin]]
+name = "aoc"
+
+[dependencies]
+aoc-2015-common = { path = "../aoc-2015-common" }
+aoc-2015-01 = { path = "../aoc-2015-01" }
+aoc-2015-02 = { path = "../aoc-2015-02" }
+aoc-2015-03 = { path = "../aoc-2015-03" }
+aoc-2015-04 = { path = "../aoc-2015-04" }
+aoc-2015-05 = { path = "../aoc-2015-05" }
+aoc-2015-06 = { path = "../aoc-2015-06" }
+aoc-2015-07 = { path = "../aoc-2015-07" }

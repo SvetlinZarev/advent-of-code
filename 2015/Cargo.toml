@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "./aoc-2020*",
+    "./aoc-2015*",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
