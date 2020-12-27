@@ -1,22 +1,26 @@
 use core::ops::RangeInclusive;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
 use aoc_2020_common::parsing::parse_csv_as_u32;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-16.txt";
+pub const DAY: usize = 16;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let mut input = parse_input(&input);
 
-    measure_solution(16, 1, "", || part_one::solve(&mut input));
-    measure_solution(16, 2, "v1", || part_two::solve_v1(&input));
-    measure_solution(16, 2, "v2", || part_two::solve_v2(&input));
+    let (dp, mut input) = measure(DAY, "parsing", || parse_input(&input));
+    let (d1, _) = measure(DAY, "part 1", || part_one::solve(&mut input));
+    let (d2a, _) = measure(DAY, "part 2: v1", || part_two::solve_v1(&input));
+    let (d2b, _) = measure(DAY, "part 2: v2", || part_two::solve_v2(&input));
+
+    dp.add(d1).add(d2a.min(d2b))
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -127,10 +131,11 @@ fn parse_ticket(line: &str) -> Vec<u32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aoc_2020_common::input::default_test_input;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let mut input = parse_input(&input);
 
         let solution = part_one::solve(&mut input);
@@ -139,7 +144,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let mut input = parse_input(&input);
         part_one::solve(&mut input); // removes the invalid entries
 

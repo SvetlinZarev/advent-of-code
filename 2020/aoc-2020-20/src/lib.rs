@@ -1,13 +1,15 @@
 use std::collections::HashMap;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-20.txt";
+pub const DAY: usize = 20;
 
 const WIDTH: usize = 10;
 const HEIGHT: usize = 10;
@@ -20,12 +22,12 @@ const IMAGE_HEIGHT: usize = ROWS * (HEIGHT - 2);
 
 pub type Grid = [[bool; WIDTH]; HEIGHT];
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let grids = parse_input(&input);
+    let (dp, grids) = measure(DAY, "parsing", || parse_input(&input));
 
     let mut image = None;
-    measure_solution(20, 1, "", || {
+    let (d1, _) = measure(DAY, "part 1", || {
         if let Some((solution, img)) = part_one::solve(&grids) {
             image = Some(img);
             return Some(solution);
@@ -34,9 +36,13 @@ pub fn demo<P: AsRef<Path>>(path: P) {
         None
     });
 
-    if let Some(mut image) = image {
-        measure_solution(20, 2, "", || part_two::solve(&mut image));
+    let mut d2 = Duration::default();
+    if let Some(mut img) = image {
+        let (d2x, _) = measure(DAY, "part 2", || part_two::solve(&mut img));
+        d2 = d2x;
     }
+
+    dp.add(d1).add(d2)
 }
 
 pub fn parse_input(input: &str) -> HashMap<usize, Grid> {
@@ -81,11 +87,13 @@ pub fn parse_input(input: &str) -> HashMap<usize, Grid> {
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let grids = parse_input(&input);
 
         let (solution, _) = part_one::solve(&grids).unwrap();
@@ -94,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let grids = parse_input(&input);
 
         let (_, mut image) = part_one::solve(&grids).unwrap();

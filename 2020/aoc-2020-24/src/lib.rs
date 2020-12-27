@@ -1,25 +1,30 @@
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-24.txt";
+pub const DAY: usize = 24;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let tile_directions = parse_input(&input);
+
+    let (dp, tile_directions) = measure(DAY, "parsing", || parse_input(&input));
 
     let mut tiles = None;
-    measure_solution(24, 1, "", || {
+    let (d1, _) = measure(DAY, "part 1", || {
         let (solution, part_two_input) = part_one::solve(&tile_directions);
         tiles = Some(part_two_input);
         solution
     });
 
-    measure_solution(24, 2, "", || part_two::solve(&tiles.unwrap()));
+    let (d2, _) = measure(DAY, "part 2", || part_two::solve(&tiles.unwrap()));
+
+    dp.add(d1).add(d2)
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -149,6 +154,8 @@ pub fn parse_input(input: &str) -> Vec<Vec<Direction>> {
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
@@ -182,7 +189,7 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let tile_directions = parse_input(&input);
 
         let (solution, _) = part_one::solve(&tile_directions);
@@ -191,7 +198,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let tile_directions = parse_input(&input);
 
         let (_, tiles) = part_one::solve(&tile_directions);

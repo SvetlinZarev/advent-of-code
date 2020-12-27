@@ -12,7 +12,8 @@ pub fn solve_with_bruteforce(input: &[i32]) -> Option<i32> {
     None
 }
 
-pub fn solve_with_quadratic_alg(input: &mut [i32]) -> Option<i32> {
+pub fn solve_with_quadratic_alg(input: &[i32]) -> Option<i32> {
+    let mut input = input.to_vec();
     input.sort_unstable();
 
     for x in 0..input.len() - 3 {

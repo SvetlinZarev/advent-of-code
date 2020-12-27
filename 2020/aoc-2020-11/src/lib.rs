@@ -1,33 +1,35 @@
-use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
+
+use aoc_2020_common::input::load_input;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one_v1;
 pub mod part_one_v2;
 pub mod part_one_v3;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-11.txt";
+pub const DAY: usize = 11;
 
 const NUM_COLS: usize = 96;
 const NUM_ROWS: usize = 99;
 
 type Grid = [[Tile; NUM_COLS]; NUM_ROWS];
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
 
-    let mut grid = parse_input(&input);
-    measure_solution(11, 1, "v1", || part_one_v1::solve(&mut grid));
+    let (d1p, grid) = measure(DAY, "parsing", || parse_input(&input));
+    let (d1a, _) = measure(DAY, "part 1: v1", || part_one_v1::solve(&mut grid.clone()));
+    let (d1b, _) = measure(DAY, "part 1: v2", || part_one_v2::solve(&mut grid.clone()));
+    let (d1cp, mut seats) = measure(DAY, "parsing", || part_one_v3::parse_input(&input));
+    let (d1c, _) = measure(DAY, "part 1: v3", || part_one_v3::solve(&mut seats));
+    let (d2, _) = measure(DAY, "part 2", || part_two::solve(&mut grid.clone()));
 
-    let mut grid = parse_input(&input);
-    measure_solution(11, 1, "v2", || part_one_v2::solve(&mut grid));
-
-    let mut seats = part_one_v3::parse_input(&input);
-    measure_solution(11, 1, "v3", || part_one_v3::solve(&mut seats));
-
-    let mut grid = parse_input(&input);
-    measure_solution(11, 2, "", || part_two::solve(&mut grid));
+    let s1 = d1p.add(d1a.min(d1b)).add(d2);
+    let s2 = d1cp.add(d1c).add(d1p).add(d2);
+    s1.min(s2)
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -75,11 +77,13 @@ fn init_grid(grid: &mut Grid, input: &str) {
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
 
         let mut grid = parse_input(&input);
         let solution = part_one_v1::solve(&mut grid);
@@ -96,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
 
         let mut grid = parse_input(&input);
         let solution = part_two::solve(&mut grid);

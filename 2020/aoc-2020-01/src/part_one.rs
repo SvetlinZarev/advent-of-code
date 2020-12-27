@@ -10,7 +10,8 @@ pub fn solve_bruteforce(input: &[i32]) -> Option<i32> {
     None
 }
 
-pub fn solve_with_sorting(input: &mut [i32]) -> Option<i32> {
+pub fn solve_with_sorting(input: &[i32]) -> Option<i32> {
+    let mut input = input.to_vec();
     input.sort_unstable();
 
     let mut l = 0;

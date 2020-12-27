@@ -45,14 +45,14 @@ Here's a more interesting example:
 ```
 
 Here, because rule 4 matches a and rule 5 matches b, rule 2 matches two letters that are the same (
-aa or bb), and rule 3 matches two letters that are different (ab or ba).
+`aa` or `bb`), and rule 3 matches two letters that are different (`ab` or `ba`).
 
 Since rule 1 matches rules 2 and 3 once each in either order, it must match two pairs of letters,
 one pair with matching letters and one pair with different letters. This leaves eight possibilities:
-aaab, aaba, bbab, bbba, abaa, abbb, baaa, or babb.
+`aaab, aaba, bbab, bbba, abaa, abbb, baaa`, or `babb`.
 
 Rule 0, therefore, matches a (rule 4), then any of the eight options from rule 1, then b (rule 5):
-aaaabb, aaabab, abbabb, abbbab, aabaab, aabbbb, abaaab, or ababbb.
+`aaaabb, aaabab, abbabb, abbbab, aabaab, aabbbb, abaaab`, or `ababbb`.
 
 The received messages (the bottom part of your puzzle input) need to be checked against the rules so
 you can determine which are valid and which are corrupted. Including the rules and the messages

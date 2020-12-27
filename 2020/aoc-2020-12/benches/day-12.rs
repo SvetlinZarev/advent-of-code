@@ -1,13 +1,13 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 
-use aoc_2020_12::{part_one, part_two, DEFAULT_INPUT_PATH};
-use aoc_2020_common::input::load_input;
+use aoc_2020_12::{part_one, part_two, DAY};
+use aoc_2020_common::input::{default_test_input, load_input};
 
 criterion_group!(benches, input_parsing, part_one, part_two);
 criterion_main!(benches);
 
 fn input_parsing(c: &mut Criterion) {
-    let input = load_input(DEFAULT_INPUT_PATH);
+    let input = load_input(default_test_input(DAY));
 
     c.bench_with_input(
         BenchmarkId::new("day-12-p01-parsing", ""),
@@ -23,7 +23,7 @@ fn input_parsing(c: &mut Criterion) {
 }
 
 fn part_one(c: &mut Criterion) {
-    let input = load_input(DEFAULT_INPUT_PATH);
+    let input = load_input(default_test_input(DAY));
     let input = part_one::parse_input_data(&input);
 
     c.bench_with_input(BenchmarkId::new("day-12-p01", ""), &input, |b, i| {
@@ -32,7 +32,7 @@ fn part_one(c: &mut Criterion) {
 }
 
 fn part_two(c: &mut Criterion) {
-    let input = load_input(DEFAULT_INPUT_PATH);
+    let input = load_input(default_test_input(DAY));
     let input = part_two::parse_input_data(&input);
 
     c.bench_with_input(BenchmarkId::new("day-12-p02", ""), &input, |b, i| {

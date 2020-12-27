@@ -1,23 +1,36 @@
-use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
+
+use aoc_2020_common::input::load_input;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-06.txt";
+pub const DAY: usize = 6;
 
 const MASK_SET_NEW_LINE: u32 = 1 << 31;
 const MASK_CLEAR_NEW_LINE: u32 = u32::max_value() >> 1;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
 
-    measure_solution(6, 1, "iter", || part_one::solve_iter(input.as_str()));
-    measure_solution(6, 1, "loop", || part_one::solve_loops(input.as_bytes()));
+    measure(DAY, "part 1: iterators", || {
+        part_one::solve_iter(input.as_str())
+    });
+    let (d_1, _) = measure(DAY, "part 1: loops", || {
+        part_one::solve_iter(input.as_str())
+    });
 
-    measure_solution(6, 2, "iter", || part_two::solve_iter(input.as_str()));
-    measure_solution(6, 2, "loop", || part_two::solve_loops(input.as_bytes()));
+    measure(DAY, "part 2: iterators", || {
+        part_two::solve_iter(input.as_str())
+    });
+    let (d_2, _) = measure(DAY, "part 2: loops", || {
+        part_two::solve_iter(input.as_str())
+    });
+
+    d_1.add(d_2)
 }
 
 fn solve_iter(input: &str, initial: u32, fold_function: fn(u32, u32) -> u32) -> u32 {
@@ -95,11 +108,13 @@ fn solve_loop(input: &[u8], init: u32, fold_function: fn(a: u32, b: u32) -> u32)
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
 
         let solution = part_one::solve_iter(input.as_str());
         assert_eq!(6443, solution);
@@ -110,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
 
         let solution = part_two::solve_iter(input.as_str());
         assert_eq!(3232, solution);

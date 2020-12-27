@@ -1,29 +1,36 @@
-use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
+
+use aoc_2020_common::input::load_input;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-13.txt";
+pub const DAY: usize = 13;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let raw_input = load_input(path);
 
     let (arrival_time, schedule) = part_one::parse_input_data(&raw_input);
-    measure_solution(13, 1, "", || part_one::solve(arrival_time, &schedule));
+    let (d1, _) = measure(DAY, "part 1", || part_one::solve(arrival_time, &schedule));
 
     let schedule = part_two::parse_input_data(&raw_input);
-    measure_solution(13, 2, "", || part_two::solve(&schedule));
+    let (d2, _) = measure(DAY, "part 2", || part_two::solve(&schedule));
+
+    d1.add(d2)
 }
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let raw_input = load_input(DEFAULT_INPUT_PATH);
+        let raw_input = load_input(default_test_input(DAY));
 
         let (arrival_time, schedule) = part_one::parse_input_data(&raw_input);
         let solution = part_one::solve(arrival_time, &schedule);
@@ -32,7 +39,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let raw_input = load_input(DEFAULT_INPUT_PATH);
+        let raw_input = load_input(default_test_input(DAY));
 
         let schedule = part_two::parse_input_data(&raw_input);
         let solution = part_two::solve(&schedule);

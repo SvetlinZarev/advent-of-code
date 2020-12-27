@@ -1,7 +1,10 @@
-use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
 use std::cmp::Ordering;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
+
+use aoc_2020_common::input::load_input;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
@@ -9,14 +12,16 @@ pub mod part_two;
 pub type Operand = isize;
 type PrecedenceFunction = fn(Function, Function) -> Ordering;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-18.txt";
+pub const DAY: usize = 18;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let expressions = parse_input(&input);
 
-    measure_solution(18, 1, "", || part_one::solve(&expressions));
-    measure_solution(18, 2, "", || part_two::solve(&expressions));
+    let (dp, expressions) = measure(DAY, "parsing", || parse_input(&input));
+    let (d1, _) = measure(DAY, "part 1", || part_one::solve(&expressions));
+    let (d2, _) = measure(DAY, "part 2", || part_two::solve(&expressions));
+
+    dp.add(d1).add(d2)
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -231,11 +236,13 @@ fn apply_function(operands: &mut Vec<Operand>, function: Function) {
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let expressions = parse_input(&input);
 
         let solution = part_one::solve(&expressions);
@@ -244,7 +251,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let expressions = parse_input(&input);
 
         let solution = part_two::solve(&expressions);

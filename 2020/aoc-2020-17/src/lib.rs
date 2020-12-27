@@ -1,29 +1,36 @@
-use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
+
+use aoc_2020_common::input::load_input;
+use aoc_2020_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-17.txt";
+pub const DAY: usize = 17;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
 
-    let mut data = part_one::parse_input(&input);
-    measure_solution(17, 1, "", || part_one::solve(&mut data));
+    let (d1p, mut data) = measure(DAY, "parsing", || part_one::parse_input(&input));
+    let (d1, _) = measure(DAY, "part 1", || part_one::solve(&mut data));
 
-    let mut data = part_two::parse_input(&input);
-    measure_solution(17, 2, "", || part_two::solve(&mut data));
+    let (d2p, mut data) = measure(DAY, "parsing", || part_two::parse_input(&input));
+    let (d2, _) = measure(DAY, "part 2", || part_two::solve(&mut data));
+
+    d1.add(d1p).add(d2).add(d2p)
 }
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
 
         let mut data = part_one::parse_input(&input);
         let solution = part_one::solve(&mut data);
@@ -32,7 +39,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
 
         let mut data = part_two::parse_input(&input);
         let solution = part_two::solve(&mut data);

@@ -1,22 +1,22 @@
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
+use aoc_2020_common::timing::measure;
 
-pub const INPUT_PATH_P1: &'static str = "../puzzle-inputs/day-19-1.txt";
-pub const INPUT_PATH_P2: &'static str = "../puzzle-inputs/day-19-2.txt";
+pub const DAY: usize = 19;
 
-pub fn demo_part_one<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let (rules, messages) = parse_input(&input);
-    measure_solution(19, 1, "", || solve(&rules, &messages));
-}
 
-pub fn demo_part_two<P: AsRef<Path>>(path: P) {
-    let input = load_input(path);
-    let (rules, messages) = parse_input(&input);
+    let (dp, (mut rules, messages)) = measure(DAY, "parsing", || parse_input(&input));
+    let (d1, _) = measure(DAY, "part 1", || solve(&rules, &messages));
 
-    measure_solution(19, 2, "", || solve(&rules, &messages));
+    modify_input(&mut rules);
+    let (d2, _) = measure(DAY, "part 2", || solve(&rules, &messages));
+
+    dp.add(d1).add(d2)
 }
 
 #[derive(Debug, Clone)]
@@ -110,6 +110,12 @@ pub fn parse_rule(line: &str) -> (usize, Rule) {
     (rule_number, Rule::MatchEither(fg, sg))
 }
 
+pub fn modify_input(rules: &mut [Rule]) {
+    // The vectors' content is reversed, due to how the solver works
+    rules[8] = Rule::MatchEither(vec![42], vec![8, 42]);
+    rules[11] = Rule::MatchEither(vec![31, 42], vec![31, 11, 42]);
+}
+
 pub fn solve(rules: &[Rule], msgs: &[Vec<u8>]) -> usize {
     msgs.iter()
         .filter(|&m| is_valid(rules, m))
@@ -198,11 +204,13 @@ fn match_rule(rules: &[Rule], msg: &[u8], rule: Rule, midx: usize) -> Option<Vec
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(INPUT_PATH_P1);
+        let input = load_input(default_test_input(DAY));
         let (rules, messages) = parse_input(&input);
 
         let solution = solve(&rules, &messages);
@@ -211,8 +219,9 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(INPUT_PATH_P2);
-        let (rules, messages) = parse_input(&input);
+        let input = load_input(default_test_input(DAY));
+        let (mut rules, messages) = parse_input(&input);
+        modify_input(&mut rules);
 
         let solution = solve(&rules, &messages);
         assert_eq!(374, solution);

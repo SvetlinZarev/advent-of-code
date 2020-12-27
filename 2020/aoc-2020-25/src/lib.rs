@@ -1,21 +1,24 @@
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
 use aoc_2020_common::parsing::parse_lines_as_usize;
+use aoc_2020_common::timing::measure;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-25.txt";
+pub const DAY: usize = 25;
 
 const SUBJECT_NUMBER: usize = 7;
 const KEY_DIV: usize = 20201227;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
     let data = parse_lines_as_usize(&input);
 
-    measure_solution(25, 1, "two loops", || solve_v1(&data));
-    measure_solution(25, 1, "one loop", || solve_v2(&data));
-    measure_solution(25, 1, "both keys", || solve_v3(&data));
+    let (d1, _) = measure(DAY, "two loops", || solve_v1(&data));
+    let (d2, _) = measure(DAY, "one loop", || solve_v2(&data));
+    let (d3, _) = measure(DAY, "both keys", || solve_v3(&data));
+
+    d1.min(d2).min(d3)
 }
 
 pub fn solve_v3(input: &[usize]) -> usize {
@@ -94,6 +97,8 @@ fn derive_encryption_key(ls: usize, sn: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
@@ -114,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_part_one_v1() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let data = parse_lines_as_usize(&input);
 
         let solution = solve_v1(&data);
@@ -123,7 +128,7 @@ mod tests {
 
     #[test]
     fn test_part_one_v2() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let data = parse_lines_as_usize(&input);
 
         let solution = solve_v2(&data);
@@ -132,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_part_one_v3() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let data = parse_lines_as_usize(&input);
 
         let solution = solve_v3(&data);

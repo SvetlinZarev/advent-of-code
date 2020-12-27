@@ -1,26 +1,44 @@
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::output::measure_solution;
 use aoc_2020_common::parsing::parse_csv_as_usize;
+use aoc_2020_common::timing::measure;
 
-pub const DEFAULT_INPUT_PATH: &str = "../puzzle-inputs/day-15.txt";
+pub const DAY: usize = 15;
 pub const MAX_TURNS_PART_ONE: usize = 2020;
 pub const MAX_TURNS_PART_TWO: usize = 30000000;
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
     let input = parse_csv_as_usize(&input);
 
-    measure_solution(15, 1, "v1/vector", || solve_v1(&input, MAX_TURNS_PART_ONE));
-    measure_solution(15, 1, "v2/vector", || solve_v2(&input, MAX_TURNS_PART_ONE));
-    measure_solution(15, 1, "v3/map", || solve_v3(&input, MAX_TURNS_PART_ONE));
+    let (d1a, _) = measure(DAY, "part 1: v1/vector", || {
+        solve_v1(&input, MAX_TURNS_PART_ONE)
+    });
+    let (d1b, _) = measure(DAY, "part 1: v2/vector", || {
+        solve_v2(&input, MAX_TURNS_PART_ONE)
+    });
+    let (d1c, _) = measure(DAY, "part 1: v3/map", || {
+        solve_v3(&input, MAX_TURNS_PART_ONE)
+    });
 
-    measure_solution(15, 2, "v1/vector", || solve_v1(&input, MAX_TURNS_PART_TWO));
-    measure_solution(15, 2, "v2/vector", || solve_v2(&input, MAX_TURNS_PART_TWO));
-    measure_solution(15, 2, "v3/map", || solve_v3(&input, MAX_TURNS_PART_TWO));
+    let (d2a, _) = measure(DAY, "part 2: v1/vector", || {
+        solve_v1(&input, MAX_TURNS_PART_TWO)
+    });
+    let (d2b, _) = measure(DAY, "part 2: v2/vector", || {
+        solve_v2(&input, MAX_TURNS_PART_TWO)
+    });
+    let (d2c, _) = measure(DAY, "part 2: v3/map", || {
+        solve_v3(&input, MAX_TURNS_PART_TWO)
+    });
+
+    let d1 = d1a.min(d1b).min(d1c);
+    let d2 = d2a.min(d2b).min(d2c);
+    d1.add(d2)
 }
 
 pub fn solve_v1(input: &[usize], max_turns: usize) -> usize {
@@ -103,11 +121,13 @@ pub fn solve_v3(input: &[usize], max_turns: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use aoc_2020_common::input::default_test_input;
+
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let input = parse_csv_as_usize(&input);
 
         let solution = solve_v1(&input, MAX_TURNS_PART_ONE);
@@ -122,7 +142,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let input = load_input(DEFAULT_INPUT_PATH);
+        let input = load_input(default_test_input(DAY));
         let input = parse_csv_as_usize(&input);
 
         let solution = solve_v1(&input, MAX_TURNS_PART_TWO);

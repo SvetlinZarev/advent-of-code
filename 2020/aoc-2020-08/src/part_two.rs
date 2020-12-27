@@ -60,31 +60,6 @@ pub fn solve(mut opcodes: Vec<OpCode>) -> Option<i32> {
     solution
 }
 
-pub fn preprocess_opcodes(opcodes: &mut Vec<OpCode>) {
-    // preprocess the opcodes
-    for idx in 0..opcodes.len() {
-        match opcodes[idx] {
-            OpCode::Nop(offset) => {
-                // Offset of 0 means that it will jump back to itself if converted to a JMP
-                // Offset of 1 has no effect
-                if offset == 0 || offset == 1 {
-                    opcodes[idx] = OpCode::ImNop(offset);
-                }
-            }
-
-            OpCode::Jmp(offset) => {
-                if offset == 1 {
-                    opcodes[idx] = OpCode::ImNop(offset);
-                }
-            }
-
-            _ => {
-                //no -op
-            }
-        }
-    }
-}
-
 pub fn parse_input(input: &str) -> Vec<OpCode> {
     let mut instructions = vec![];
     for line in input.lines() {
