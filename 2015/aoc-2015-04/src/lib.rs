@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use std::ops::Add;
 use std::path::Path;
 use std::time::Duration;
@@ -27,8 +28,14 @@ pub fn solve_p2(input: &str) -> Option<u32> {
 }
 
 fn solve(input: &str, check_digest: fn(&Digest) -> bool) -> Option<u32> {
+    let mut buffer = String::with_capacity(input.len() + 6);
+    write!(&mut buffer, "{}", input).unwrap();
+
     for key in 1..=u32::max_value() {
-        let digest = compute(format!("{}{}", input, key));
+        buffer.truncate(input.len());
+        write!(&mut buffer, "{}", key).unwrap();
+
+        let digest = compute(&buffer);
         if check_digest(&digest) {
             return Some(key);
         }
