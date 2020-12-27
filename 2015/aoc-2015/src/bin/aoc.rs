@@ -1,30 +1,51 @@
+use std::ops::AddAssign;
+use std::time::Duration;
+
 use aoc_2015_common::input::default_input;
 
 fn main() {
     let args = std::env::args().collect::<Vec<String>>();
     if args.len() != 2 && args.len() != 3 {
-        println!("usage: aoc day-xx <puzzle_input>");
+        println!("usage: aoc <day> <puzzle_input>");
         return;
     }
 
-    let demo = match args[1].as_str() {
-        "day-01" => aoc_2015_01::demo,
-        "day-02" => aoc_2015_02::demo,
-        "day-03" => aoc_2015_03::demo,
-        "day-04" => aoc_2015_04::demo,
-        "day-05" => aoc_2015_05::demo,
-        "day-06" => aoc_2015_06::demo,
-        "day-07" => aoc_2015_07::demo,
-        _ => {
-            println!("Invalid selection: {}", args[1]);
-            std::process::exit(1);
-        }
-    };
+    let puzzles = [
+        aoc_2015_01::demo,
+        aoc_2015_02::demo,
+        aoc_2015_03::demo,
+        aoc_2015_04::demo,
+        aoc_2015_05::demo,
+        aoc_2015_06::demo,
+        aoc_2015_07::demo,
+    ];
 
-    let mut puzzle_input = default_input(args[1].as_str());
+    let selection = &args[1];
+    if selection == "all" {
+        let mut runtime = Duration::default();
+        for (day, puzzle) in puzzles.iter().enumerate() {
+            let elapsed = puzzle(default_input(day + 1));
+            runtime.add_assign(elapsed);
+        }
+        println!("---------");
+        println!("Total execution time: {:.3?}", runtime);
+
+        return;
+    }
+
+    let day = selection.parse::<usize>().unwrap();
+    if day < 1 || day > puzzles.len() {
+        println!(
+            "Invalid selection. The day must be between 1 and {}",
+            puzzles.len()
+        );
+        return;
+    }
+
+    let mut puzzle_input = default_input(day);
     if args.len() == 3 {
         puzzle_input = args[2].to_owned();
     }
 
-    demo(puzzle_input);
+    puzzles[day - 1](puzzle_input);
 }

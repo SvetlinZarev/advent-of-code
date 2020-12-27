@@ -1,17 +1,21 @@
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use md5::{compute, Digest};
 
 use aoc_2015_common::input::load_input;
-use aoc_2015_common::output::measure_solution;
+use aoc_2015_common::timing::measure;
 
 pub const DAY: &'static str = "day-04";
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path).trim().to_owned();
 
-    measure_solution(4, 1, "", || solve_p1(&input));
-    measure_solution(4, 2, "", || solve_p2(&input));
+    let (d_1, _) = measure(4, "part 1", || solve_p1(&input));
+    let (d_2, _) = measure(4, "part 2", || solve_p2(&input));
+
+    d_1.add(d_2)
 }
 
 pub fn solve_p1(input: &str) -> Option<u32> {

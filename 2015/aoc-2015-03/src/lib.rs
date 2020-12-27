@@ -1,19 +1,23 @@
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2015_common::input::load_input;
-use aoc_2015_common::output::measure_solution;
+use aoc_2015_common::timing::measure;
 
 pub mod part_one;
 pub mod part_two;
 
 pub const DAY: &'static str = "day-03";
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let input = parse_input(&input);
 
-    measure_solution(3, 1, "", || part_one::solve(&input));
-    measure_solution(3, 2, "", || part_two::solve(&input));
+    let (d_p, input) = measure(3, "parsing", || parse_input(&input));
+    let (d_1, _) = measure(3, "part 1", || part_one::solve(&input));
+    let (d_2, _) = measure(3, "part 2", || part_two::solve(&input));
+
+    d_p.add(d_1).add(d_2)
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]

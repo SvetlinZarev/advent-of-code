@@ -1,19 +1,23 @@
 use std::collections::HashMap;
+use std::ops::Add;
 use std::path::Path;
+use std::time::Duration;
 
 use aoc_2015_common::input::load_input;
-use aoc_2015_common::output::measure_solution;
+use aoc_2015_common::timing::measure;
 
 pub const DAY: &'static str = "day-07";
 
-pub fn demo<P: AsRef<Path>>(path: P) {
+pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
 
-    let mut wires = parse_input(&input);
-    let signal = measure_solution(7, 1, "", || solve(&wires));
+    let (d_p, mut wires) = measure(7, "parsing", || parse_input(&input));
+    let (d_1, signal) = measure(7, "part 1", || solve(&wires));
 
     wires.insert("b", Operation::Set(signal));
-    measure_solution(7, 2, "", || solve(&wires));
+    let (d_2, _) = measure(7, "part 2", || solve(&wires));
+
+    d_p.add(d_1).add(d_2)
 }
 
 #[derive(Debug, Copy, Clone)]
