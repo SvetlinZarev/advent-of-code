@@ -7,13 +7,13 @@ use md5::{compute, Digest};
 use aoc_2015_common::input::load_input;
 use aoc_2015_common::timing::measure;
 
-pub const DAY: &'static str = "day-04";
+pub const DAY: usize = 4;
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path).trim().to_owned();
 
-    let (d_1, _) = measure(4, "part 1", || solve_p1(&input));
-    let (d_2, _) = measure(4, "part 2", || solve_p2(&input));
+    let (d_1, _) = measure(DAY, "part 1", || solve_p1(&input));
+    let (d_2, _) = measure(DAY, "part 2", || solve_p2(&input));
 
     d_1.add(d_2)
 }

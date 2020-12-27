@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::time::Duration;
 
-pub fn display_measurement<A>(day: u32, comment: &str, duration: Duration, answer: &A)
+pub fn display_measurement<A>(day: usize, comment: &str, duration: Duration, answer: &A)
 where
     A: Debug,
 {

@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 
 use crate::output::display_measurement;
 
-pub fn measure<S, R, F>(day: u32, comment: S, f: F) -> (Duration, R)
+pub fn measure<S, R, F>(day: usize, comment: S, f: F) -> (Duration, R)
 where
     S: AsRef<str>,
     R: Debug,

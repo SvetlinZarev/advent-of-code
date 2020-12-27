@@ -6,8 +6,8 @@ pub fn default_input(day: usize) -> String {
     format!("puzzle-inputs/day-{:02}.txt", day)
 }
 
-pub fn default_test_input(day: &str) -> String {
-    format!("../puzzle-inputs/{}.txt", day)
+pub fn default_test_input(day: usize) -> String {
+    format!("../puzzle-inputs/day-{:02}.txt", day)
 }
 
 pub fn load_input<P: AsRef<Path>>(path: P) -> String {

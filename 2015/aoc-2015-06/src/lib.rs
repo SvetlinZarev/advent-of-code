@@ -8,14 +8,14 @@ use aoc_2015_common::timing::measure;
 pub mod part_one;
 pub mod part_two;
 
-pub const DAY: &'static str = "day-06";
+pub const DAY: usize = 6;
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
 
-    let (d_p, instructions) = measure(6, "parsing", || parse_input(&input));
-    let (d_1, _) = measure(6, "part 1", || part_one::solve(&instructions));
-    let (d_2, _) = measure(6, "part 2", || part_two::solve(&instructions));
+    let (d_p, instructions) = measure(DAY, "parsing", || parse_input(&input));
+    let (d_1, _) = measure(DAY, "part 1", || part_one::solve(&instructions));
+    let (d_2, _) = measure(DAY, "part 2", || part_two::solve(&instructions));
 
     d_p.add(d_1).add(d_2)
 }

@@ -6,16 +6,18 @@ use std::time::Duration;
 use aoc_2015_common::input::load_input;
 use aoc_2015_common::timing::measure;
 
-pub const DAY: &'static str = "day-07";
+pub const DAY: usize = 7;
+
+const WIRE_B: &'static str = "b";
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
 
-    let (d_p, mut wires) = measure(7, "parsing", || parse_input(&input));
-    let (d_1, signal) = measure(7, "part 1", || solve(&wires));
+    let (d_p, mut wires) = measure(DAY, "parsing", || parse_input(&input));
+    let (d_1, signal) = measure(DAY, "part 1", || solve(&wires));
 
-    wires.insert("b", Operation::Set(signal));
-    let (d_2, _) = measure(7, "part 2", || solve(&wires));
+    wires.insert(WIRE_B, Operation::Set(signal));
+    let (d_2, _) = measure(DAY, "part 2", || solve(&wires));
 
     d_p.add(d_1).add(d_2)
 }
