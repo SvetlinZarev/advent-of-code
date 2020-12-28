@@ -4,7 +4,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::parsing::parse_csv_as_u32;
+use aoc_2020_common::parsing::parse_csv;
 use aoc_2020_common::timing::measure;
 
 pub mod part_one;
@@ -74,7 +74,7 @@ pub fn parse_input(input: &str) -> Input {
                 if my_ticket.is_some() {
                     panic!("My ticket was already parsed: {:?}", my_ticket);
                 }
-                my_ticket = Some(parse_csv_as_u32(line));
+                my_ticket = Some(parse_csv(line));
             }
             ParserStage::NearbyTicketsHeader => {
                 assert_eq!("nearby tickets:", line);
@@ -125,13 +125,14 @@ fn parse_range(r: &str) -> RangeInclusive<u32> {
 }
 
 fn parse_ticket(line: &str) -> Vec<u32> {
-    parse_csv_as_u32(line)
+    parse_csv(line)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use aoc_2020_common::input::default_test_input;
+
+    use super::*;
 
     #[test]
     fn test_part_one() {

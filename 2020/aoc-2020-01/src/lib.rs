@@ -3,7 +3,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::parsing::parse_lines_as_i32;
+use aoc_2020_common::parsing::parse_line_delimited;
 use aoc_2020_common::timing::measure;
 
 pub mod part_one;
@@ -13,7 +13,7 @@ pub const DAY: usize = 1;
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let input = parse_lines_as_i32(&input);
+    let input = parse_line_delimited(&input);
 
     measure(DAY, "part 1 / bruteforce", || {
         part_one::solve_bruteforce(&input)
@@ -43,7 +43,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = load_input(default_test_input(DAY));
-        let input = parse_lines_as_i32(&input);
+        let input = parse_line_delimited(&input);
 
         let solution = part_one::solve_bruteforce(&input);
         assert_eq!(Some(1020036), solution);
@@ -55,7 +55,7 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = load_input(default_test_input(DAY));
-        let input = parse_lines_as_i32(&input);
+        let input = parse_line_delimited(&input);
 
         let solution = part_two::solve_with_bruteforce(&input);
         assert_eq!(Some(286977330), solution);

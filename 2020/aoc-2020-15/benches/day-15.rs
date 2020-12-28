@@ -2,14 +2,14 @@ use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criteri
 
 use aoc_2020_15::{solve_v1, solve_v2, solve_v3, DAY, MAX_TURNS_PART_ONE};
 use aoc_2020_common::input::{default_test_input, load_input};
-use aoc_2020_common::parsing::parse_csv_as_usize;
+use aoc_2020_common::parsing::parse_csv;
 
 criterion_group!(benches, part_one);
 criterion_main!(benches);
 
 fn part_one(c: &mut Criterion) {
     let input = load_input(default_test_input(DAY));
-    let input = parse_csv_as_usize(&input);
+    let input = parse_csv(&input);
 
     c.bench_with_input(
         BenchmarkId::new("day-15-p01-v1-vector", ""),

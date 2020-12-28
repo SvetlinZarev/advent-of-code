@@ -2,14 +2,14 @@ use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criteri
 
 use aoc_2020_09::{part_one, part_two, DAY};
 use aoc_2020_common::input::{default_test_input, load_input};
-use aoc_2020_common::parsing::parse_lines_as_u64;
+use aoc_2020_common::parsing::parse_line_delimited;
 
 criterion_group!(benches, part_one, part_two);
 criterion_main!(benches);
 
 fn part_one(c: &mut Criterion) {
     let input = load_input(default_test_input(DAY));
-    let input = parse_lines_as_u64(&input);
+    let input = parse_line_delimited(&input);
 
     c.bench_with_input(BenchmarkId::new("day-09-p01", ""), &input, |b, i| {
         b.iter(|| black_box(part_one::solve(i)))
@@ -18,7 +18,7 @@ fn part_one(c: &mut Criterion) {
 
 fn part_two(c: &mut Criterion) {
     let input = load_input(default_test_input(DAY));
-    let input = parse_lines_as_u64(&input);
+    let input = parse_line_delimited(&input);
 
     let key = part_one::solve(&input).unwrap();
 

@@ -1,3 +1,6 @@
+use std::fmt::Debug;
+use std::str::FromStr;
+
 pub fn parse_csv_as_usize(input: &str) -> Vec<usize> {
     input
         .split(',')
@@ -8,38 +11,34 @@ pub fn parse_csv_as_usize(input: &str) -> Vec<usize> {
         .unwrap()
 }
 
-pub fn parse_csv_as_u32(input: &str) -> Vec<u32> {
+pub fn parse_csv<I, R, E>(input: I) -> Vec<R>
+where
+    I: AsRef<str>,
+    E: Debug,
+    R: FromStr<Err = E>,
+{
     input
+        .as_ref()
         .split(',')
         .map(|v| v.trim())
-        .filter(|v| !v.is_empty())
+        .filter(|&v| !v.is_empty())
         .map(|v| v.parse())
-        .collect::<Result<Vec<_>, _>>()
+        .collect::<Result<_, _>>()
         .unwrap()
 }
 
-pub fn parse_lines_as_i32(input: &str) -> Vec<i32> {
+pub fn parse_line_delimited<I, R, E>(input: I) -> Vec<R>
+where
+    I: AsRef<str>,
+    E: Debug,
+    R: FromStr<Err = E>,
+{
     input
-        .lines()
-        .map(|l| l.parse())
-        .collect::<Result<Vec<_>, _>>()
-        .unwrap()
-}
-
-pub fn parse_lines_as_u64(input: &str) -> Vec<u64> {
-    input
+        .as_ref()
         .lines()
         .map(|l| l.trim())
+        .filter(|&l| !l.is_empty())
         .map(|l| l.parse())
-        .collect::<Result<Vec<_>, _>>()
-        .unwrap()
-}
-
-pub fn parse_lines_as_usize(input: &str) -> Vec<usize> {
-    input
-        .lines()
-        .map(|l| l.trim())
-        .map(|l| l.parse())
-        .collect::<Result<Vec<_>, _>>()
+        .collect::<Result<_, _>>()
         .unwrap()
 }

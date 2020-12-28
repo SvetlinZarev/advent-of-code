@@ -3,7 +3,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::parsing::parse_lines_as_usize;
+use aoc_2020_common::parsing::parse_line_delimited;
 use aoc_2020_common::timing::measure;
 
 pub mod part_one;
@@ -25,16 +25,17 @@ pub fn parse_input(input: &str) -> (Vec<usize>, Vec<usize>) {
     let separator = input.find("\n\n").unwrap();
     let (a, b) = input.split_at(separator);
 
-    let player_one = parse_lines_as_usize(a[9..].trim());
-    let player_two = parse_lines_as_usize(b[9 + 2..].trim());
+    let player_one = parse_line_delimited(a[9..].trim());
+    let player_two = parse_line_delimited(b[9 + 2..].trim());
 
     (player_one, player_two)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use aoc_2020_common::input::default_test_input;
+
+    use super::*;
 
     #[test]
     fn test_part_one() {

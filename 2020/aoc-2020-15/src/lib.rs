@@ -5,7 +5,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::parsing::parse_csv_as_usize;
+use aoc_2020_common::parsing::parse_csv;
 use aoc_2020_common::timing::measure;
 
 pub const DAY: usize = 15;
@@ -14,7 +14,7 @@ pub const MAX_TURNS_PART_TWO: usize = 30000000;
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let input = parse_csv_as_usize(&input);
+    let input = parse_csv(&input);
 
     let (d1a, _) = measure(DAY, "part 1: v1/vector", || {
         solve_v1(&input, MAX_TURNS_PART_ONE)
@@ -128,7 +128,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = load_input(default_test_input(DAY));
-        let input = parse_csv_as_usize(&input);
+        let input = parse_csv(&input);
 
         let solution = solve_v1(&input, MAX_TURNS_PART_ONE);
         assert_eq!(610, solution);
@@ -143,7 +143,7 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = load_input(default_test_input(DAY));
-        let input = parse_csv_as_usize(&input);
+        let input = parse_csv(&input);
 
         let solution = solve_v1(&input, MAX_TURNS_PART_TWO);
         assert_eq!(1407, solution);

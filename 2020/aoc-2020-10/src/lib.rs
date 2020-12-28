@@ -3,7 +3,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::parsing::parse_lines_as_usize;
+use aoc_2020_common::parsing::parse_line_delimited;
 use aoc_2020_common::timing::measure;
 
 pub mod part_one;
@@ -13,7 +13,7 @@ pub const DAY: usize = 10;
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let input = parse_lines_as_usize(&input);
+    let input = parse_line_delimited(&input);
 
     let (d1a, _) = measure(DAY, "part 1: v1", || part_one::solve_v1(&mut input.clone()));
     let (d1b, _) = measure(DAY, "part 1: v2", || part_one::solve_v2(&mut input.clone()));
@@ -37,7 +37,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = load_input(default_test_input(DAY));
-        let input = parse_lines_as_usize(&input);
+        let input = parse_line_delimited(&input);
 
         let solution = part_one::solve_v1(&mut input.clone());
         assert_eq!(Some(2343), solution);
@@ -49,7 +49,7 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = load_input(default_test_input(DAY));
-        let input = parse_lines_as_usize(&input);
+        let input = parse_line_delimited(&input);
 
         let solution = part_two::solve_v1(&mut input.clone());
         assert_eq!(Some(31581162962944), solution);

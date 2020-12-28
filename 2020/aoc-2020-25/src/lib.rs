@@ -2,7 +2,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use aoc_2020_common::input::load_input;
-use aoc_2020_common::parsing::parse_lines_as_usize;
+use aoc_2020_common::parsing::parse_line_delimited;
 use aoc_2020_common::timing::measure;
 
 pub const DAY: usize = 25;
@@ -12,7 +12,7 @@ const KEY_DIV: usize = 20201227;
 
 pub fn demo<P: AsRef<Path>>(path: P) -> Duration {
     let input = load_input(path);
-    let data = parse_lines_as_usize(&input);
+    let data = parse_line_delimited(&input);
 
     let (d1, _) = measure(DAY, "two loops", || solve_v1(&data));
     let (d2, _) = measure(DAY, "one loop", || solve_v2(&data));
@@ -120,7 +120,7 @@ mod tests {
     #[test]
     fn test_part_one_v1() {
         let input = load_input(default_test_input(DAY));
-        let data = parse_lines_as_usize(&input);
+        let data = parse_line_delimited(&input);
 
         let solution = solve_v1(&data);
         assert_eq!(11328376, solution);
@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn test_part_one_v2() {
         let input = load_input(default_test_input(DAY));
-        let data = parse_lines_as_usize(&input);
+        let data = parse_line_delimited(&input);
 
         let solution = solve_v2(&data);
         assert_eq!(11328376, solution);
@@ -138,7 +138,7 @@ mod tests {
     #[test]
     fn test_part_one_v3() {
         let input = load_input(default_test_input(DAY));
-        let data = parse_lines_as_usize(&input);
+        let data = parse_line_delimited(&input);
 
         let solution = solve_v3(&data);
         assert_eq!(11328376, solution);
