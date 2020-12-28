@@ -1,16 +1,6 @@
 use std::fmt::Debug;
 use std::str::FromStr;
 
-pub fn parse_csv_as_usize(input: &str) -> Vec<usize> {
-    input
-        .split(',')
-        .map(|v| v.trim())
-        .filter(|v| !v.is_empty())
-        .map(|v| v.parse())
-        .collect::<Result<Vec<_>, _>>()
-        .unwrap()
-}
-
 pub fn parse_csv<I, R, E>(input: I) -> Vec<R>
 where
     I: AsRef<str>,
