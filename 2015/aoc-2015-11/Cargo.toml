@@ -1,0 +1,11 @@
+[package]
+name = "aoc-2015-11"
+version = "0.1.0"
+authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
+edition = "2018"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+aoc-2015-common = { path = "../aoc-2015-common" }
