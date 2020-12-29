@@ -94,7 +94,6 @@ Using your labeling, simulate 100 moves. What are the labels on the cups after c
 
 Due to what you can only assume is a mistranslation (you're not exactly fluent in Crab), you are
 quite surprised when the crab starts arranging many cups in a circle on your raft - one million (
-
 1000000) in total.
 
 Your labeling is still correct for the first few cups; after that, the remaining cups are just
