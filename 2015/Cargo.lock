@@ -31,6 +31,7 @@ dependencies = [
  "aoc-2015-10",
  "aoc-2015-11",
  "aoc-2015-12",
+ "aoc-2015-13",
  "aoc-2015-common",
 ]
 
@@ -128,6 +129,13 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "aoc-2015-13"
+version = "0.1.0"
+dependencies = [
+ "aoc-2015-common",
 ]
 
 [[package]]

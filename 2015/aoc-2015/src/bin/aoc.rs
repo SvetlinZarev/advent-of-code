@@ -23,6 +23,7 @@ fn main() {
         aoc_2015_10::demo,
         aoc_2015_11::demo,
         aoc_2015_12::demo,
+        aoc_2015_13::demo,
     ];
 
     let selection = &args[1];
