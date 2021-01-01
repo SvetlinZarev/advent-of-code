@@ -35,6 +35,7 @@ dependencies = [
  "aoc-2015-14",
  "aoc-2015-15",
  "aoc-2015-16",
+ "aoc-2015-17",
  "aoc-2015-common",
 ]
 
@@ -157,6 +158,13 @@ dependencies = [
 
 [[package]]
 name = "aoc-2015-16"
+version = "0.1.0"
+dependencies = [
+ "aoc-2015-common",
+]
+
+[[package]]
+name = "aoc-2015-17"
 version = "0.1.0"
 dependencies = [
  "aoc-2015-common",
