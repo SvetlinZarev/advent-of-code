@@ -28,6 +28,7 @@ fn main() {
         aoc_2015_15::demo,
         aoc_2015_16::demo,
         aoc_2015_17::demo,
+        aoc_2015_18::demo,
     ];
 
     let selection = &args[1];
@@ -37,8 +38,7 @@ fn main() {
             let elapsed = puzzle(default_input(day + 1));
             runtime.add_assign(elapsed);
         }
-        println!("---------");
-        println!("Total execution time: {:.3?}", runtime);
+        print_total_exec_time(runtime);
 
         return;
     }
@@ -57,5 +57,11 @@ fn main() {
         puzzle_input = args[2].to_owned();
     }
 
-    puzzles[day - 1](puzzle_input);
+    let runtime = puzzles[day - 1](puzzle_input);
+    print_total_exec_time(runtime);
+}
+
+fn print_total_exec_time(runtime: Duration) {
+    println!("---------");
+    println!("Total execution time: {:.3?}", runtime);
 }
