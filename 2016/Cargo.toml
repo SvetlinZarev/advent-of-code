@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "./aoc-2016*",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.test]
+opt-level = 0
+debug = true
+debug-assertions = true
+overflow-checks = true
+
+[profile.bench]
+codegen-units = 1
+lto = "thin"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
