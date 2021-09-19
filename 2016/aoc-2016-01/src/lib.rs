@@ -103,20 +103,44 @@ fn solve_part_one(input: &[Rot]) -> i32 {
 
 fn solve_part_two(input: &[Rot]) -> Option<i32> {
     let mut direction = Direction::N;
-    let (mut north, mut east) = (0, 0);
+    let (mut north, mut east) = (0i32, 0i32);
     let mut visited = HashSet::new();
 
     for inst in input.iter().copied() {
         direction = direction.rotate(inst);
         match direction {
-            Direction::N => north += inst.steps(),
-            Direction::E => east += inst.steps(),
-            Direction::S => north -= inst.steps(),
-            Direction::W => east -= inst.steps(),
-        }
-
-        if !visited.insert((north, east)) {
-            return Some(north.abs() + east.abs());
+            Direction::N => {
+                for s in 1..inst.steps() {
+                    if !visited.insert((north + s, east)) {
+                        return Some((north + s).abs() + east.abs());
+                    }
+                }
+                north += inst.steps();
+            }
+            Direction::E => {
+                for s in 1..inst.steps() {
+                    if !visited.insert((north, east + s)) {
+                        return Some(north.abs() + (east + s).abs());
+                    }
+                }
+                east += inst.steps();
+            }
+            Direction::S => {
+                for s in 1..inst.steps() {
+                    if !visited.insert((north - s, east)) {
+                        return Some((north - s).abs() + east.abs());
+                    }
+                }
+                north -= inst.steps();
+            }
+            Direction::W => {
+                for s in 1..inst.steps() {
+                    if !visited.insert((north, east - s)) {
+                        return Some(north.abs() + (east - s).abs());
+                    }
+                }
+                east -= inst.steps();
+            }
         }
     }
 
@@ -141,6 +165,9 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = load_input(default_test_input(DAY));
-        //
+        let parsed = parse_csv(&input);
+        let answer = solve_part_two(&parsed);
+
+        assert_eq!(Some(140), answer);
     }
 }
