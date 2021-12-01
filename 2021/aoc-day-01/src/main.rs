@@ -18,24 +18,11 @@ fn main() {
         .count();
     println!("Part 1: {}", count);
 
-    // part 02 using prefix sums
-    // let mut count = 0;
-    // let mut w0 = 0;
-    // let mut w1 = input[0] + input[1] + input[2];
-    //
-    // for idx in 3..input.len() {
-    //     w0 = w1;
-    //     w1 = w0 - input[idx - 3] + input[idx];
-    //
-    //     if w1 > w0 {
-    //         count += 1;
-    //     }
-    // }
 
+    // part 02
     let count = input.windows(4)
         .filter(|w| w[3] > w[0])
         .count();
-
     println!("Part 2: {}", count);
 }
 
