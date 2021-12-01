@@ -1,8 +1,9 @@
 ### Ignore
 **/target
 **/.*
+*.iml
 
 
 ### Exceptions
-!.gitignore
-!.cargo
+!**/.gitignore
+!**/.cargo
