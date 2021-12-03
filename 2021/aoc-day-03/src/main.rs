@@ -52,10 +52,10 @@ fn part_two(input: &mut [String]) {
     co2 = reduce_input(co2, false);
     assert_eq!(1, co2.len(), "Too many/few elements for co2: {:?}", co2);
 
-    let ox_rating = str_to_num(oxygen[0].as_str());
-    let co_rating = str_to_num(co2[0].as_str());
+    let ox_rating = u32::from_str_radix(oxygen[0].as_str(), 2).unwrap();
+    let co_rating = u32::from_str_radix(co2[0].as_str(), 2).unwrap();
 
-    println!("part 2: {:?}", ox_rating * co_rating);
+    println!("Part 2: {:?}", ox_rating * co_rating);
 }
 
 fn reduce_input(input: &mut [String], is_oxygen_rating: bool) -> &mut [String] {
@@ -99,12 +99,4 @@ fn split(array: &mut [String], idx: usize) -> (&mut [String], &mut [String]) {
     }
 
     array.split_at_mut(dst)
-}
-
-fn str_to_num(s: &str) -> u32 {
-    let mut n = 0;
-    for ch in s.as_bytes().iter().copied().map(|c| (c - b'0') as u32) {
-        n = (n << 1) | ch;
-    }
-    n
 }
