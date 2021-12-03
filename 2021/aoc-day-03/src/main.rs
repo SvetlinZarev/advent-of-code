@@ -38,7 +38,11 @@ fn part_one(input: &[String]) {
 
 fn part_two(input: &mut [String]) {
     let (mut oxygen, mut co2) = split(input, 0);
-    if oxygen.len() < co2.len() {
+
+    // The left part contains the strings with "0" bit, the right one - with "1" bit
+    // The oxygen rating uses the slice with more elements. If the slices have
+    // equal lengths, then the "oxygen" slice should use the one with the "1" bit
+    if oxygen.len() <= co2.len() {
         swap(&mut oxygen, &mut co2);
     }
 
