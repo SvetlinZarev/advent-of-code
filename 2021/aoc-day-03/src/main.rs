@@ -16,9 +16,9 @@ fn part_one(input: &[String]) {
         assert_eq!(element.len(), ones.len());
 
         for idx in 0..element.len() {
-            if element[idx] == b'1' {
-                ones[idx] += 1;
-            }
+            // true is cast to 1
+            // false is cast to 0
+            ones[idx] += (element[idx] == b'1') as usize;
         }
     }
 
