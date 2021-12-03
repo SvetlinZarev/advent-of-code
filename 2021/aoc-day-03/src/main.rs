@@ -10,18 +10,22 @@ fn main() {
 fn part_one(input: &[String]) {
     assert!(input.len() > 0);
 
-    let mut freq = vec![(0u8, 0u32); input[0].len()];
+    let mut ones = vec![0; input[0].len()];
+
     for element in input.iter().map(|i| i.as_bytes()) {
-        assert_eq!(element.len(), freq.len());
+        assert_eq!(element.len(), ones.len());
 
         for idx in 0..element.len() {
-            boyer_moore_voting(&mut freq[idx], element[idx]);
+            if element[idx] == b'1' {
+                ones[idx] += 1;
+            }
         }
     }
 
     let mut gamma = 0u32;
     let mut epsilon = 0u32;
-    for v in freq.iter().copied().map(|(v, _)| (v - b'0') as u32) {
+
+    for v in ones.iter().copied().map(|v| if v > input.len() - v { 1 } else { 0 }) {
         gamma <<= 1;
         epsilon <<= 1;
 
@@ -30,20 +34,6 @@ fn part_one(input: &[String]) {
     }
 
     println!("Part 1: {}", gamma * epsilon);
-}
-
-fn boyer_moore_voting(stats: &mut (u8, u32), element: u8) {
-    let v = &mut stats.0;
-    let c = &mut stats.1;
-
-    if *c == 0 {
-        *c = 1;
-        *v = element;
-    } else if *v == element {
-        *c += 1;
-    } else {
-        *c -= 1;
-    }
 }
 
 fn part_two(input: &mut [String]) {
