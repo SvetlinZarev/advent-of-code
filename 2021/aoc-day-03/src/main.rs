@@ -44,7 +44,7 @@ fn part_two(input: &mut [String]) {
         a[0].cmp(&b[0])
     });
 
-    let (mut oxigen, mut co2) = match first_occurence(input, 0, b'1') {
+    let (mut oxigen, mut co2) = match first_occurrence(input, 0, b'1') {
         None => input.split_at_mut(input.len()),
         Some(idx) => input.split_at_mut(idx)
     };
@@ -53,11 +53,11 @@ fn part_two(input: &mut [String]) {
         swap(&mut oxigen, &mut co2);
     }
 
-    oxigen = reduce_input(oxigen, |a, b| a.len() > b.len());
-    assert_eq!(1, oxigen.len(), "Too many elements for oxygen: {:?}", oxigen);
+    oxigen = reduce_input(oxigen, |all, ones| if ones >= all - ones { b'1' } else { b'0' });
+    assert_eq!(1, oxigen.len(), "Too many/few elements for oxygen: {:?}", oxigen);
 
-    co2 = reduce_input(co2, |a, b| a.len() <= b.len());
-    assert_eq!(1, co2.len(), "Too many elements for co2: {:?}", co2);
+    co2 = reduce_input(co2, |all, ones| if ones >= all - ones { b'0' } else { b'1' });
+    assert_eq!(1, co2.len(), "Too many/few elements for co2: {:?}", co2);
 
     let ox_rating = str_to_num(oxigen[0].as_str());
     let co_rating = str_to_num(co2[0].as_str());
@@ -65,28 +65,29 @@ fn part_two(input: &mut [String]) {
     println!("part 2: {:?}", ox_rating * co_rating);
 }
 
-fn reduce_input(input: &mut [String], cmp: fn(&[String], &[String]) -> bool) -> &mut [String] {
+fn reduce_input(input: &mut [String], filter: fn(usize, usize) -> u8) -> &mut [String] {
     let mut reduced = input;
 
     for idx in 1..reduced[0].len() {
-        reduced.sort_unstable_by(|a, b| {
-            let a = a.as_bytes();
-            let b = b.as_bytes();
+        let ones = reduced.iter()
+            .map(|s| s.as_bytes())
+            .filter(|&b| b[idx] == b'1')
+            .count();
 
-            a[idx].cmp(&b[idx])
-        });
+        let ch = filter(reduced.len(), ones);
 
-        let (a, b) = match first_occurence(reduced, idx, b'1') {
-            None => reduced.split_at_mut(reduced.len()),
-            Some(idx) => reduced.split_at_mut(idx)
-        };
+        let mut dst = 0;
+        let mut src = 0;
+        while src < reduced.len() {
+            if reduced[src].as_bytes()[idx] == ch {
+                reduced.swap(dst, src);
+                dst += 1;
+            }
 
-        if cmp(a, b) {
-            reduced = a;
-        } else {
-            reduced = b;
+            src += 1;
         }
 
+        reduced = &mut reduced[..dst];
         if reduced.len() <= 1 {
             break;
         }
@@ -95,7 +96,7 @@ fn reduce_input(input: &mut [String], cmp: fn(&[String], &[String]) -> bool) -> 
     reduced
 }
 
-fn first_occurence(array: &[String], pos: usize, target: u8) -> Option<usize> {
+fn first_occurrence(array: &[String], pos: usize, target: u8) -> Option<usize> {
     if array.len() == 0 {
         return None;
     }
