@@ -85,12 +85,12 @@ fn reduce_input(input: &mut [String], is_oxygen_rating: bool) -> &mut [String] {
     reduced
 }
 
-fn split(array: &mut [String], idx: usize) -> (&mut [String], &mut [String]) {
+fn split(array: &mut [String], filter_idx: usize) -> (&mut [String], &mut [String]) {
     let mut dst = 0;
     let mut src = 0;
 
     while src < array.len() {
-        if array[src].as_bytes()[idx] == b'0' {
+        if array[src].as_bytes()[filter_idx] == b'0' {
             array.swap(dst, src);
             dst += 1;
         }
