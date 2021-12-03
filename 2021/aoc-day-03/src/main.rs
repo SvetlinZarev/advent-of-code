@@ -64,6 +64,10 @@ fn reduce_input(input: &mut [String], is_oxygen_rating: bool) -> &mut [String] {
     let mut reduced = input;
 
     for idx in 1..reduced[0].len() {
+        if reduced.len() <= 1 {
+            break;
+        }
+
         let (zeroes, ones) = split(reduced, idx);
 
         let (mut larger, mut smaller) = (zeroes, ones);
@@ -75,10 +79,6 @@ fn reduce_input(input: &mut [String], is_oxygen_rating: bool) -> &mut [String] {
             reduced = larger;
         } else {
             reduced = smaller;
-        }
-
-        if reduced.len() <= 1 {
-            break;
         }
     }
 
