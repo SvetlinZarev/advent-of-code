@@ -8,7 +8,7 @@ fn main() {
 }
 
 fn part_one(input: &[String]) {
-    assert!(input.len() > 0);
+    assert!(!input.is_empty());
 
     let mut ones = vec![0; input[0].len()];
 
@@ -37,61 +37,42 @@ fn part_one(input: &[String]) {
 }
 
 fn part_two(input: &mut [String]) {
-    input.sort_unstable_by(|a, b| {
-        let a = a.as_bytes();
-        let b = b.as_bytes();
-
-        a[0].cmp(&b[0])
-    });
-
-    let (mut oxigen, mut co2) = match first_occurrence(input, 0, b'1') {
-        None => panic!("Cannot split the input into two parts - there are no 1 bits at index 0"),
-        Some(idx) => input.split_at_mut(idx)
-    };
-    assert_eq!(false, oxigen.is_empty());
-    assert_eq!(false, co2.is_empty());
-
-    if oxigen.len() < co2.len() {
-        swap(&mut oxigen, &mut co2);
+    let (mut oxygen, mut co2) = split(input, 0);
+    if oxygen.len() < co2.len() {
+        swap(&mut oxygen, &mut co2);
     }
 
-    oxigen = reduce_input(oxigen, |all, ones| if ones >= all - ones { b'1' } else { b'0' });
-    assert_eq!(1, oxigen.len(), "Too many/few elements for oxygen: {:?}", oxigen);
+    oxygen = reduce_input(oxygen, true);
+    assert_eq!(1, oxygen.len(), "Too many/few elements for oxygen: {:?}", oxygen);
 
-    co2 = reduce_input(co2, |all, ones| if ones >= all - ones { b'0' } else { b'1' });
+    co2 = reduce_input(co2, false);
     assert_eq!(1, co2.len(), "Too many/few elements for co2: {:?}", co2);
 
-    let ox_rating = str_to_num(oxigen[0].as_str());
+    let ox_rating = str_to_num(oxygen[0].as_str());
     let co_rating = str_to_num(co2[0].as_str());
 
     println!("part 2: {:?}", ox_rating * co_rating);
 }
 
-fn reduce_input(input: &mut [String], filter: fn(usize, usize) -> u8) -> &mut [String] {
-    assert_eq!(false, input.is_empty());
+fn reduce_input(input: &mut [String], is_oxygen_rating: bool) -> &mut [String] {
+    assert!(!input.is_empty());
 
     let mut reduced = input;
 
     for idx in 1..reduced[0].len() {
-        let ones = reduced.iter()
-            .map(|s| s.as_bytes())
-            .filter(|&b| b[idx] == b'1')
-            .count();
+        let (zeroes, ones) = split(reduced, idx);
 
-        let ch = filter(reduced.len(), ones);
-
-        let mut dst = 0;
-        let mut src = 0;
-        while src < reduced.len() {
-            if reduced[src].as_bytes()[idx] == ch {
-                reduced.swap(dst, src);
-                dst += 1;
-            }
-
-            src += 1;
+        let (mut larger, mut smaller) = (zeroes, ones);
+        if larger.len() <= smaller.len() {
+            swap(&mut larger, &mut smaller);
         }
 
-        reduced = &mut reduced[..dst];
+        if is_oxygen_rating {
+            reduced = larger;
+        } else {
+            reduced = smaller;
+        }
+
         if reduced.len() <= 1 {
             break;
         }
@@ -100,37 +81,20 @@ fn reduce_input(input: &mut [String], filter: fn(usize, usize) -> u8) -> &mut [S
     reduced
 }
 
-fn first_occurrence(array: &[String], pos: usize, target: u8) -> Option<usize> {
-    if array.len() == 0 {
-        return None;
-    }
+fn split(array: &mut [String], idx: usize) -> (&mut [String], &mut [String]) {
+    let mut dst = 0;
+    let mut src = 0;
 
-    let mut lo = 0;
-    let mut hi = array.len() - 1;
-    let mut idx = None;
-
-    while lo <= hi {
-        let mid = (hi - lo) / 2 + lo;
-        let element = array[mid].as_bytes();
-
-        if target == element[pos] {
-            idx = Some(mid);
-            if mid == 0 {
-                break;
-            }
-
-            hi = mid - 1;
-        } else if target < element[pos] {
-            if mid == 0 {
-                break;
-            }
-            hi = mid - 1;
-        } else {
-            lo = mid + 1;
+    while src < array.len() {
+        if array[src].as_bytes()[idx] == b'0' {
+            array.swap(dst, src);
+            dst += 1;
         }
+
+        src += 1;
     }
 
-    idx
+    array.split_at_mut(dst)
 }
 
 fn str_to_num(s: &str) -> u32 {
