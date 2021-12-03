@@ -45,9 +45,11 @@ fn part_two(input: &mut [String]) {
     });
 
     let (mut oxigen, mut co2) = match first_occurrence(input, 0, b'1') {
-        None => input.split_at_mut(input.len()),
+        None => panic!("Cannot split the input into two parts - there are no 1 bits at index 0"),
         Some(idx) => input.split_at_mut(idx)
     };
+    assert_eq!(false, oxigen.is_empty());
+    assert_eq!(false, co2.is_empty());
 
     if oxigen.len() < co2.len() {
         swap(&mut oxigen, &mut co2);
@@ -66,6 +68,8 @@ fn part_two(input: &mut [String]) {
 }
 
 fn reduce_input(input: &mut [String], filter: fn(usize, usize) -> u8) -> &mut [String] {
+    assert_eq!(false, input.is_empty());
+
     let mut reduced = input;
 
     for idx in 1..reduced[0].len() {
