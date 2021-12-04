@@ -3,7 +3,7 @@ pub mod parsing;
 pub use parsing::parse_input;
 
 #[derive(Debug, Clone, Default)]
-struct Board {
+pub struct Board {
     board: [[u32; 5]; 5],
 }
 
@@ -16,25 +16,13 @@ impl Board {
         self.board[r][c] = val;
     }
 
-    pub fn index(&self, index: &mut [Vec<usize>], key: usize) {
+    pub fn index(&self, index: &mut [Vec<(usize, u32, u32)>], key: usize) {
         for r in 0..self.board.len() {
             for c in 0..self.board[r].len() {
                 let pos = self.board[r][c] as usize;
-                index[pos].push(key);
+                index[pos].push((key, r as u32, c as u32));
             }
         }
-    }
-
-    pub fn find(&self, value: u32) -> Option<(u32, u32)> {
-        for r in 0..self.board.len() {
-            for c in 0..self.board[r].len() {
-                if self.board[r][c] == value {
-                    return Some((r as u32, c as u32));
-                }
-            }
-        }
-
-        None
     }
 
     pub fn sum(&self) -> u32 {
@@ -78,9 +66,7 @@ pub fn part_one(numbers: &[u32], boards: &[Board]) -> u32 {
     let mut marks = vec![Stats::default(); boards.len()];
 
     for number in numbers.iter().copied() {
-        for board_idx in index[number as usize].iter().copied() {
-            let (r, c) = boards[board_idx].find(number).unwrap();
-
+        for (board_idx, r, c) in index[number as usize].iter().copied() {
             if marks[board_idx].mark(r, c, number) {
                 return (boards[board_idx].sum() - marks[board_idx].sum()) * number;
             }
@@ -100,13 +86,12 @@ pub fn part_two(numbers: &[u32], boards: &[Board]) -> u32 {
     let mut marks = vec![Stats::default(); boards.len()];
 
     for number in numbers.iter().copied() {
-        for board_idx in index[number as usize].iter().copied() {
+        for (board_idx, r, c) in index[number as usize].iter().copied() {
             let stats = &mut marks[board_idx];
             if stats.has_won() {
                 continue;
             }
 
-            let (r, c) = boards[board_idx].find(number).unwrap();
             if stats.mark(r, c, number) {
                 last_to_win = Some((board_idx, number));
             }
