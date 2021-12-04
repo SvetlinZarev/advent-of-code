@@ -1,8 +1,8 @@
-use aoc_day_02::{part_one, part_two, Direction};
-use aoc_shared::input::stdin_line_delimited;
+use aoc_day_02::{part_one, part_two};
+use aoc_shared::input::load_line_delimited_input_autodetect;
 
 fn main() {
-    let input: Vec<Direction> = stdin_line_delimited();
+    let input = load_line_delimited_input_autodetect();
     println!("Part 1: {}", part_one(&input));
     println!("Part 2: {}", part_two(&input));
 }
