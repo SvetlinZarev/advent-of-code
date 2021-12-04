@@ -17,6 +17,22 @@ pub fn parse_line_delimited<I, R>(input: I) -> Vec<R>
         .unwrap()
 }
 
+pub fn parse_csv<I, R>(input: I) -> Vec<R>
+    where
+        I: AsRef<str>,
+        R: FromStr,
+        <R as FromStr>::Err: Debug
+{
+    input
+        .as_ref()
+        .split(',')
+        .map(|v| v.trim())
+        .filter(|&v| !v.is_empty())
+        .map(|v| v.parse())
+        .collect::<Result<_, _>>()
+        .unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
