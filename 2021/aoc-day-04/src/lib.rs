@@ -3,7 +3,7 @@ pub mod parsing;
 pub use parsing::parse_input;
 
 #[derive(Debug, Clone, Default)]
-pub struct Board {
+struct Board {
     board: [[u32; 5]; 5],
 }
 
@@ -43,7 +43,7 @@ impl Board {
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct Stats {
+struct Stats {
     row: [u16; 5],
     col: [u16; 5],
     sum: u32,
