@@ -104,3 +104,28 @@ pub fn part_two(numbers: &[u32], boards: &[Board]) -> u32 {
 
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    #[test]
+    fn test_part_one() {
+        let file = File::open("inputs/input.txt").unwrap();
+        let (numbers, boards) = parse_input(BufReader::new(file));
+
+        let answer = part_one(&numbers, &boards);
+        assert_eq!(4662, answer);
+    }
+
+    #[test]
+    fn test_part_two() {
+        let file = File::open("inputs/input.txt").unwrap();
+        let (numbers, boards) = parse_input(BufReader::new(file));
+
+        let answer = part_two(&numbers, &boards);
+        assert_eq!(12080, answer);
+    }
+}
