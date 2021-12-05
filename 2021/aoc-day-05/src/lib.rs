@@ -14,12 +14,6 @@ impl Point {
     pub fn new(x: u16, y: u16) -> Self {
         Self { x, y }
     }
-
-    pub fn diff(self, other: Point) -> u16 {
-        let x = self.x.max(other.x) - self.x.min(other.x);
-        let y = self.y.max(other.y) - self.y.min(other.y);
-        x.max(y)
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -31,6 +25,16 @@ pub struct Line {
 impl Line {
     pub fn new(a: Point, b: Point) -> Self {
         Self { a, b }
+    }
+
+    pub fn is_straight(&self) -> bool {
+        self.a.x == self.b.x || self.a.y == self.b.y
+    }
+
+    pub fn steps(&self) -> usize {
+        let x = self.a.x.max(self.b.x) - self.a.x.min(self.b.x);
+        let y = self.a.y.max(self.b.y) - self.a.y.min(self.b.y);
+        x.max(y) as usize
     }
 }
 
@@ -77,23 +81,19 @@ impl FromStr for Line {
 pub fn part_one(input: &[Line]) -> usize {
     let mut field = HashMap::with_hasher(HashBuilder::<FnvHasher>::default());
 
-    input
-        .iter()
-        .filter(|&l| l.a.x == l.b.x || l.a.y == l.b.y)
-        .for_each(|l| {
-            let iterations = l.a.diff(l.b);
-            let (mut x, mut y) = (l.a.x, l.a.y);
+    input.iter().filter(|&l| l.is_straight()).for_each(|l| {
+        let (mut x, mut y) = (l.a.x, l.a.y);
 
-            for _ in 0..=iterations {
-                field.entry((x, y)).and_modify(|v| *v += 1).or_insert(1u32);
+        for _ in 0..=l.steps() {
+            field.entry((x, y)).and_modify(|v| *v += 1).or_insert(1u32);
 
-                x += (x < l.b.x) as u16;
-                x -= (x > l.b.x) as u16;
+            x += (x < l.b.x) as u16;
+            x -= (x > l.b.x) as u16;
 
-                y += (y < l.b.y) as u16;
-                y -= (y > l.b.y) as u16;
-            }
-        });
+            y += (y < l.b.y) as u16;
+            y -= (y > l.b.y) as u16;
+        }
+    });
 
     field.values().filter(|&&v| v > 1).count()
 }
@@ -102,10 +102,9 @@ pub fn part_two(input: &[Line]) -> usize {
     let mut field = HashMap::with_hasher(HashBuilder::<FnvHasher>::default());
 
     input.iter().for_each(|l| {
-        let iterations = l.a.diff(l.b);
         let (mut x, mut y) = (l.a.x, l.a.y);
 
-        for _ in 0..=iterations {
+        for _ in 0..=l.steps() {
             field.entry((x, y)).and_modify(|v| *v += 1).or_insert(1u32);
 
             x += (x < l.b.x) as u16;
