@@ -11,18 +11,18 @@ pub fn part_two(input: &[u32]) -> usize {
 #[cfg(test)]
 mod tests {
     use crate::{part_one, part_two};
-    use aoc_shared::input::file_line_delimited;
+    use aoc_shared::input::load_line_delimited_input_from_file;
 
     #[test]
     fn test_part_one() {
-        let input = file_line_delimited("inputs/input.txt");
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_one(&input);
         assert_eq!(1832, answer)
     }
 
     #[test]
     fn test_part_two() {
-        let input = file_line_delimited("inputs/input.txt");
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_two(&input);
         assert_eq!(1858, answer)
     }

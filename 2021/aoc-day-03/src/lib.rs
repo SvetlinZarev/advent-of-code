@@ -165,12 +165,12 @@ fn first_occurrence(array: &[String], pos: usize, target: u8) -> Option<usize> {
 
 #[cfg(test)]
 mod tests {
-    use aoc_shared::input::file_line_delimited;
+    use aoc_shared::input::{load_line_delimited_input_from_file};
     use super::*;
 
     #[test]
     fn test_part_one() {
-        let parsed = file_line_delimited("inputs/input.txt");
+        let parsed = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_one(&parsed);
 
         assert_eq!(741950, answer);
@@ -178,7 +178,7 @@ mod tests {
 
     #[test]
     fn test_part_two_v1() {
-        let mut parsed = file_line_delimited("inputs/input.txt");
+        let mut parsed = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_two_v1(&mut parsed);
 
         assert_eq!(903810, answer);
@@ -186,7 +186,7 @@ mod tests {
 
     #[test]
     fn test_part_two_v2() {
-        let mut parsed = file_line_delimited("inputs/input.txt");
+        let mut parsed = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_two_v2(&mut parsed);
 
         assert_eq!(903810, answer);

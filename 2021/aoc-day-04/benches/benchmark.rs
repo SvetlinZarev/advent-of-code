@@ -19,7 +19,7 @@ fn benchmark_parsing(c: &mut Criterion) {
     c.bench_function("parse-input", |b| {
         b.iter_batched(
             || BufReader::new(input.as_bytes()),
-            |input| black_box(parse_input(input)),
+            |reader| black_box(parse_input(reader)),
             BatchSize::PerIteration,
         );
     });

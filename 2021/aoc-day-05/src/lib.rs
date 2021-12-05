@@ -121,18 +121,18 @@ pub fn part_two(input: &[Line]) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use aoc_shared::input::file_line_delimited;
+    use aoc_shared::input::load_line_delimited_input_from_file;
 
     #[test]
     fn test_part_one() {
-        let input = file_line_delimited("inputs/input.txt");
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_one(&input);
         assert_eq!(6267, answer);
     }
 
     #[test]
     fn test_part_two() {
-        let input = file_line_delimited("inputs/input.txt");
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_two(&input);
         assert_eq!(20196, answer);
     }
