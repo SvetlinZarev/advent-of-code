@@ -6,16 +6,16 @@ mod fnvhash;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Point {
-    x: usize,
-    y: usize,
+    x: u16,
+    y: u16,
 }
 
 impl Point {
-    pub fn new(x: usize, y: usize) -> Self {
+    pub fn new(x: u16, y: u16) -> Self {
         Self { x, y }
     }
 
-    pub fn diff(self, other: Point) -> usize {
+    pub fn diff(self, other: Point) -> u16 {
         let x = self.x.max(other.x) - self.x.min(other.x);
         let y = self.y.max(other.y) - self.y.min(other.y);
         x.max(y)
@@ -87,11 +87,11 @@ pub fn part_one(input: &[Line]) -> usize {
             for _ in 0..=iterations {
                 field.entry((x, y)).and_modify(|v| *v += 1).or_insert(1u32);
 
-                x += (x < l.b.x) as usize;
-                x -= (x > l.b.x) as usize;
+                x += (x < l.b.x) as u16;
+                x -= (x > l.b.x) as u16;
 
-                y += (y < l.b.y) as usize;
-                y -= (y > l.b.y) as usize;
+                y += (y < l.b.y) as u16;
+                y -= (y > l.b.y) as u16;
             }
         });
 
@@ -108,11 +108,11 @@ pub fn part_two(input: &[Line]) -> usize {
         for _ in 0..=iterations {
             field.entry((x, y)).and_modify(|v| *v += 1).or_insert(1u32);
 
-            x += (x < l.b.x) as usize;
-            x -= (x > l.b.x) as usize;
+            x += (x < l.b.x) as u16;
+            x -= (x > l.b.x) as u16;
 
-            y += (y < l.b.y) as usize;
-            y -= (y > l.b.y) as usize;
+            y += (y < l.b.y) as u16;
+            y -= (y > l.b.y) as u16;
         }
     });
 
