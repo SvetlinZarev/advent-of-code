@@ -2,10 +2,10 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 pub fn parse_line_delimited<I, R>(input: I) -> Vec<R>
-    where
-        I: AsRef<str>,
-        R: FromStr,
-        <R as FromStr>::Err: Debug
+where
+    I: AsRef<str>,
+    R: FromStr,
+    <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
@@ -18,10 +18,10 @@ pub fn parse_line_delimited<I, R>(input: I) -> Vec<R>
 }
 
 pub fn parse_csv<I, R>(input: I) -> Vec<R>
-    where
-        I: AsRef<str>,
-        R: FromStr,
-        <R as FromStr>::Err: Debug
+where
+    I: AsRef<str>,
+    R: FromStr,
+    <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
