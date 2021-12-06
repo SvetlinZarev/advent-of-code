@@ -1,13 +1,9 @@
-use aoc_shared::input::{load_line_delimited_input_from_file, load_text_input_from_file};
+use aoc_day_06::{part_one_v1, part_one_v2, part_two_v1, part_two_v2};
+use aoc_shared::input::load_text_input_from_file;
 use aoc_shared::parsing::parse_csv;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use aoc_day_06::{part_one_v1, part_one_v2, part_two_v1, part_two_v2};
 
-criterion_group!(
-    benches,
-    benchmark_part_1,
-    benchmark_part_2
-);
+criterion_group!(benches, benchmark_part_1, benchmark_part_2);
 criterion_main!(benches);
 
 fn benchmark_part_1(c: &mut Criterion) {

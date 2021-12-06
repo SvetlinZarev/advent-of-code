@@ -21,7 +21,6 @@ pub fn part_one_v1(input: &[u8]) -> u32 {
     stage_a.iter().sum()
 }
 
-
 pub fn part_two_v1(input: &[u8]) -> u64 {
     let mut stage_a = [0u64; 9];
     let mut stage_b = [0u64; 9];
@@ -57,7 +56,6 @@ pub fn part_one_v2(input: &[u8]) -> u32 {
     state.iter().sum()
 }
 
-
 pub fn part_two_v2(input: &[u8]) -> u64 {
     let mut state = [0u64; 9];
 
@@ -72,9 +70,9 @@ pub fn part_two_v2(input: &[u8]) -> u64 {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use aoc_shared::input::load_text_input_from_file;
     use aoc_shared::parsing::parse_csv;
-    use super::*;
 
     #[test]
     fn test_part_one_v1() {
