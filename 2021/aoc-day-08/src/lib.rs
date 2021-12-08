@@ -10,7 +10,9 @@ impl FromStr for Entry {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (left, right) = s.split_once('|').ok_or(format!("invalid input: {}", s))?;
+        let (left, right) = s
+            .split_once('|')
+            .ok_or_else(|| format!("invalid input: {}", s))?;
 
         let mut notes = [0u8; 10];
         let mut displ = [0u8; 4];
