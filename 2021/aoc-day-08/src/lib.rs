@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+const DISPAY_LEN: usize = 4;
+
 #[derive(Debug, Copy, Clone)]
 pub struct Entry {
     notes: [u8; 10],
@@ -15,7 +17,7 @@ impl FromStr for Entry {
             .ok_or_else(|| format!("invalid input: {}", s))?;
 
         let mut notes = [0u8; 10];
-        let mut displ = [0u8; 4];
+        let mut displ = [0u8; DISPAY_LEN];
         parse_connections(left, &mut notes)?;
         parse_connections(right, &mut displ)?;
 
@@ -62,7 +64,7 @@ pub fn part_one(input: &[Entry]) -> usize {
         .count()
 }
 
-pub fn part_two(input: &[Entry]) -> usize {
+pub fn part_two_v1(input: &[Entry]) -> usize {
     let mut result = 0;
 
     for entry in input.iter().copied() {
@@ -140,6 +142,76 @@ pub fn part_two(input: &[Entry]) -> usize {
     result
 }
 
+pub fn part_two_v2(input: &[Entry]) -> usize {
+    let mut result = 0;
+
+    for entry in input.iter().copied() {
+        let (mut one, mut four, mut seven, mut eight) = (0, 0, 0, 0);
+
+        // Find the numbers with unique number of bits set to 1
+        let mut to_find = 4;
+        for idx in 0..entry.notes.len() {
+            if to_find == 0 {
+                break;
+            }
+
+            match entry.notes[idx].count_ones() {
+                2 => one = entry.notes[idx],
+                3 => seven = entry.notes[idx],
+                4 => four = entry.notes[idx],
+                7 => eight = entry.notes[idx],
+                _ => continue,
+            }
+
+            to_find -= 1;
+        }
+
+        // decode the displayed numbers
+        let mut display = [0u8; DISPAY_LEN];
+        for idx in 0..DISPAY_LEN {
+            let x = entry.displ[idx];
+            let bits = x.count_ones() as usize;
+
+            let val = match bits {
+                2 => 1,
+                3 => 7,
+                4 => 4,
+                7 => 8,
+
+                5 => {
+                    if (x ^ eight) & one == 0 {
+                        3
+                    } else if (x & (one ^ four)) == one ^ four {
+                        5
+                    } else {
+                        2
+                    }
+                }
+
+                6 => {
+                    if (x ^ eight) & one != 0 {
+                        6
+                    } else if x & (seven | four) == seven | four {
+                        9
+                    } else {
+                        0
+                    }
+                }
+
+                _ => panic!("Unexpected number of bits ({}) for {}", bits, x),
+            };
+            display[idx] = val;
+        }
+
+        result += display[0] as usize * 1000
+            + display[1] as usize * 100
+            + display[2] as usize * 10
+            + display[3] as usize;
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -153,9 +225,16 @@ mod tests {
     }
 
     #[test]
-    fn test_part_two() {
+    fn test_part_two_v1() {
         let input = load_line_delimited_input_from_file("inputs/input.txt");
-        let answer = part_two(&input);
+        let answer = part_two_v1(&input);
+        assert_eq!(1020159, answer);
+    }
+
+    #[test]
+    fn test_part_two_v2() {
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
+        let answer = part_two_v2(&input);
         assert_eq!(1020159, answer);
     }
 }
