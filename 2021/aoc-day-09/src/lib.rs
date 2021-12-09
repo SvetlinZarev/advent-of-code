@@ -103,7 +103,7 @@ fn dfs(board: &mut [Vec<u8>], r: usize, c: usize) -> usize {
         size += dfs(board, r, c + 1);
     }
 
-    //top
+    //bottom
     if r < board.len() - 1 && board[r + 1][c] < 9 {
         size += dfs(board, r + 1, c);
     }
