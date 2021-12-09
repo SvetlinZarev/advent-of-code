@@ -1,7 +1,7 @@
 use aoc_day_09::{parse_input, part_one, part_two};
 use aoc_shared::input::load_text_input_from_file;
 use aoc_shared::parsing::parse_line_delimited;
-use criterion::{black_box, criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 criterion_group!(benches, benchmark_part_1, benchmark_part_2);
 criterion_main!(benches);

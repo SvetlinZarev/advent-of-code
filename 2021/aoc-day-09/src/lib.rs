@@ -50,20 +50,7 @@ pub fn part_two(input: &[Vec<u8>]) -> usize {
     for row in 0..input.len() {
         for col in 0..input[row].len() {
             let cell_value = input[row][col];
-
-            if col > 0 && cell_value >= input[row][col - 1] {
-                continue;
-            }
-
-            if col < input[row].len() - 1 && cell_value >= input[row][col + 1] {
-                continue;
-            }
-
-            if row > 0 && cell_value >= input[row - 1][col] {
-                continue;
-            }
-
-            if row < input.len() - 1 && cell_value >= input[row + 1][col] {
+            if cell_value >= 9 {
                 continue;
             }
 
@@ -86,7 +73,7 @@ pub fn part_two(input: &[Vec<u8>]) -> usize {
 
 fn dfs(board: &mut [Vec<u8>], r: usize, c: usize) -> usize {
     let mut size = 1;
-    board[r][c] = u8::MAX;
+    board[r][c] = 9;
 
     //top
     if r > 0 && board[r - 1][c] < 9 {
