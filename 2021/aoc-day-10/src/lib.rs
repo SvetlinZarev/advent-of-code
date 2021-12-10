@@ -21,7 +21,8 @@ pub fn part_one(input: &[Vec<u8>]) -> u64 {
                 b'{' => stack.push(b'}'),
                 b'<' => stack.push(b'>'),
                 br => if Some(br) != stack.pop() {
-                    syntax_score += invalid_bracket_score(br)
+                    syntax_score += invalid_bracket_score(br);
+                    break;
                 }
             }
         }
