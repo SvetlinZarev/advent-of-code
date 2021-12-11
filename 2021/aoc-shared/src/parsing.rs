@@ -33,6 +33,26 @@ where
         .unwrap()
 }
 
+pub fn parse_u8_numeric_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
+    input
+        .as_ref()
+        .lines()
+        .map(|l| l.as_bytes().to_vec())
+        .map(|mut v| {
+            v.iter_mut().for_each(|x| *x -= b'0');
+            v
+        })
+        .collect()
+}
+
+pub fn parse_i8_numeric_grid<I: AsRef<str>>(input: I) -> Vec<Vec<i8>> {
+    input
+        .as_ref()
+        .lines()
+        .map(|l| l.as_bytes().iter().map(|&b| (b - b'0') as i8).collect())
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

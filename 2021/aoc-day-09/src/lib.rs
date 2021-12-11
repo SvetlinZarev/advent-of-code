@@ -1,15 +1,3 @@
-pub fn parse_input<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
-    input
-        .as_ref()
-        .lines()
-        .map(|l| l.as_bytes().to_vec())
-        .map(|mut v| {
-            v.iter_mut().for_each(|x| *x -= b'0');
-            v
-        })
-        .collect()
-}
-
 pub fn part_one(input: &[Vec<u8>]) -> usize {
     let mut sum = 0;
 
@@ -102,17 +90,18 @@ fn dfs(board: &mut [Vec<u8>], r: usize, c: usize) -> usize {
 mod tests {
     use super::*;
     use aoc_shared::input::load_text_input_from_file;
+    use aoc_shared::parsing::parse_u8_numeric_grid;
 
     #[test]
     fn test_part_one() {
-        let input = parse_input(&load_text_input_from_file("inputs/input.txt"));
+        let input = parse_u8_numeric_grid(&load_text_input_from_file("inputs/input.txt"));
         let answer = part_one(&input);
         assert_eq!(498, answer);
     }
 
     #[test]
     fn test_part_two() {
-        let input = parse_input(&load_text_input_from_file("inputs/input.txt"));
+        let input = parse_u8_numeric_grid(&load_text_input_from_file("inputs/input.txt"));
         let answer = part_two(&input);
         assert_eq!(1071000, answer);
     }
