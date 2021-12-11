@@ -27,7 +27,7 @@ fn benchmark_part_1(c: &mut Criterion) {
     let input = load_line_delimited_input_from_file("inputs/input.txt");
 
     c.bench_function("part-1", |b| {
-        b.iter(|| black_box(part_one(black_box(&input))));
+        b.iter(|| black_box(part_one(black_box(black_box(&input)))));
     });
 }
 
@@ -35,10 +35,10 @@ fn benchmark_part_2(c: &mut Criterion) {
     let input = load_line_delimited_input_from_file("inputs/input.txt");
 
     c.bench_function("part-2-v1", |b| {
-        b.iter(|| black_box(part_two_v1(black_box(&input))));
+        b.iter(|| black_box(part_two_v1(black_box(black_box(&input)))));
     });
 
     c.bench_function("part-2-v2", |b| {
-        b.iter(|| black_box(part_two_v2(black_box(&input))));
+        b.iter(|| black_box(part_two_v2(black_box(black_box(&input)))));
     });
 }

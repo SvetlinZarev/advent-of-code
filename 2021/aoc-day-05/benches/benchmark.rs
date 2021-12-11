@@ -16,8 +16,7 @@ fn benchmark_parsing(c: &mut Criterion) {
 
     c.bench_function("parse-input", |b| {
         b.iter(|| {
-            let parsed: Vec<Line> = parse_line_delimited(&input);
-            black_box(parsed);
+            black_box(parse_line_delimited::<_, Line>(&input));
         });
     });
 }
@@ -26,11 +25,11 @@ fn benchmark_part_1(c: &mut Criterion) {
     let input = load_line_delimited_input_from_file("inputs/input.txt");
 
     c.bench_function("part-1-v1", |b| {
-        b.iter(|| black_box(part_one_v1(&input)));
+        b.iter(|| black_box(part_one_v1(black_box(&input))));
     });
 
     c.bench_function("part-1-v2", |b| {
-        b.iter(|| black_box(part_one_v2(&input)));
+        b.iter(|| black_box(part_one_v2(black_box(&input))));
     });
 }
 
@@ -38,10 +37,10 @@ fn benchmark_part_2(c: &mut Criterion) {
     let input = load_line_delimited_input_from_file("inputs/input.txt");
 
     c.bench_function("part-2-v1", |b| {
-        b.iter(|| black_box(part_two_v1(&input)));
+        b.iter(|| black_box(part_two_v1(black_box(&input))));
     });
 
     c.bench_function("part-2-v2", |b| {
-        b.iter(|| black_box(part_two_v2(&input)));
+        b.iter(|| black_box(part_two_v2(black_box(&input))));
     });
 }
