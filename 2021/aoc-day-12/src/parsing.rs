@@ -3,6 +3,7 @@ use std::collections::HashMap;
 const KEY_START: &'static str = "start";
 const KEY_END: &'static str = "end";
 const NODE_SEPARATOR: char = '-';
+const ID_START: usize = 0;
 
 pub fn parse_input<'l, I: AsRef<str> + 'l>(input: I) -> (Vec<Vec<usize>>, Vec<usize>) {
     let input = input.as_ref();
@@ -69,4 +70,54 @@ fn max_visits(s: &str) -> usize {
     }
 
     usize::MAX
+}
+
+pub(crate) fn simplify_graph(graph: &[Vec<usize>], limits: &[usize]) -> Vec<Vec<(usize, u64)>> {
+    // Assign consecutive IDs to the "small" caves
+    let mut id_map = vec![None; graph.len()];
+    let mut next_node_idx = 0;
+    for node_id in 0..graph.len() {
+        if limits[node_id] == 1 {
+            id_map[node_id] = Some(next_node_idx);
+            next_node_idx += 1;
+        }
+    }
+
+    let mut simple_graph = Vec::with_capacity(graph.len());
+    for (old_id, connections) in graph.iter().enumerate() {
+        if id_map[old_id].is_some() {
+            let mut links: Vec<(usize, u64)> = vec![];
+
+            for &connection in connections.iter() {
+                match id_map[connection] {
+                    Some(link) => {
+                        // The start node can be visited only once!
+                        if link != ID_START {
+                            match links.binary_search_by(|&(id, _)| id.cmp(&link)) {
+                                Ok(idx) => links[idx].1 += 1,
+                                Err(idx) => links.insert(idx, (link, 1)),
+                            }
+                        }
+                    }
+
+                    None => {
+                        for &conn in graph[connection].iter() {
+                            let link = id_map[conn].unwrap();
+                            // The start node can be visited only once!
+                            if link != ID_START {
+                                match links.binary_search_by(|&(id, _)| id.cmp(&link)) {
+                                    Ok(idx) => links[idx].1 += 1,
+                                    Err(idx) => links.insert(idx, (link, 1)),
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            simple_graph.push(links);
+        }
+    }
+
+    simple_graph
 }

@@ -1,4 +1,4 @@
-pub fn part_two(graph: &[Vec<usize>], limits: &[usize]) -> u64 {
+pub fn part_two_v1(graph: &[Vec<usize>], limits: &[usize]) -> u64 {
     let mut limits = limits.to_vec();
     count_paths(&graph, &mut limits, 1, 0)
 }
@@ -50,10 +50,10 @@ mod tests {
     use aoc_shared::input::load_text_input_from_file;
 
     #[test]
-    fn test_part_two() {
+    fn test_part_two_v1() {
         let input = load_text_input_from_file("inputs/input.txt");
         let (graph, limits) = parse_input(input);
-        let answer = part_two(&graph, &limits);
+        let answer = part_two_v1(&graph, &limits);
         assert_eq!(104834, answer);
     }
 }
