@@ -1,16 +1,19 @@
 use std::collections::HashMap;
 
+const KEY_START: &'static str = "start";
+const KEY_END: &'static str = "end";
+const NODE_SEPARATOR: char = '-';
+
 pub fn parse_input<'l, I: AsRef<str> + 'l>(input: I) -> (Vec<Vec<usize>>, Vec<usize>) {
     let input = input.as_ref();
 
     let mut connections = HashMap::new();
-
-    let mut last_id = 0;
     let mut ids = HashMap::new();
+    let mut last_id = 0;
 
     input
         .lines()
-        .map(|l| l.split_once('-').unwrap())
+        .map(|l| l.split_once(NODE_SEPARATOR).unwrap())
         .for_each(|(a, b)| {
             connections
                 .entry(a)
@@ -22,14 +25,14 @@ pub fn parse_input<'l, I: AsRef<str> + 'l>(input: I) -> (Vec<Vec<usize>>, Vec<us
                 .and_modify(|v| v.push(a))
                 .or_insert(vec![a]);
 
-            if a != "start" && a != "end" {
+            if a != KEY_START && a != KEY_END {
                 ids.entry(a).or_insert_with(|| {
                     last_id += 1;
                     last_id
                 });
             }
 
-            if b != "start" && b != "end" {
+            if b != KEY_START && b != KEY_END {
                 ids.entry(b).or_insert_with(|| {
                     last_id += 1;
                     last_id
@@ -37,8 +40,8 @@ pub fn parse_input<'l, I: AsRef<str> + 'l>(input: I) -> (Vec<Vec<usize>>, Vec<us
             }
         });
 
-    ids.insert("start", 0);
-    ids.insert("end", last_id + 1);
+    ids.insert(KEY_START, 0);
+    ids.insert(KEY_END, last_id + 1);
 
     let mut graph = vec![vec![]; last_id + 2];
     let mut limits = vec![0; last_id + 2];
