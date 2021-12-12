@@ -1,4 +1,4 @@
-use aoc_day_12::{parse_input, part_one_v1, part_one_v2, part_two_v1, part_two_v2};
+use aoc_day_12::{parse_input, part_one_v1, part_one_v2, part_two_v1, part_two_v2, simplify_graph};
 use aoc_shared::input::load_text_input_from_file;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
@@ -16,6 +16,11 @@ fn benchmark_parsing(c: &mut Criterion) {
     c.bench_function("parsing", |b| {
         b.iter(|| black_box(parse_input(black_box(&input))));
     });
+
+    let (graph, limits) = parse_input(&input);
+    c.bench_function("graph-simplification", |b| {
+        b.iter(|| black_box(simplify_graph(black_box(&graph), black_box(&limits))));
+    });
 }
 
 fn benchmark_part_1(c: &mut Criterion) {
@@ -25,8 +30,9 @@ fn benchmark_part_1(c: &mut Criterion) {
         b.iter(|| black_box(part_one_v1(black_box(&graph), black_box(&limits))));
     });
 
+    let graph = simplify_graph(&graph, &limits);
     c.bench_function("part-1-v2", |b| {
-        b.iter(|| black_box(part_one_v2(black_box(&graph), black_box(&limits))));
+        b.iter(|| black_box(part_one_v2(black_box(&graph))));
     });
 }
 
@@ -37,7 +43,8 @@ fn benchmark_part_2(c: &mut Criterion) {
         b.iter(|| black_box(part_two_v1(black_box(&graph), black_box(&limits))));
     });
 
+    let graph = simplify_graph(&graph, &limits);
     c.bench_function("part-2-v1", |b| {
-        b.iter(|| black_box(part_two_v2(black_box(&graph), black_box(&limits))));
+        b.iter(|| black_box(part_two_v2(black_box(&graph))));
     });
 }

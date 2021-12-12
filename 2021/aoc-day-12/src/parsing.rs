@@ -72,7 +72,7 @@ fn max_visits(s: &str) -> usize {
     usize::MAX
 }
 
-pub(crate) fn simplify_graph(graph: &[Vec<usize>], limits: &[usize]) -> Vec<Vec<(usize, u64)>> {
+pub fn simplify_graph(graph: &[Vec<usize>], limits: &[usize]) -> Vec<Vec<(usize, u64)>> {
     // Assign consecutive IDs to the "small" caves
     let mut id_map = vec![None; graph.len()];
     let mut next_node_idx = 0;
