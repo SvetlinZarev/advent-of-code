@@ -84,7 +84,7 @@ pub fn simplify_graph(graph: &[Vec<usize>], limits: &[usize]) -> Vec<Vec<(usize,
     }
 
     let mut simple_graph = Vec::with_capacity(graph.len());
-    for (old_id, connections) in graph.iter().enumerate() {
+    for (old_id, connections) in graph.iter().enumerate().take(graph.len() - 1) {
         if id_map[old_id].is_some() {
             let mut links: Vec<(usize, u64)> = vec![];
 
@@ -119,5 +119,6 @@ pub fn simplify_graph(graph: &[Vec<usize>], limits: &[usize]) -> Vec<Vec<(usize,
         }
     }
 
+    simple_graph.push(vec![]);
     simple_graph
 }
