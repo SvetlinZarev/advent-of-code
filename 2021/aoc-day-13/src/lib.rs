@@ -30,7 +30,7 @@ pub fn part_two(points: &[Point], instr: &[Fold]) -> Vec<Vec<char>> {
 
     points
         .iter()
-        .for_each(|p| grid[p.y as usize][p.x as usize] = '#');
+        .for_each(|p| grid[p.y as usize][p.x as usize] = '█');
 
     grid
 }
@@ -50,12 +50,12 @@ mod tests {
     #[test]
     fn test_part_two() {
         let expected = vec![
-            "#  # #  # #  #   ##  ##   ##    ## ####",
-            "#  # # #  #  #    # #  # #  #    #    #",
-            "#### ##   #  #    # #    #  #    #   # ",
-            "#  # # #  #  #    # # ## ####    #  #  ",
-            "#  # # #  #  # #  # #  # #  # #  # #   ",
-            "#  # #  #  ##   ##   ### #  #  ##  ####",
+            "█  █ █  █ █  █   ██  ██   ██    ██ ████",
+            "█  █ █ █  █  █    █ █  █ █  █    █    █",
+            "████ ██   █  █    █ █    █  █    █   █ ",
+            "█  █ █ █  █  █    █ █ ██ ████    █  █  ",
+            "█  █ █ █  █  █ █  █ █  █ █  █ █  █ █   ",
+            "█  █ █  █  ██   ██   ███ █  █  ██  ████",
         ];
 
         let (points, instr) = parse_input(load_text_input_from_file("inputs/input.txt"));
