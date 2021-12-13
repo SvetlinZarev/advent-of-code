@@ -13,7 +13,7 @@ impl Fold {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct Point {
     pub x: u32,
     pub y: u32,

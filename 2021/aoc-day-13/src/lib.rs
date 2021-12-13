@@ -3,7 +3,6 @@ mod parsing;
 
 pub use input::{Fold, Point};
 pub use parsing::parse_input;
-use std::collections::HashSet;
 
 pub fn part_one(points: &[Point], instr: &[Fold]) -> usize {
     let mut points = points.to_vec();
@@ -12,7 +11,9 @@ pub fn part_one(points: &[Point], instr: &[Fold]) -> usize {
         points.iter_mut().for_each(|p| *p = f_op.apply(*p));
     }
 
-    points.iter().collect::<HashSet<_>>().len()
+    points.sort_unstable();
+    points.dedup();
+    points.len()
 }
 
 pub fn part_two(points: &[Point], instr: &[Fold]) -> Vec<Vec<char>> {
