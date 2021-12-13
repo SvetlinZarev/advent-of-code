@@ -27,9 +27,10 @@ pub fn part_two(points: &[Point], instr: &[Fold]) -> Vec<Vec<char>> {
         .fold((0, 0), |(x, y), p| (x.max(p.x), y.max(p.y)));
 
     let mut grid = vec![vec![' '; (max_x + 1) as usize]; (max_y + 1) as usize];
-    points.iter().for_each(|p| {
-        grid[p.y as usize][p.x as usize] = '#';
-    });
+
+    points
+        .iter()
+        .for_each(|p| grid[p.y as usize][p.x as usize] = '#');
 
     grid
 }
