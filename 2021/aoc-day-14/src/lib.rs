@@ -1,11 +1,9 @@
-mod input;
 mod parsing;
 mod part_one_naive;
 mod solver;
 
 use crate::solver::solve;
-pub use input::Rule;
-pub use parsing::parse_input;
+pub use parsing::{parse_input, Rule};
 pub use part_one_naive::part_one_naive;
 
 pub fn part_one(polymer: &str, rules: &[Rule]) -> u64 {

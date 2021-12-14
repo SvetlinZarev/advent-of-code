@@ -1,5 +1,17 @@
-use crate::parsing::optimize_rules;
 use crate::Rule;
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Default)]
+struct FastRule {
+    pub(crate) key: [u8; 2],
+    pub(crate) first: usize,
+    pub(crate) second: usize,
+}
+
+impl FastRule {
+    pub fn new(key: [u8; 2], first: usize, second: usize) -> Self {
+        Self { key, first, second }
+    }
+}
 
 pub fn solve(polymer: &str, rules: &[Rule], rounds: u32) -> u64 {
     let rules = optimize_rules(rules);
@@ -43,4 +55,24 @@ pub fn solve(polymer: &str, rules: &[Rule], rounds: u32) -> u64 {
         .fold((0u64, u64::MAX), |(m, l), c| (m.max(c), l.min(c)));
 
     most - least
+}
+
+fn optimize_rules(rules: &[Rule]) -> Vec<FastRule> {
+    let mut fast_rules = vec![FastRule::default(); rules.len()];
+
+    for (idx, &rule) in rules.iter().enumerate() {
+        debug_assert!(rules.iter().any(|r| r.from == rule.to));
+
+        let first = rules.binary_search_by(|r| r.from.cmp(&rule.to)).unwrap();
+        let second = rules
+            .binary_search_by(|r| {
+                let key = [rule.to[1], rule.from[1]];
+                r.from.cmp(&key)
+            })
+            .unwrap();
+
+        fast_rules[idx] = FastRule::new(rule.from, first, second);
+    }
+
+    fast_rules
 }

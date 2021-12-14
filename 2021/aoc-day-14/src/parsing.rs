@@ -1,10 +1,26 @@
-use crate::input::FastRule;
-use crate::Rule;
 use std::str::FromStr;
 
 enum ParserState {
     ReadPolymer,
     ReadRules,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub struct Rule {
+    pub(crate) from: [u8; 2],
+    pub(crate) to: [u8; 2],
+}
+
+impl Rule {
+    pub fn new<S: AsRef<[u8]>>(from: S, insert: u8) -> Self {
+        let from = from.as_ref();
+        assert_eq!(2, from.len());
+
+        Self {
+            from: [from[0], from[1]],
+            to: [from[0], insert],
+        }
+    }
 }
 
 pub fn parse_input<S: AsRef<str>>(input: S) -> (String, Vec<Rule>) {
@@ -53,24 +69,4 @@ impl FromStr for Rule {
 
         Ok(Rule::new(from.as_bytes(), insert.as_bytes()[0]))
     }
-}
-
-pub fn optimize_rules(rules: &[Rule]) -> Vec<FastRule> {
-    let mut fast_rules = vec![FastRule::default(); rules.len()];
-
-    for (idx, &rule) in rules.iter().enumerate() {
-        debug_assert!(rules.iter().any(|r| r.from == rule.to));
-
-        let first = rules.binary_search_by(|r| r.from.cmp(&rule.to)).unwrap();
-        let second = rules
-            .binary_search_by(|r| {
-                let key = [rule.to[1], rule.from[1]];
-                r.from.cmp(&key)
-            })
-            .unwrap();
-
-        fast_rules[idx] = FastRule::new(rule.from, first, second);
-    }
-
-    fast_rules
 }
