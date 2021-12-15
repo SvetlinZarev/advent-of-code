@@ -33,6 +33,19 @@ where
         .unwrap()
 }
 
+pub fn parse_numeric_grid<I: AsRef<str>, T: From<u8> + Copy>(input: I) -> Vec<Vec<T>> {
+    input
+        .as_ref()
+        .lines()
+        .map(|l| {
+            l.as_bytes()
+                .iter()
+                .map(|&b| (b - b'0').try_into().unwrap())
+                .collect()
+        })
+        .collect()
+}
+
 pub fn parse_u8_numeric_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
     input
         .as_ref()
