@@ -1,4 +1,5 @@
-use aoc_day_15::{a_star_pf, expand_grid, part_one, part_two};
+use aoc_day_15::astar_pf::a_star_pf;
+use aoc_day_15::{expand_grid, part_one, part_two};
 use aoc_shared::input::load_text_input_from_autodetect;
 use aoc_shared::parsing::parse_numeric_grid;
 
