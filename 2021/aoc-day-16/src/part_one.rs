@@ -5,15 +5,11 @@ pub fn part_one(packet: &Packet) -> u32 {
 }
 
 fn dfs(packet: &Packet) -> u32 {
-    let mut sum = packet.version();
-
     if let Content::Operator(_, packets) = packet.content() {
-        for p in packets.iter() {
-            sum += dfs(p);
-        }
+        return packets.iter().fold(packet.version(), |sum, p| sum + dfs(p));
     }
 
-    sum
+    0
 }
 
 
