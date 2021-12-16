@@ -9,61 +9,13 @@ fn eval(packet: &Packet) -> u64 {
         Content::Literal(val) => *val,
         Content::Operator(id, packets) => {
             match id {
-                0 => {
-                    let mut sum = 0;
-                    for p in packets.iter() {
-                        sum += eval(p);
-                    }
-                    sum
-                }
-
-                1 => {
-                    let mut prod = 1;
-                    for p in packets.iter() {
-                        prod *= eval(p);
-                    }
-                    prod
-                }
-
-                2 => {
-                    if packets.is_empty() {
-                        return 0;
-                    }
-
-                    let mut min = u64::MAX;
-                    for p in packets.iter() {
-                        min = min.min(eval(p));
-                    }
-                    min
-                }
-
-                3 => {
-                    if packets.is_empty() {
-                        return 0;
-                    }
-
-                    let mut max = u64::MIN;
-                    for p in packets.iter() {
-                        max = max.max(eval(p));
-                    }
-                    max
-                }
-
-                5 => {
-                    assert_eq!(2, packets.len());
-                    (eval(&packets[0]) > eval(&packets[1])) as u64
-                }
-
-                6 => {
-                    assert_eq!(2, packets.len());
-                    (eval(&packets[0]) < eval(&packets[1])) as u64
-                }
-
-                7 => {
-                    assert_eq!(2, packets.len());
-                    (eval(&packets[0]) == eval(&packets[1])) as u64
-                }
-
+                0 => packets.iter().fold(0, |x, p| x + eval(p)),
+                1 => packets.iter().fold(1, |x, p| x * eval(p)),
+                2 => packets.iter().fold(u64::MAX, |x, p| x.min(eval(p))),
+                3 => packets.iter().fold(0, |x, p| x.max(eval(p))),
+                5 => (eval(&packets[0]) > eval(&packets[1])) as u64,
+                6 => (eval(&packets[0]) < eval(&packets[1])) as u64,
+                7 => (eval(&packets[0]) == eval(&packets[1])) as u64,
                 _ => panic!("Invalid packet: {:#?}", packet)
             }
         }
