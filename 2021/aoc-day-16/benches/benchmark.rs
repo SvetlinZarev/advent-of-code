@@ -36,7 +36,7 @@ fn benchmark_part_2(c: &mut Criterion) {
     let (binary, bits) = parse_to_binary(load_text_input_from_file("inputs/input.txt"));
     let packet = decode_packets(&binary, bits);
 
-    c.bench_function("part-1", |b| {
+    c.bench_function("part-2", |b| {
         b.iter(|| black_box(part_two(black_box(&packet))));
     });
 }
