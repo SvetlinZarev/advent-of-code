@@ -9,7 +9,7 @@ fn dfs(packet: &Packet) -> u32 {
         return packets.iter().fold(packet.version(), |sum, p| sum + dfs(p));
     }
 
-    0
+    packet.version()
 }
 
 
