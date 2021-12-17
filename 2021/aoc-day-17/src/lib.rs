@@ -54,15 +54,40 @@ pub fn part_two(x0: Unit, x1: Unit, y0: Unit, y1: Unit) -> usize {
         HashBuilder::<FnvHasher>::default(),
     );
 
-    for idx in 0..horizontal_to_zero.len().min(vertical.len()) {
-        for &vh in horizontal_to_zero[idx].iter() {
-            for pos in idx..vertical.len() {
-                for &vv in vertical[pos].iter() {
+    let max_len = horizontal_to_zero.len().min(vertical.len());
+    for (idx, v) in vertical[0..max_len].iter().enumerate() {
+        for vv in v.iter().copied() {
+            horizontal_to_zero
+                .iter()
+                .take(idx + 1)
+                .flat_map(|x| x.iter().copied())
+                .for_each(|vh| {
                     velocities.insert((vh, vv));
-                }
-            }
+                });
         }
     }
+
+    // These "horizontal" velocities will have to be combined with every single "vertical" velocity
+    let mut unique_to_zero_velocities = horizontal_to_zero
+        .iter()
+        .flat_map(|x| x.iter().copied())
+        .collect::<Vec<_>>();
+    unique_to_zero_velocities.sort_unstable();
+    unique_to_zero_velocities.dedup();
+
+    let mut largest_vv = Unit::MIN;
+    vertical.iter().skip(max_len).for_each(|v| {
+        v.iter().for_each(|&vv| {
+            // Although we've eliminated the duplicates in the "horizontal" velocities,
+            // there are a few duplicates in the vertical velocities, which we can avoid
+            if vv > largest_vv {
+                largest_vv = vv;
+                unique_to_zero_velocities.iter().for_each(|&vh| {
+                    velocities.insert((vh, vv));
+                });
+            }
+        })
+    });
 
     for idx in 0..horizontal.len().min(vertical.len()) {
         for &vh in horizontal[idx].iter() {
@@ -122,7 +147,9 @@ fn vertical_velocities(y0: Unit, y1: Unit) -> Vec<Vec<Unit>> {
     let mut velocities = vec![vec![]; max_steps];
 
     // negative velocities -> points the probe downwards
-    for y in 0..=y0.abs() {
+    // Do it in reverse order, because we'll use the fact that
+    // they appear in increasing order to reduce the execution time
+    for y in (0..=y0.abs()).rev() {
         let mut v = y;
         let mut dist = 0;
         let mut steps = 0;
