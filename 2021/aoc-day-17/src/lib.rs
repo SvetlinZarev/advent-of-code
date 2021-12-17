@@ -1,7 +1,6 @@
 use aoc_shared::hashing::{FnvHasher, HashBuilder};
 use num::integer::Roots;
 use std::collections::HashSet;
-use std::ops::Sub;
 
 pub type Unit = i32;
 
@@ -19,20 +18,55 @@ pub fn parse_input<S: AsRef<str>>(input: S) -> (Unit, Unit, Unit, Unit) {
     )
 }
 
-pub fn part_one(_x0: Unit, _x1: Unit, y0: Unit, _y1: Unit) -> Unit {
-    // The distances travelled are actually arithmetic progressions
-    // Thus, we can easily find the height if we know the largest
-    // "step". Given that velocity decreases by 1 upwards and increases
-    // by 1 downwards, we can conclude that we will always have a
-    // "step" at `y==0` at the Nth step. And because the speed increases
-    // on the downward direction, then after N+1 steps we will be on the
-    // negative 'y' axis. Thus the largest `N+1` step would be to have or
-    // 'y' be equal to the lowest point in the target area. Then then the
-    // Nth step would be that lowest point - 1 (because speed increases by 1),
-    // thus the max height would be the arithmetic progression of N, with a
-    // step of 1)
+pub fn part_one(x0: Unit, x1: Unit, y0: Unit, y1: Unit) -> Unit {
+    // If it takes less steps to reach the target horizontally when the
+    // velocity becomes 0, then we can just use an arithmetic progression
+    // to calculate the maximum height
+    if let Some(min_h_steps) = min_h_steps_for_stop_within_target(x0, x1) {
+        if let Some(max_v_steps) = max_v_steps(y0, y1, min_h_steps) {
+            // The distances travelled are actually arithmetic progressions
+            // Thus, we can easily find the height if we know the largest
+            // "step". Given that velocity decreases by 1 upwards and increases
+            // by 1 downwards, we can conclude that we will always have a
+            // "step" at `y==0` at the Nth step. And because the speed increases
+            // on the downward direction, then after N+1 steps we will be on the
+            // negative 'y' axis. Thus the largest `N+1` step would be to have or
+            // 'y' be equal to the lowest point in the target area. Then then the
+            // Nth step would be that lowest point - 1 (because speed increases by 1),
+            // thus the max height would be the arithmetic progression of N, with a
+            // step of 1)
 
-    distance(y0.abs().sub(1))
+            return distance(max_v_steps);
+        }
+    }
+
+    calculate_all_unique_velocities(x0, x1, y0, y1)
+        .iter()
+        .filter(|(_, v)| *v >= 0)
+        .fold(0, |h, &(_, v)| h.max(distance(v)))
+}
+
+fn min_h_steps_for_stop_within_target(x0: Unit, x1: Unit) -> Option<Unit> {
+    let min_h_vel = reverse_arithmetic_progression(x0);
+    let max_h_vel = reverse_arithmetic_progression(x1);
+
+    for v in min_h_vel..=max_h_vel {
+        let dist = distance(v);
+        if dist >= x0 && dist <= x1 {
+            return Some(dist);
+        }
+    }
+
+    None
+}
+
+fn max_v_steps(y0: Unit, y1: Unit, min_steps: Unit) -> Option<Unit> {
+    for y in (y1.abs()..=y0.abs()).rev() {
+        if (y - 1) * 2 + 2 >= min_steps {
+            return Some(y - 1);
+        }
+    }
+    None
 }
 
 fn distance(velocity: Unit) -> Unit {
@@ -42,6 +76,15 @@ fn distance(velocity: Unit) -> Unit {
 }
 
 pub fn part_two(x0: Unit, x1: Unit, y0: Unit, y1: Unit) -> usize {
+    calculate_all_unique_velocities(x0, x1, y0, y1).len()
+}
+
+fn calculate_all_unique_velocities(
+    x0: Unit,
+    x1: Unit,
+    y0: Unit,
+    y1: Unit,
+) -> HashSet<(Unit, Unit), HashBuilder<FnvHasher>> {
     assert!(x0 <= x1);
     assert!(x0 >= 0);
     assert!(y0 <= y1);
@@ -98,8 +141,7 @@ pub fn part_two(x0: Unit, x1: Unit, y0: Unit, y1: Unit) -> usize {
             }
         }
     }
-
-    velocities.len()
+    velocities
 }
 
 fn horizontal_velocity_zero_in_target(x0: Unit, x1: Unit) -> Vec<Vec<Unit>> {
