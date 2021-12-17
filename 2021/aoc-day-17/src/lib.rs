@@ -43,7 +43,9 @@ fn distance(velocity: Unit) -> Unit {
 
 pub fn part_two(x0: Unit, x1: Unit, y0: Unit, y1: Unit) -> usize {
     assert!(x0 <= x1);
+    assert!(x0 >= 0);
     assert!(y0 <= y1);
+    assert!(y1 <= 0);
 
     let horizontal_to_zero = horizontal_velocity_zero_in_target(x0, x1);
     let horizontal = horizontal_velocity_non_zero_in_target(x0, x1);
