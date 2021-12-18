@@ -43,11 +43,7 @@ impl Display for Number {
         match self {
             Number::Value(v) => write!(f, "{}", *v)?,
             Number::Tuple(t) => {
-                write!(f, "[")?;
-                Display::fmt(&t.0, f)?;
-                write!(f, ",")?;
-                Display::fmt(&t.1, f)?;
-                write!(f, "]")?;
+                write!(f, "[{},{}]", &t.0, &t.1)?;
             }
         }
 
