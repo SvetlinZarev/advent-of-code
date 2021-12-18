@@ -9,8 +9,7 @@ pub(crate) fn reduce(number: &mut Number) {
             continue;
         }
 
-        let split = split(number);
-        if split {
+        if split(number) {
             continue;
         }
 
