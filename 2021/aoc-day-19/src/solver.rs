@@ -27,8 +27,8 @@ pub(crate) fn calculate_corrections(
     mut distances: Vec<Map<Int, Vec<(Point, Point)>>>,
     input: &[Vec<Point>],
 ) -> Vec<(u8, Point)> {
-    let mut normalized = vec![None; input.len()];
-    normalized[0] = Some((0, (0, 0, 0)));
+    let mut corrections = vec![None; input.len()];
+    corrections[0] = Some((0, (0, 0, 0)));
 
     let mut remaining = input.len() - 1;
 
@@ -36,7 +36,7 @@ pub(crate) fn calculate_corrections(
     while remaining > 0 {
         // skip the scanner if it has already been processed
         for scanner_idx in 1..input.len() {
-            if normalized[scanner_idx].is_some() {
+            if corrections[scanner_idx].is_some() {
                 continue;
             }
 
@@ -46,7 +46,7 @@ pub(crate) fn calculate_corrections(
             for norm_idx in 0..input.len() {
                 // Do not use these distances as anchor, because those
                 // points have not been normalized yet
-                if normalized[norm_idx].is_none() {
+                if corrections[norm_idx].is_none() {
                     continue;
                 }
 
@@ -65,7 +65,7 @@ pub(crate) fn calculate_corrections(
                 // If we have found at least 12 points, we can calculate the rotation and the translation
                 if common_points.len() >= COMBINATIONS_OF_2_FROM_12 {
                     if let Some((rot, diff)) = detect_rotation(&common_points) {
-                        normalized[scanner_idx] = Some((rot, diff));
+                        corrections[scanner_idx] = Some((rot, diff));
 
                         // Fix the anchor points for the new anchor
                         distances[scanner_idx].iter_mut().for_each(|(_, points)| {
@@ -86,7 +86,7 @@ pub(crate) fn calculate_corrections(
         }
     }
 
-    normalized.into_iter().map(|x| x.unwrap()).collect()
+    corrections.into_iter().map(|x| x.unwrap()).collect()
 }
 
 fn detect_rotation(
