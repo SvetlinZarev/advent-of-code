@@ -117,6 +117,9 @@ fn detect_rotation(
                             let diff = subtract(p1, anchor.0);
                             return Some((rot, diff));
                         }
+
+                        // TODO do not check for all 12 points and do not check
+                        // all rotations.
                     }
                 }
             }

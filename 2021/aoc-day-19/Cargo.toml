@@ -7,6 +7,7 @@ edition = "2021"
 
 [profile.release]
 codegen-units = 1
+lto = "fat"
 
 [dependencies]
 aoc-shared = { path = "../aoc-shared" }
