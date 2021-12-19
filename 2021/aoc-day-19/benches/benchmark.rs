@@ -1,4 +1,4 @@
-use aoc_day_19::{parse_input, part_one};
+use aoc_day_19::{parse_input, part_one, part_two};
 use aoc_shared::input::load_text_input_from_file;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
@@ -30,6 +30,6 @@ fn benchmark_part_2(c: &mut Criterion) {
     let input = parse_input(load_text_input_from_file("inputs/input.txt"));
 
     c.bench_function("part-2", |b| {
-        b.iter(|| black_box(part_one(black_box(&input))))
+        b.iter(|| black_box(part_two(black_box(&input))))
     });
 }
