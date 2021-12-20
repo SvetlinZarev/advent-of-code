@@ -30,18 +30,21 @@ pub(crate) fn solve(
     }
 
     for cycle in 0..cycles {
-        for r in 0..rows {
-            for c in 0..cols {
+        let off = cycles - cycle;
+        let lim = off - 1;
+
+        for r in lim..rows - lim {
+            for c in lim..cols - lim {
                 let mut key = 0usize;
-                key |= get(&this_img, rows, cols, r, c, -1, -1).unwrap_or(state) << 8;
-                key |= get(&this_img, rows, cols, r, c, -1, 0).unwrap_or(state) << 7;
-                key |= get(&this_img, rows, cols, r, c, -1, 1).unwrap_or(state) << 6;
-                key |= get(&this_img, rows, cols, r, c, 0, -1).unwrap_or(state) << 5;
-                key |= get(&this_img, rows, cols, r, c, 0, 0).unwrap_or(state) << 4;
-                key |= get(&this_img, rows, cols, r, c, 0, 1).unwrap_or(state) << 3;
-                key |= get(&this_img, rows, cols, r, c, 1, -1).unwrap_or(state) << 2;
-                key |= get(&this_img, rows, cols, r, c, 1, 0).unwrap_or(state) << 1;
-                key |= get(&this_img, rows, cols, r, c, 1, 1).unwrap_or(state) << 0;
+                key |= get(&this_img, rows, cols, r, c, off, -1, -1).unwrap_or(state) << 8;
+                key |= get(&this_img, rows, cols, r, c, off, -1, 0).unwrap_or(state) << 7;
+                key |= get(&this_img, rows, cols, r, c, off, -1, 1).unwrap_or(state) << 6;
+                key |= get(&this_img, rows, cols, r, c, off, 0, -1).unwrap_or(state) << 5;
+                key |= get(&this_img, rows, cols, r, c, off, 0, 0).unwrap_or(state) << 4;
+                key |= get(&this_img, rows, cols, r, c, off, 0, 1).unwrap_or(state) << 3;
+                key |= get(&this_img, rows, cols, r, c, off, 1, -1).unwrap_or(state) << 2;
+                key |= get(&this_img, rows, cols, r, c, off, 1, 0).unwrap_or(state) << 1;
+                key |= get(&this_img, rows, cols, r, c, off, 1, 1).unwrap_or(state) << 0;
 
                 let v = alg[key];
                 set(&mut next_img, cols, r, c, v);
@@ -55,28 +58,35 @@ pub(crate) fn solve(
     this_img.iter().filter(|&&v| v > 0).count()
 }
 
+#[inline(always)]
 fn get(
     img: &[u8],
     rows: usize,
     cols: usize,
     r: usize,
     c: usize,
+    o: usize,
     rx: isize,
     cx: isize,
 ) -> Option<usize> {
+    let offset = o as isize;
+    let rows = rows as isize;
+    let cols = cols as isize;
+
     let row = (r as isize) + rx;
-    if row < 0 || row >= rows as isize {
+    if row < offset || row >= rows - offset {
         return None;
     }
 
     let col = (c as isize) + cx;
-    if col < 0 || col >= cols as isize {
+    if col < offset || col >= cols - offset {
         return None;
     }
 
-    Some(img[(row as usize * cols) + col as usize] as usize)
+    Some(img[(row as usize * cols as usize) + col as usize] as usize)
 }
 
+#[inline(always)]
 fn set(img: &mut [u8], cols: usize, r: usize, c: usize, val: u8) {
     img[r * cols + c] = val;
 }
