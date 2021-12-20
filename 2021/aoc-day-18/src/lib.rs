@@ -42,9 +42,7 @@ impl Display for Number {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Number::Value(v) => write!(f, "{}", *v)?,
-            Number::Tuple(t) => {
-                write!(f, "[{},{}]", &t.0, &t.1)?;
-            }
+            Number::Tuple(t) => write!(f, "[{},{}]", &t.0, &t.1)?,
         }
 
         Ok(())
