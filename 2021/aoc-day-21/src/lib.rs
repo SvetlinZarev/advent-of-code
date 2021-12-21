@@ -4,18 +4,33 @@ use std::collections::HashMap;
 const PRACTICE_WIN_SCORE: u64 = 1000;
 const QUANTUM_WIN_SCORE: u64 = 21;
 
-const DETERMINISTIC_DIE: [u64; 200] = init_deterministic_die();
-const QUANTUM_DIE: [(usize, u64); 7] = [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
+// Because the board size is only 10, then every roll of the dice will
+// eventually get MOD 10, // thus "1+2+3 == 6" and so is "11+12+13 == 36"
+// because "36 % 10 == 6". So there is no need to precalculate all rolls
+// of the 100-sided die, because it is equivalent to a 10 sided die
+const DETERMINISTIC_DIE_UNIQUE_ROLLS: usize = 10;
+const DETERMINISTIC_DIE: [u64; DETERMINISTIC_DIE_UNIQUE_ROLLS] = init_deterministic_die();
 
+// The dirac die has only 3 sides, thus 3 rolls will result in 27 different
+// states. But some states are not unique, for instance 1 + 2 + 3 == 2 + 2 + 2
+// So we'll calculate the unique rolls and how many times they are repeated
+// in the 27 total states: `(roll, repetitions)`
+const QUANTUM_DIE_UNIQUE_ROLLS: usize = 7;
+const QUANTUM_DIE: [(usize, u64); QUANTUM_DIE_UNIQUE_ROLLS] =
+    [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)];
+
+// Type aliases, so we can easily change the actual type, without modifying
+// all references in the code. Useful for trying out different hash functions.
 type HashFnFactory = HashBuilder<FnvHasher>;
 type Map<K, V> = HashMap<K, V, HashFnFactory>;
 
-const fn init_deterministic_die() -> [u64; 200] {
-    let mut dice = [0; 200];
+// Let's try out the compile-time evaluation :)
+const fn init_deterministic_die() -> [u64; DETERMINISTIC_DIE_UNIQUE_ROLLS] {
+    let mut dice = [0; DETERMINISTIC_DIE_UNIQUE_ROLLS];
 
     let mut roll = 0;
     let mut value = 1;
-    while roll < 200 {
+    while roll < DETERMINISTIC_DIE_UNIQUE_ROLLS {
         dice[roll] = (value + (value + 1) + (value + 2)) as u64;
         value += 3;
         roll += 1;
@@ -49,33 +64,31 @@ pub fn part_one(a: usize, b: usize) -> u64 {
     let mut rolls = 0;
 
     loop {
-        let rolled = DETERMINISTIC_DIE[rolls % DETERMINISTIC_DIE.len()];
+        let mut rolled = DETERMINISTIC_DIE[rolls % DETERMINISTIC_DIE.len()];
         rolls += 1;
 
-        if rolls % 2 != 0 {
-            pos_a = (pos_a + rolled) % 10;
-            score_a += pos_a + 1;
-            if score_a >= PRACTICE_WIN_SCORE {
-                break;
-            }
-        } else {
-            pos_b = (pos_b + rolled) % 10;
-            score_b += pos_b + 1;
-            if score_b >= PRACTICE_WIN_SCORE {
-                break;
-            }
+        pos_a = (pos_a + rolled) % 10;
+        score_a += pos_a + 1; // +1 because the board is 1-based, while the code is 0-based
+        if score_a >= PRACTICE_WIN_SCORE {
+            break score_b * (rolls as u64) * 3;
         }
-    }
 
-    if score_a < 1000 {
-        score_a * (rolls as u64) * 3
-    } else {
-        score_b * (rolls as u64) * 3
+        rolled = DETERMINISTIC_DIE[rolls % DETERMINISTIC_DIE.len()];
+        rolls += 1;
+
+        pos_b = (pos_b + rolled) % 10;
+        score_b += pos_b + 1; // +1 because the board is 1-based, while the code is 0-based
+        if score_b >= PRACTICE_WIN_SCORE {
+            break score_a * (rolls as u64) * 3;
+        }
     }
 }
 
 pub fn part_two(a: usize, b: usize) -> u64 {
     let mut cache = Map::default();
+
+    // Because the board is in the range from 1 to 10 (inclusive), subtract 1
+    // so we can use a simple % operation
     let (a, b) = play_dirac(&mut cache, a - 1, b - 1, 0, 0);
 
     a.max(b)
