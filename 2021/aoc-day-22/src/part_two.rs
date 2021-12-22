@@ -5,23 +5,14 @@ pub fn part_two(commands: &[Command]) -> u64 {
     let mut processed = Vec::with_capacity(commands.len() * 2);
 
     for cmd in commands.iter() {
-        let c = cmd.cuboid.clone();
-
         for kube in active.drain(..) {
-            // This, on first sight,  seemingly unnecessary intersection,
-            // allows us to avoid a lot allocations, thus resulting in
-            // 77% decrease in execution time for part 2
-            if let Some(intersection) = kube.intersect(&c) {
-                let intersections = kube.subtract(&intersection);
-                processed.extend(intersections);
-            } else {
-                processed.push(kube);
-            }
+            kube.collect_non_overlapping(&cmd.cuboid, &mut processed);
         }
 
         if Operation::On == cmd.op {
-            processed.push(c);
+            processed.push(cmd.cuboid.clone());
         }
+
         std::mem::swap(&mut active, &mut processed);
     }
 

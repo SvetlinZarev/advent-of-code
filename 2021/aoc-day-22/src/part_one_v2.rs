@@ -5,7 +5,7 @@ pub fn part_one_v2(commands: &[Command]) -> u64 {
     let mut processed = Vec::with_capacity(commands.len() * 2);
 
     for cmd in commands.iter() {
-        let c = cmd.cuboid.clone();
+        let c = &cmd.cuboid;
         if c.a.0 < -50 || c.a.0 > 50 {
             continue;
         }
@@ -26,17 +26,13 @@ pub fn part_one_v2(commands: &[Command]) -> u64 {
         }
 
         for kube in active.drain(..) {
-            if let Some(intersection) = kube.intersect(&c) {
-                let intersections = kube.subtract(&intersection);
-                processed.extend(intersections);
-            } else {
-                processed.push(kube);
-            }
+            kube.collect_non_overlapping(&cmd.cuboid, &mut processed);
         }
 
         if Operation::On == cmd.op {
-            processed.push(c);
+            processed.push(cmd.cuboid.clone());
         }
+
         std::mem::swap(&mut active, &mut processed);
     }
 

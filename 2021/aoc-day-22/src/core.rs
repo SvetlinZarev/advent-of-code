@@ -46,13 +46,14 @@ impl Cuboid {
         Cuboid::new((xlo, ylo, zlo), (xhi, yhi, zhi))
     }
 
-    pub fn subtract(&self, other: &Self) -> Vec<Self> {
+    pub fn collect_non_overlapping(&self, other: &Self, dst: &mut Vec<Self>) {
         let isn = match self.intersect(other) {
             Some(intersection) => intersection,
-            None => return vec![self.clone()],
+            None => {
+                dst.push(self.clone());
+                return;
+            }
         };
-
-        let mut result = Vec::with_capacity(26);
 
         // The cuboid has 3 "floors" each looking like that:
         //
@@ -68,67 +69,67 @@ impl Cuboid {
 
         // floor 0, section 0
         if let Some(x) = Cuboid::new((self.a.0, self.a.1, self.a.2), (isn.a.0, isn.a.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 1
         if let Some(x) = Cuboid::new((isn.a.0, self.a.1, self.a.2), (isn.b.0, isn.a.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 2
         if let Some(x) = Cuboid::new((isn.b.0, self.a.1, self.a.2), (self.b.0, isn.a.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 3
         if let Some(x) = Cuboid::new((self.a.0, isn.a.1, self.a.2), (isn.a.0, isn.b.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 4
         if let Some(x) = Cuboid::new((isn.a.0, isn.a.1, self.a.2), (isn.b.0, isn.b.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 5
         if let Some(x) = Cuboid::new((isn.b.0, isn.a.1, self.a.2), (self.b.0, isn.b.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 6
         if let Some(x) = Cuboid::new((self.a.0, isn.b.1, self.a.2), (isn.a.0, self.b.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 7
         if let Some(x) = Cuboid::new((isn.a.0, isn.b.1, self.a.2), (isn.b.0, self.b.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 0, section 8
         if let Some(x) = Cuboid::new((isn.b.0, isn.b.1, self.a.2), (self.b.0, self.b.1, isn.a.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 0
         if let Some(x) = Cuboid::new((self.a.0, self.a.1, isn.a.2), (isn.a.0, isn.a.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 1
         if let Some(x) = Cuboid::new((isn.a.0, self.a.1, isn.a.2), (isn.b.0, isn.a.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 2
         if let Some(x) = Cuboid::new((isn.b.0, self.a.1, isn.a.2), (self.b.0, isn.a.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 3
         if let Some(x) = Cuboid::new((self.a.0, isn.a.1, isn.a.2), (isn.a.0, isn.b.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 4
@@ -138,69 +139,67 @@ impl Cuboid {
 
         // floor 1, section 5
         if let Some(x) = Cuboid::new((isn.b.0, isn.a.1, isn.a.2), (self.b.0, isn.b.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 6
         if let Some(x) = Cuboid::new((self.a.0, isn.b.1, isn.a.2), (isn.a.0, self.b.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 7
         if let Some(x) = Cuboid::new((isn.a.0, isn.b.1, isn.a.2), (isn.b.0, self.b.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 1, section 8
         if let Some(x) = Cuboid::new((isn.b.0, isn.b.1, isn.a.2), (self.b.0, self.b.1, isn.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 0
         if let Some(x) = Cuboid::new((self.a.0, self.a.1, isn.b.2), (isn.a.0, isn.a.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 1
         if let Some(x) = Cuboid::new((isn.a.0, self.a.1, isn.b.2), (isn.b.0, isn.a.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 2
         if let Some(x) = Cuboid::new((isn.b.0, self.a.1, isn.b.2), (self.b.0, isn.a.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 3
         if let Some(x) = Cuboid::new((self.a.0, isn.a.1, isn.b.2), (isn.a.0, isn.b.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 4
         if let Some(x) = Cuboid::new((isn.a.0, isn.a.1, isn.b.2), (isn.b.0, isn.b.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 5
         if let Some(x) = Cuboid::new((isn.b.0, isn.a.1, isn.b.2), (self.b.0, isn.b.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 6
         if let Some(x) = Cuboid::new((self.a.0, isn.b.1, isn.b.2), (isn.a.0, self.b.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 7
         if let Some(x) = Cuboid::new((isn.a.0, isn.b.1, isn.b.2), (isn.b.0, self.b.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
 
         // floor 2, section 8
         if let Some(x) = Cuboid::new((isn.b.0, isn.b.1, isn.b.2), (self.b.0, self.b.1, self.b.2)) {
-            result.push(x);
+            dst.push(x);
         }
-
-        return result;
     }
 }
