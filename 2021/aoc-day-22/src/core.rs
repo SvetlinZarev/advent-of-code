@@ -67,49 +67,45 @@ impl Cuboid {
         //
         // For a total of 27 different sections.
 
-        if self.a.2 < isn.a.2 {
-            // Floor-0: below the intersection, all sections
-            dst.push(
-                Cuboid::new(
-                    (self.a.0, self.a.1, self.a.2),
-                    (self.b.0, self.b.1, isn.a.2),
-                )
-                .unwrap(),
-            );
+        // Floor-0: Bellow the intersection: all, sections
+        let lo = (self.a.0, self.a.1, self.a.2);
+        let hi = (self.b.0, self.b.1, isn.a.2);
+        if let Some(cuboid) = Cuboid::new(lo, hi) {
+            dst.push(cuboid);
         }
 
-        if isn.b.2 < self.b.2 {
-            // Floor-2: Above the intersection,a;; sections
-            dst.push(
-                Cuboid::new(
-                    (self.a.0, self.a.1, isn.b.2),
-                    (self.b.0, self.b.1, self.b.2),
-                )
-                .unwrap(),
-            );
+        // Floor-2: Above the intersection: all, sections
+        let lo = (self.a.0, self.a.1, isn.b.2);
+        let hi = (self.b.0, self.b.1, self.b.2);
+        if let Some(cuboid) = Cuboid::new(lo, hi) {
+            dst.push(cuboid);
         }
 
-        if self.a.0 < isn.a.0 {
-            // At the left of the intersection (section, 0,3,6)
-            dst.push(
-                Cuboid::new((self.a.0, self.a.1, isn.a.2), (isn.a.0, self.b.1, isn.b.2)).unwrap(),
-            );
+        // At the left of the intersection (section, 0,3,6)
+        let lo = (self.a.0, self.a.1, isn.a.2);
+        let hi = (isn.a.0, self.b.1, isn.b.2);
+        if let Some(cuboid) = Cuboid::new(lo, hi) {
+            dst.push(cuboid);
         }
 
-        if isn.b.0 < self.b.0 {
-            // At the right of the intersection (section, 2,5,8)
-            dst.push(
-                Cuboid::new((isn.b.0, self.a.1, isn.a.2), (self.b.0, self.b.1, isn.b.2)).unwrap(),
-            );
+        // At the right of the intersection (section, 2,5,8)
+        let lo = (isn.b.0, self.a.1, isn.a.2);
+        let hi = (self.b.0, self.b.1, isn.b.2);
+        if let Some(cuboid) = Cuboid::new(lo, hi) {
+            dst.push(cuboid);
         }
 
         // floor 1, section 1 (in front of the intersection)
-        if let Some(x) = Cuboid::new((isn.a.0, self.a.1, isn.a.2), (isn.b.0, isn.a.1, isn.b.2)) {
+        let lo = (isn.a.0, self.a.1, isn.a.2);
+        let hi = (isn.b.0, isn.a.1, isn.b.2);
+        if let Some(x) = Cuboid::new(lo, hi) {
             dst.push(x);
         }
 
         // floor 1, section 7 (behind the intersection)
-        if let Some(x) = Cuboid::new((isn.a.0, isn.b.1, isn.a.2), (isn.b.0, self.b.1, isn.b.2)) {
+        let lo = (isn.a.0, isn.b.1, isn.a.2);
+        let hi = (isn.b.0, self.b.1, isn.b.2);
+        if let Some(x) = Cuboid::new(lo, hi) {
             dst.push(x);
         }
     }
