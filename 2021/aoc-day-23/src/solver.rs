@@ -1,6 +1,5 @@
 use crate::{Hall, Rooms, FREE_SPOT, HALL_LEN, ROOMS};
-use aoc_shared::hashing::{FnvHasher, HashBuilder};
-use std::collections::HashMap;
+use ahash::AHashMap;
 
 const COSTS: [u64; ROOMS] = [1, 10, 100, 1000];
 const HALL_DIST: [[u8; 11]; ROOMS] = [
@@ -10,7 +9,7 @@ const HALL_DIST: [[u8; 11]; ROOMS] = [
     [8, 7, 0, 5, 0, 3, 0, 1, 0, 1, 2],
 ];
 
-type Map<K, V> = HashMap<K, V, HashBuilder<FnvHasher>>;
+type Map<K, V> = AHashMap<K, V>;
 
 pub(crate) fn solve<const N: usize>(input: Rooms<N>, hall: Hall) -> u64 {
     let mut cache = Map::default();
