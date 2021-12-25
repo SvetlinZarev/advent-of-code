@@ -46,16 +46,22 @@ pub fn parse_numeric_grid<I: AsRef<str>, T: From<u8> + Copy>(input: I) -> Vec<Ve
         .collect()
 }
 
-pub fn parse_u8_numeric_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
+pub fn parse_u8_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
     input
         .as_ref()
         .lines()
         .map(|l| l.as_bytes().to_vec())
-        .map(|mut v| {
-            v.iter_mut().for_each(|x| *x -= b'0');
-            v
-        })
         .collect()
+}
+
+pub fn parse_u8_numeric_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
+    let mut grid = parse_u8_grid(input);
+    for r in 0..grid.len() {
+        for c in 0..grid[r].len() {
+            grid[r][c] -= b'0';
+        }
+    }
+    grid
 }
 
 pub fn parse_i8_numeric_grid<I: AsRef<str>>(input: I) -> Vec<Vec<i8>> {
