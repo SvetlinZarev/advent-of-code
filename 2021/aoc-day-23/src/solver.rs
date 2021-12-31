@@ -2,7 +2,7 @@ use crate::{Hall, Rooms, FREE_SPOT, HALL_LEN, ROOMS};
 use ahash::AHashMap;
 
 const COSTS: [u64; ROOMS] = [1, 10, 100, 1000];
-const HALL_DIST: [[u8; 11]; ROOMS] = [
+const HALL_DIST: [[u8; HALL_LEN]; ROOMS] = [
     [2, 1, 0, 1, 0, 3, 0, 5, 0, 7, 8],
     [4, 3, 0, 1, 0, 1, 0, 3, 0, 5, 6],
     [6, 5, 0, 3, 0, 1, 0, 1, 0, 3, 4],
@@ -27,7 +27,7 @@ pub(crate) fn solve<const N: usize>(input: Rooms<N>, hall: Hall) -> u64 {
 
 fn round<const N: usize>(
     rooms: Rooms<N>,
-    hall: [u8; HALL_LEN],
+    hall: Hall,
     cache: &mut Map<(Rooms<N>, Hall), Option<u64>>,
 ) -> Option<u64> {
     if let Some(&cost) = cache.get(&(rooms, hall)) {
