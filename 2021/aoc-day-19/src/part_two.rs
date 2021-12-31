@@ -1,10 +1,9 @@
-use crate::solver::{calculate_corrections, calculate_distances};
+use crate::solver::calculate_corrections;
 use crate::{Int, Point};
 
 pub fn part_two(input: &[Vec<Point>]) -> Int {
     assert!(!input.is_empty());
-    let distances = calculate_distances(input);
-    let corrections = calculate_corrections(distances, input);
+    let corrections = calculate_corrections(input);
 
     let mut best = 0;
     for i in 0..corrections.len() {

@@ -1,20 +1,17 @@
-use crate::math::rotate;
-use crate::solver::{calculate_corrections, calculate_distances};
+use crate::solver::{calculate_corrections, fix_point};
 use crate::{Point, Set};
 
 pub fn part_one(input: &[Vec<Point>]) -> usize {
     assert!(!input.is_empty());
-    let distances = calculate_distances(input);
-    let corrections = calculate_corrections(distances, input);
+    let corrections = calculate_corrections(input);
 
     let mut fixed = Set::<Point>::default();
     for (idx, scanner) in input.iter().enumerate() {
         let (rot, diff) = corrections[idx];
 
-        for &p in scanner {
-            let p = rotate(p, rot);
-            fixed.insert((p.0 - diff.0, p.1 - diff.1, p.2 - diff.2));
-        }
+        scanner.iter().copied().for_each(|p| {
+            fixed.insert(fix_point(p, diff, rot));
+        });
     }
 
     fixed.len()

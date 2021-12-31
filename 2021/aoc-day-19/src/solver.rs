@@ -3,30 +3,8 @@ use crate::{Int, Map, Point, Set};
 
 const COMBINATIONS_OF_2_FROM_12: usize = 66;
 
-pub(crate) fn calculate_distances(input: &[Vec<Point>]) -> Vec<Map<Int, Vec<(Point, Point)>>> {
-    let mut distances = vec![Map::default(); input.len()];
-
-    for (idx, scanner) in input.iter().enumerate() {
-        for i in 0..scanner.len() {
-            for j in i + 1..scanner.len() {
-                let a = scanner[i];
-                let b = scanner[j];
-                let d = distance_sq(a, b);
-
-                distances[idx]
-                    .entry(d)
-                    .and_modify(|v: &mut Vec<(Point, Point)>| v.push((a, b)))
-                    .or_insert(vec![(a, b)]);
-            }
-        }
-    }
-    distances
-}
-
-pub(crate) fn calculate_corrections(
-    mut distances: Vec<Map<Int, Vec<(Point, Point)>>>,
-    input: &[Vec<Point>],
-) -> Vec<(u8, Point)> {
+pub(crate) fn calculate_corrections(input: &[Vec<Point>]) -> Vec<(u8, Point)> {
+    let mut distances = calculate_distances(input);
     let mut corrections = vec![None; input.len()];
     corrections[0] = Some((0, (0, 0, 0)));
 
@@ -70,11 +48,8 @@ pub(crate) fn calculate_corrections(
                         // Fix the anchor points for the new anchor
                         distances[scanner_idx].iter_mut().for_each(|(_, points)| {
                             points.iter_mut().for_each(|(a, b)| {
-                                *a = rotate(a.clone(), rot);
-                                *b = rotate(b.clone(), rot);
-
-                                *a = (a.0 - diff.0, a.1 - diff.1, a.2 - diff.2);
-                                *b = (b.0 - diff.0, b.1 - diff.1, b.2 - diff.2);
+                                *a = fix_point(*a, diff, rot);
+                                *b = fix_point(*b, diff, rot);
                             });
                         });
 
@@ -87,6 +62,26 @@ pub(crate) fn calculate_corrections(
     }
 
     corrections.into_iter().map(|x| x.unwrap()).collect()
+}
+
+fn calculate_distances(input: &[Vec<Point>]) -> Vec<Map<Int, Vec<(Point, Point)>>> {
+    let mut distances = vec![Map::default(); input.len()];
+
+    for (idx, scanner) in input.iter().enumerate() {
+        for i in 0..scanner.len() {
+            for j in i + 1..scanner.len() {
+                let a = scanner[i];
+                let b = scanner[j];
+                let d = distance_sq(a, b);
+
+                distances[idx]
+                    .entry(d)
+                    .and_modify(|v: &mut Vec<(Point, Point)>| v.push((a, b)))
+                    .or_insert(vec![(a, b)]);
+            }
+        }
+    }
+    distances
 }
 
 fn detect_rotation(
@@ -127,4 +122,13 @@ fn detect_rotation(
     }
 
     None
+}
+#[inline(always)]
+pub(crate) fn fix_point(p: Point, translation: Point, rotation: u8) -> Point {
+    let rotated = rotate(p, rotation);
+    (
+        rotated.0 - translation.0,
+        rotated.1 - translation.1,
+        rotated.2 - translation.2,
+    )
 }
