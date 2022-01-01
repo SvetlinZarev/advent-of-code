@@ -20,8 +20,8 @@ For example:
 #############
 #...........#
 ###B#C#B#D###
-#A#D#C#A#
-#########
+  #A#D#C#A#
+  #########
 ```
 
 The amphipods would like a method to organize every amphipod into side rooms so
@@ -32,8 +32,8 @@ going left to right, like this:
 #############
 #...........#
 ###A#B#C#D###
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #########
 ```
 
 Amphipods can move up, down, left, or right so long as they are moving into an
@@ -46,11 +46,23 @@ amphipods that requires the least total energy.
 However, because they are timid and stubborn, the amphipods have some extra
 rules:
 
-    Amphipods will never stop on the space immediately outside any room. They can move into that space so long as they immediately continue moving. (Specifically, this refers to the four open spaces in the hallway that are directly above an amphipod starting position.)
-    Amphipods will never move from the hallway into a room unless that room is their destination room and that room contains no amphipods which do not also have that room as their own destination. If an amphipod's starting room is not its destination room, it can stay in that room until it leaves the room. (For example, an Amber amphipod will not move from the hallway into the right three rooms, and will only move into the leftmost room if that room is empty or if it only contains other Amber amphipods.)
-    Once an amphipod stops moving in the hallway, it will stay in that spot until it can move into a room. (That is, once any amphipod starts moving, any other amphipods currently in the hallway are locked in place and will not move again until they can move fully into a room.)
+* Amphipods will never stop on the space immediately outside any room. They can
+  move into that space so long as they immediately continue moving. (
+  Specifically, this refers to the four open spaces in the hallway that are
+  directly above an amphipod starting position.)
+* Amphipods will never move from the hallway into a room unless that room is
+  their destination room and that room contains no amphipods which do not also
+  have that room as their own destination. If an amphipod's starting room is not
+  its destination room, it can stay in that room until it leaves the room. (For
+  example, an Amber amphipod will not move from the hallway into the right three
+  rooms, and will only move into the leftmost room if that room is empty or if
+  it only contains other Amber amphipods.)
+* Once an amphipod stops moving in the hallway, it will stay in that spot until
+  it can move into a room. (That is, once any amphipod starts moving, any other
+  amphipods currently in the hallway are locked in place and will not move again
+  until they can move fully into a room.)
 
-In the above example, the amphipods can be organized using a minimum of 12521
+In the above example, the amphipods can be organized using a minimum of `12521`
 energy. One way to do this is shown below.
 
 Starting configuration:
@@ -59,82 +71,84 @@ Starting configuration:
 #############
 #...........#
 ###B#C#B#D###
-#A#D#C#A#
-#########
+  #A#D#C#A#
+  #########
 ```
 
-One Bronze amphipod moves into the hallway, taking 4 steps and using 40 energy:
+One Bronze amphipod moves into the hallway, taking `4` steps and using `40`
+energy:
 
 ```
 #############
 #...B.......#
 ###B#C#.#D###
-#A#D#C#A#
-#########
+  #A#D#C#A#
+  #########
 ```
 
-The only Copper amphipod not in its side room moves there, taking 4 steps and
-using 400 energy:
+The only Copper amphipod not in its side room moves there, taking `4` steps and
+using `400` energy:
 
 ```
 #############
 #...B.......#
 ###B#.#C#D###
-#A#D#C#A#
-#########
+  #A#D#C#A#
+  #########
 ```
 
-A Desert amphipod moves out of the way, taking 3 steps and using 3000 energy,
-and then the Bronze amphipod takes its place, taking 3 steps and using 30
+A Desert amphipod moves out of the way, taking `3` steps and using `3000`
+energy, and then the Bronze amphipod takes its place, taking `3` steps and
+using `30`
 energy:
 
 ```
 #############
 #.....D.....#
 ###B#.#C#D###
-#A#B#C#A#
-#########
+  #A#B#C#A#
+  #########
 ```
 
-The leftmost Bronze amphipod moves to its room using 40 energy:
+The leftmost Bronze amphipod moves to its room using `40` energy:
 
 ```
 #############
 #.....D.....#
 ###.#B#C#D###
-#A#B#C#A#
-#########
+  #A#B#C#A#
+  #########
 ```
 
-Both amphipods in the rightmost room move into the hallway, using 2003 energy in
-total:
+Both amphipods in the rightmost room move into the hallway, using `2003` energy
+in total:
 
 ```
 #############
 #.....D.D.A.#
 ###.#B#C#.###
-#A#B#C#.#
-#########
+  #A#B#C#.#
+  #########
 ```
 
-Both Desert amphipods move into the rightmost room using 7000 energy:
+Both Desert amphipods move into the rightmost room using `7000` energy:
 
 ```
 #############
 #.........A.#
 ###.#B#C#D###
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #########
 ```
 
-Finally, the last Amber amphipod moves into its room, using 8 energy:
+Finally, the last Amber amphipod moves into its room, using `8` energy:
 
 ```
 #############
 #...........#
 ###A#B#C#D###
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #########
 ```
 
 What is the least energy required to organize the amphipods?
@@ -161,10 +175,10 @@ So, the above example now becomes:
 #############
 #...........#
 ###B#C#B#D###
-#D#C#B#A#
-#D#B#A#C#
-#A#D#C#A#
-#########
+  #D#C#B#A#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
 ```
 
 The amphipods still want to be organized into rooms similar to before:
@@ -173,207 +187,207 @@ The amphipods still want to be organized into rooms similar to before:
 #############
 #...........#
 ###A#B#C#D###
-#A#B#C#D#
-#A#B#C#D#
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #A#B#C#D#
+  #A#B#C#D#
+  #########
 ```
 
 In this updated example, the least energy required to organize these amphipods
-is 44169:
+is `44169`:
 
 ```
 #############
 #...........#
 ###B#C#B#D###
-#D#C#B#A#
-#D#B#A#C#
-#A#D#C#A#
-#########
+  #D#C#B#A#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
 
 #############
 #..........D#
 ###B#C#B#.###
-#D#C#B#A#
-#D#B#A#C#
-#A#D#C#A#
-#########
+  #D#C#B#A#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
 
 #############
 #A.........D#
 ###B#C#B#.###
-#D#C#B#.#
-#D#B#A#C#
-#A#D#C#A#
-#########
+  #D#C#B#.#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
 
 #############
 #A........BD#
 ###B#C#.#.###
-#D#C#B#.#
-#D#B#A#C#
-#A#D#C#A#
-#########
+  #D#C#B#.#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
 
 #############
 #A......B.BD#
 ###B#C#.#.###
-#D#C#.#.#
-#D#B#A#C#
-#A#D#C#A#
-#########
+  #D#C#.#.#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
 
 #############
 #AA.....B.BD#
 ###B#C#.#.###
-#D#C#.#.#
-#D#B#.#C#
-#A#D#C#A#
-#########
+  #D#C#.#.#
+  #D#B#.#C#
+  #A#D#C#A#
+  #########
 
 #############
 #AA.....B.BD#
 ###B#.#.#.###
-#D#C#.#.#
-#D#B#C#C#
-#A#D#C#A#
-#########
+  #D#C#.#.#
+  #D#B#C#C#
+  #A#D#C#A#
+  #########
 
 #############
 #AA.....B.BD#
 ###B#.#.#.###
-#D#.#C#.#
-#D#B#C#C#
-#A#D#C#A#
-#########
+  #D#.#C#.#
+  #D#B#C#C#
+  #A#D#C#A#
+  #########
 
 #############
 #AA...B.B.BD#
 ###B#.#.#.###
-#D#.#C#.#
-#D#.#C#C#
-#A#D#C#A#
-#########
+  #D#.#C#.#
+  #D#.#C#C#
+  #A#D#C#A#
+  #########
 
 #############
 #AA.D.B.B.BD#
 ###B#.#.#.###
-#D#.#C#.#
-#D#.#C#C#
-#A#.#C#A#
-#########
+  #D#.#C#.#
+  #D#.#C#C#
+  #A#.#C#A#
+  #########
 
 #############
 #AA.D...B.BD#
 ###B#.#.#.###
-#D#.#C#.#
-#D#.#C#C#
-#A#B#C#A#
-#########
+  #D#.#C#.#
+  #D#.#C#C#
+  #A#B#C#A#
+  #########
 
 #############
 #AA.D.....BD#
 ###B#.#.#.###
-#D#.#C#.#
-#D#B#C#C#
-#A#B#C#A#
-#########
+  #D#.#C#.#
+  #D#B#C#C#
+  #A#B#C#A#
+  #########
 
 #############
 #AA.D......D#
 ###B#.#.#.###
-#D#B#C#.#
-#D#B#C#C#
-#A#B#C#A#
-#########
+  #D#B#C#.#
+  #D#B#C#C#
+  #A#B#C#A#
+  #########
 
 #############
 #AA.D......D#
 ###B#.#C#.###
-#D#B#C#.#
-#D#B#C#.#
-#A#B#C#A#
-#########
+  #D#B#C#.#
+  #D#B#C#.#
+  #A#B#C#A#
+  #########
 
 #############
 #AA.D.....AD#
 ###B#.#C#.###
-#D#B#C#.#
-#D#B#C#.#
-#A#B#C#.#
-#########
+  #D#B#C#.#
+  #D#B#C#.#
+  #A#B#C#.#
+  #########
 
 #############
 #AA.......AD#
 ###B#.#C#.###
-#D#B#C#.#
-#D#B#C#.#
-#A#B#C#D#
-#########
+  #D#B#C#.#
+  #D#B#C#.#
+  #A#B#C#D#
+  #########
 
 #############
 #AA.......AD#
 ###.#B#C#.###
-#D#B#C#.#
-#D#B#C#.#
-#A#B#C#D#
-#########
+  #D#B#C#.#
+  #D#B#C#.#
+  #A#B#C#D#
+  #########
 
 #############
 #AA.......AD#
 ###.#B#C#.###
-#.#B#C#.#
-#D#B#C#D#
-#A#B#C#D#
-#########
+  #.#B#C#.#
+  #D#B#C#D#
+  #A#B#C#D#
+  #########
 
 #############
 #AA.D.....AD#
 ###.#B#C#.###
-#.#B#C#.#
-#.#B#C#D#
-#A#B#C#D#
-#########
+  #.#B#C#.#
+  #.#B#C#D#
+  #A#B#C#D#
+  #########
 
 #############
 #A..D.....AD#
 ###.#B#C#.###
-#.#B#C#.#
-#A#B#C#D#
-#A#B#C#D#
-#########
+  #.#B#C#.#
+  #A#B#C#D#
+  #A#B#C#D#
+  #########
 
 #############
 #...D.....AD#
 ###.#B#C#.###
-#A#B#C#.#
-#A#B#C#D#
-#A#B#C#D#
-#########
+  #A#B#C#.#
+  #A#B#C#D#
+  #A#B#C#D#
+  #########
 
 #############
 #.........AD#
 ###.#B#C#.###
-#A#B#C#D#
-#A#B#C#D#
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #A#B#C#D#
+  #A#B#C#D#
+  #########
 
 #############
 #..........D#
 ###A#B#C#.###
-#A#B#C#D#
-#A#B#C#D#
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #A#B#C#D#
+  #A#B#C#D#
+  #########
 
 #############
 #...........#
 ###A#B#C#D###
-#A#B#C#D#
-#A#B#C#D#
-#A#B#C#D#
-#########
+  #A#B#C#D#
+  #A#B#C#D#
+  #A#B#C#D#
+  #########
 ```
 
 Using the initial configuration from the full diagram, what is the least energy
