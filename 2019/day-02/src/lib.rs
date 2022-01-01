@@ -1,4 +1,6 @@
-pub fn part_one(input: &[i64]) -> i64 {
+use aoc_shared_2019::intcode::{addr, instruction, OPERANDS, OP_ADD, OP_HLT, OP_MUL};
+
+pub fn part_one(input: &[usize]) -> usize {
     let mut mem = input.to_vec();
 
     // replace values as instructed
@@ -8,7 +10,7 @@ pub fn part_one(input: &[i64]) -> i64 {
     solve(mem)
 }
 
-pub fn part_two(input: &[i64]) -> i64 {
+pub fn part_two(input: &[usize]) -> usize {
     let mut noun = 0;
     let mut verb = 0;
 
@@ -28,21 +30,32 @@ pub fn part_two(input: &[i64]) -> i64 {
     }
 }
 
-fn solve(mut mem: Vec<i64>) -> i64 {
+fn solve(mut mem: Vec<usize>) -> usize {
     let mut ip = 0;
 
-    while mem[ip] != 99 {
-        let addr1 = mem[ip + 1] as usize;
-        let addr2 = mem[ip + 2] as usize;
-        let addr3 = mem[ip + 3] as usize;
+    loop {
+        let opcode = instruction(&mem, ip);
 
-        match mem[ip] {
-            1 => mem[addr3] = mem[addr1] + mem[addr2],
-            2 => mem[addr3] = mem[addr1] * mem[addr2],
+        match opcode {
+            OP_ADD => {
+                let addr1 = addr(&mem, ip + 1);
+                let addr2 = addr(&mem, ip + 2);
+                let addr3 = addr(&mem, ip + 3);
+
+                mem[addr3] = mem[addr1] + mem[addr2];
+            }
+            OP_MUL => {
+                let addr1 = addr(&mem, ip + 1);
+                let addr2 = addr(&mem, ip + 2);
+                let addr3 = addr(&mem, ip + 3);
+
+                mem[addr3] = mem[addr1] * mem[addr2];
+            }
+            OP_HLT => break,
             _ => panic!("Unsupported opcode '{}' at '{}'", mem[ip], ip),
         }
 
-        ip += 4;
+        ip += OPERANDS[opcode] + 1;
     }
 
     mem[0]
