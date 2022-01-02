@@ -11,23 +11,19 @@ pub fn part_one(input: &[usize]) -> usize {
 }
 
 pub fn part_two(input: &[usize]) -> usize {
-    let mut noun = 0;
-    let mut verb = 0;
+    for noun in 0..100 {
+        for verb in 0..100 {
+            let mut mem = input.to_vec();
+            mem[1] = noun;
+            mem[2] = verb;
 
-    loop {
-        let mut mem = input.to_vec();
-        mem[1] = noun;
-        mem[2] = verb;
-
-        if solve(mem) == 19690720 {
-            break 100 * noun + verb;
-        }
-
-        verb = (verb + 1) % 100;
-        if verb == 0 {
-            noun += 1;
+            if solve(mem) == 19690720 {
+                return 100 * noun + verb;
+            }
         }
     }
+
+    panic!("There is no solution");
 }
 
 fn solve(mut mem: Vec<usize>) -> usize {
