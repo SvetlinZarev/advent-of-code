@@ -51,7 +51,7 @@ impl Hasher for FnvHasher {
 const FX_ROTATE: u32 = 5;
 const FX_SEED64: u64 = 0x517cc1b727220a95;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone)]
 pub struct FxHasher {
     hash: u64,
 }
