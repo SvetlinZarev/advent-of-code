@@ -1,3 +1,51 @@
+use std::collections::VecDeque;
+
+pub trait Input {
+    fn read(&mut self) -> Option<isize>;
+}
+
+pub trait Output {
+    fn write(&mut self, value: isize);
+}
+
+impl Input for std::iter::Once<isize> {
+    fn read(&mut self) -> Option<isize> {
+        self.next()
+    }
+}
+
+impl<A: Iterator<Item = isize>, B: Iterator<Item = isize>> Input for std::iter::Chain<A, B> {
+    fn read(&mut self) -> Option<isize> {
+        self.next()
+    }
+}
+
+impl Input for VecDeque<isize> {
+    fn read(&mut self) -> Option<isize> {
+        self.pop_front()
+    }
+}
+
+impl Output for VecDeque<isize> {
+    fn write(&mut self, value: isize) {
+        self.push_back(value);
+    }
+}
+
+impl Output for Vec<isize> {
+    fn write(&mut self, value: isize) {
+        self.push(value);
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum Evaluation {
+    Continue(usize),
+    InsufficientInput(usize),
+    Halt,
+    Fault(Option<String>),
+}
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Mode {
     Position = 0,
@@ -94,13 +142,13 @@ impl Instruction {
         }
     }
 
-    pub fn eval<Input: Iterator<Item = isize>>(
+    pub fn eval(
         self,
         mem: &mut [isize],
-        inp: &mut Input,
-        out: &mut Vec<isize>,
+        input: &mut impl Input,
+        output: &mut impl Output,
         ip: usize,
-    ) -> Option<usize> {
+    ) -> Evaluation {
         let instruction = Instruction::decode(mem[ip]);
 
         match instruction {
@@ -120,21 +168,27 @@ impl Instruction {
                 *dst = v1 * v2;
             }
 
-            Instruction::Inp(md) => {
-                let value = inp.next().unwrap();
-                *md.reference(mem, ip + 1) = value;
-            }
+            Instruction::Inp(md) => match input.read() {
+                None => return Evaluation::InsufficientInput(ip),
+                Some(value) => *md.reference(mem, ip + 1) = value,
+            },
 
             Instruction::Out(md) => {
                 let value = *md.reference(mem, ip + 1);
-                out.push(value);
+                output.write(value);
             }
 
             Instruction::JiT(m1, m2) => {
                 let v = *m1.reference(mem, ip + 1);
                 if v != 0 {
                     let addr = *m2.reference(mem, ip + 2);
-                    return Some(addr.try_into().unwrap());
+                    return match addr.try_into() {
+                        Ok(addr) => Evaluation::Continue(addr),
+                        Err(e) => Evaluation::Fault(Some(format!(
+                            "Cannot jump to negative address: IP={}; Addr={}; Err={:?}",
+                            ip, addr, e
+                        ))),
+                    };
                 }
             }
 
@@ -142,7 +196,13 @@ impl Instruction {
                 let v = *m1.reference(mem, ip + 1);
                 if v == 0 {
                     let addr = *m2.reference(mem, ip + 2);
-                    return Some(addr.try_into().unwrap());
+                    return match addr.try_into() {
+                        Ok(addr) => Evaluation::Continue(addr),
+                        Err(e) => Evaluation::Fault(Some(format!(
+                            "Cannot jump to negative address: IP={}; Addr={}; Err={:?}",
+                            ip, addr, e
+                        ))),
+                    };
                 }
             }
 
@@ -162,10 +222,10 @@ impl Instruction {
                 *dst = (v1 == v2) as isize;
             }
 
-            Instruction::Hlt => return None,
+            Instruction::Hlt => return Evaluation::Halt,
         }
 
-        Some(ip + self.increment())
+        Evaluation::Continue(ip + self.increment())
     }
 
     pub fn increment(self) -> usize {
