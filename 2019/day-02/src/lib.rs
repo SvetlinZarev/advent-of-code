@@ -1,4 +1,4 @@
-use aoc_shared_2019::intcode::Instruction;
+use aoc_shared_2019::intcode::{Computer, Outcome};
 
 pub fn part_one(input: &[isize]) -> isize {
     let mut mem = input.to_vec();
@@ -26,35 +26,12 @@ pub fn part_two(input: &[isize]) -> isize {
     panic!("There is no solution");
 }
 
-fn solve(mut mem: Vec<isize>) -> isize {
-    let mut ip = 0;
-
-    loop {
-        let instruction = Instruction::decode(mem[ip]);
-
-        match instruction {
-            Instruction::Add(m1, m2, md) => {
-                let v1 = *m1.reference(&mut mem, ip + 1);
-                let v2 = *m2.reference(&mut mem, ip + 2);
-                let dst = md.reference(&mut mem, ip + 3);
-
-                *dst = v1 + v2;
-            }
-            Instruction::Mul(m1, m2, md) => {
-                let v1 = *m1.reference(&mut mem, ip + 1);
-                let v2 = *m2.reference(&mut mem, ip + 2);
-                let dst = md.reference(&mut mem, ip + 3);
-
-                *dst = v1 * v2;
-            }
-            Instruction::Hlt => break,
-            _ => panic!("Unexpected instruction: {:?}", instruction),
-        }
-
-        ip += instruction.increment();
+fn solve(mem: Vec<isize>) -> isize {
+    let mut vm = Computer::new(mem);
+    if let Outcome::Fault(f) = vm.run(&mut std::iter::empty(), &mut vec![]) {
+        panic!("{:?}", f);
     }
-
-    mem[0]
+    *vm.mem(0)
 }
 
 #[cfg(test)]

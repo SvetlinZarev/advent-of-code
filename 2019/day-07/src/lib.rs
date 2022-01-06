@@ -1,4 +1,4 @@
-use aoc_shared_2019::intcode::{Evaluation, Input, Instruction};
+use aoc_shared_2019::intcode::{Computer, Fault, Outcome};
 use std::collections::VecDeque;
 use std::iter::once;
 
@@ -23,12 +23,16 @@ pub fn part_one(mem: &[isize]) -> isize {
                             continue;
                         }
 
-                        let a0 = amplifier(mem.to_vec(), once(s0).chain(once(0)));
-                        let a1 = amplifier(mem.to_vec(), once(s1).chain(once(a0)));
-                        let a2 = amplifier(mem.to_vec(), once(s2).chain(once(a1)));
-                        let a3 = amplifier(mem.to_vec(), once(s3).chain(once(a2)));
-                        let a4 = amplifier(mem.to_vec(), once(s4).chain(once(a3)));
-                        best = best.max(a4);
+                        let phase = [s0, s1, s2, s3, s4];
+                        let mut output = 0;
+                        for amp in 0..5 {
+                            let mut input = once(phase[amp]).chain(once(output));
+                            let mut vm = Computer::new(mem.to_vec());
+                            match vm.run(&mut input, &mut output) {
+                                Outcome::Halt => best = best.max(output),
+                                Outcome::Fault(fault) => panic!("Unexpected error: {:?}", fault),
+                            }
+                        }
                     }
                 }
             }
@@ -36,26 +40,6 @@ pub fn part_one(mem: &[isize]) -> isize {
     }
 
     best
-}
-
-fn amplifier(mut mem: Vec<isize>, mut input: impl Input) -> isize {
-    let mut state = Evaluation::Continue(0);
-    let mut output = vec![];
-
-    loop {
-        match state {
-            Evaluation::Continue(ip) => {
-                let instruction = Instruction::decode(mem[ip]);
-                state = instruction.eval(&mut mem, &mut input, &mut output, ip);
-            }
-            Evaluation::Halt => break,
-            Evaluation::Fault(fault) => panic!("Failed to execute intcode: {:?}", fault),
-            Evaluation::InsufficientInput(_) => panic!("The program requires input"),
-        }
-    }
-
-    assert_eq!(output.len(), 1);
-    output[0]
 }
 
 pub fn part_two(mem: &[isize]) -> isize {
@@ -93,8 +77,7 @@ pub fn part_two(mem: &[isize]) -> isize {
 fn amplifier_chain(mem: &[isize], s0: isize, s1: isize, s2: isize, s3: isize, s4: isize) -> isize {
     const CHAIN_LEN: usize = 5;
 
-    let mut amps = vec![mem.to_vec(); CHAIN_LEN];
-    let mut state = vec![Evaluation::Continue(0); CHAIN_LEN];
+    let mut vms = vec![Computer::new(mem.to_vec()); CHAIN_LEN];
     let mut iobuf = vec![VecDeque::new(); CHAIN_LEN];
 
     iobuf[0].push_back(s0);
@@ -105,43 +88,28 @@ fn amplifier_chain(mem: &[isize], s0: isize, s1: isize, s2: isize, s3: isize, s4
     iobuf[4].push_back(s4);
 
     'all: loop {
-        for amp in 0..amps.len() {
-            let mem = &mut amps[amp];
-            let mut amp_state = state[amp].clone();
-
-            let (input, output) = if amp == CHAIN_LEN - 1 {
-                let (a, b) = iobuf.split_at_mut(amp);
+        for vm_idx in 0..vms.len() {
+            let (input, output) = if vm_idx == CHAIN_LEN - 1 {
+                let (a, b) = iobuf.split_at_mut(vm_idx);
                 (&mut b[0], &mut a[0])
             } else {
-                let (a, b) = iobuf.split_at_mut(amp + 1);
+                let (a, b) = iobuf.split_at_mut(vm_idx + 1);
                 (a.last_mut().unwrap(), &mut b[0])
             };
 
             loop {
-                match amp_state {
-                    Evaluation::Halt => {
-                        if mem.is_empty() {
-                            panic!("Cannot continue execution on a halted amplifier: {}", amp);
-                        }
-
-                        mem.truncate(0);
-                        if amp == CHAIN_LEN - 1 {
+                match vms[vm_idx].run(input, output) {
+                    Outcome::Halt => {
+                        if vm_idx == CHAIN_LEN - 1 {
                             break 'all;
                         }
 
                         break;
                     }
-                    Evaluation::Fault(fault) => {
-                        panic!("[AMP {}] Failed to execute program: {:?}", amp, fault);
-                    }
-                    Evaluation::Continue(ip) => {
-                        let instruction = Instruction::decode(mem[ip]);
-                        amp_state = instruction.eval(mem, input, output, ip);
-                    }
-                    Evaluation::InsufficientInput(ip) => {
-                        state[amp] = Evaluation::Continue(ip);
-                        break;
-                    }
+                    Outcome::Fault(fault) => match fault {
+                        Fault::Error(fault) => panic!("Unexpected error: {:?}", fault),
+                        Fault::InsufficientInput => break,
+                    },
                 }
             }
         }

@@ -1,4 +1,4 @@
-use aoc_shared_2019::intcode::{Evaluation, Input, Instruction};
+use aoc_shared_2019::intcode::{Computer, Input, Outcome};
 
 pub fn part_one(mem: Vec<isize>) -> isize {
     let mut output = solve(mem, std::iter::once(1));
@@ -16,21 +16,13 @@ pub fn part_two(mem: Vec<isize>) -> isize {
     last
 }
 
-fn solve(mut mem: Vec<isize>, mut input: impl Input) -> Vec<isize> {
-    let mut state = Evaluation::Continue(0);
+fn solve(mem: Vec<isize>, mut input: impl Input) -> Vec<isize> {
+    let mut vm = Computer::new(mem);
     let mut output = vec![];
 
-    loop {
-        match state {
-            Evaluation::Continue(ip) => {
-                let instruction = Instruction::decode(mem[ip]);
-                state = instruction.eval(&mut mem, &mut input, &mut output, ip);
-            }
-            Evaluation::Halt => break,
-            _ => panic!("Unexpected state: {:?}", state),
-        }
+    if let Outcome::Fault(f) = vm.run(&mut input, &mut output) {
+        panic!("{:?}", f);
     }
-
     output
 }
 
