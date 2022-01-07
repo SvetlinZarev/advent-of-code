@@ -79,17 +79,37 @@ impl Computer {
         match mode {
             Mode::Position => {
                 let idx = self.ip + arg;
+                if self.mem.len() <= idx {
+                    self.mem.resize(idx + 1, 0);
+                }
+
                 let pos = self.mem[idx] as usize;
+                if self.mem.len() <= pos {
+                    self.mem.resize(pos + 1, 0);
+                }
+
                 &mut self.mem[pos]
             }
             Mode::Immediate => {
                 let idx = self.ip + arg;
+                if self.mem.len() <= idx {
+                    self.mem.resize(idx + 1, 0);
+                }
+
                 &mut self.mem[idx]
             }
 
             Mode::Relative => {
                 let idx = self.ip + arg;
+                if self.mem.len() <= idx {
+                    self.mem.resize(idx + 1, 0);
+                }
+
                 let pos = (self.rb + self.mem[idx]) as usize;
+                if self.mem.len() <= pos {
+                    self.mem.resize(pos + 1, 0);
+                }
+
                 &mut self.mem[pos]
             }
         }
@@ -122,6 +142,7 @@ impl TryFrom<isize> for Mode {
         Ok(match value {
             0 => Mode::Position,
             1 => Mode::Immediate,
+            2 => Mode::Relative,
             _ => return Err(format!("Invalid mode: {:?}", value)),
         })
     }
@@ -137,6 +158,7 @@ pub enum Instruction {
     JiF(Mode, Mode),
     LT(Mode, Mode, Mode),
     EQ(Mode, Mode, Mode),
+    RB(Mode),
     Hlt,
 }
 
@@ -188,6 +210,11 @@ impl Instruction {
                 Instruction::EQ(a, b, c)
             }
 
+            9 => {
+                let mode = decode_1(modes);
+                Instruction::RB(mode)
+            }
+
             99 => Instruction::Hlt,
             _ => panic!("Cannot decode int-code opcode: {:?}", n),
         }
@@ -237,6 +264,10 @@ impl Instruction {
                 exec_3(vm, m1, m2, md, |dst, v1, v2| *dst = (v1 == v2) as isize);
             }
 
+            Instruction::RB(m) => {
+                vm.rb += *vm.arg(m, 1);
+            }
+
             Instruction::Hlt => return Some(Outcome::Halt),
         }
 
@@ -254,6 +285,7 @@ impl Instruction {
             Instruction::JiF(_, _) => 3,
             Instruction::LT(_, _, _) => 4,
             Instruction::EQ(_, _, _) => 4,
+            Instruction::RB(_) => 2,
             Instruction::Hlt => 0,
         }
     }
