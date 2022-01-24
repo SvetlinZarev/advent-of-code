@@ -2,11 +2,15 @@ use crate::{Hall, Rooms, FREE_SPOT, HALL_LEN, ROOMS};
 use ahash::AHashMap;
 
 const COSTS: [u64; ROOMS] = [1, 10, 100, 1000];
+
+// Distances to each free space in the hall from each room
+// Each row contains the distances from this room. A distance
+// of 0 means that it's forbidden to stand at that place
 const HALL_DIST: [[u8; HALL_LEN]; ROOMS] = [
-    [2, 1, 0, 1, 0, 3, 0, 5, 0, 7, 8],
-    [4, 3, 0, 1, 0, 1, 0, 3, 0, 5, 6],
-    [6, 5, 0, 3, 0, 1, 0, 1, 0, 3, 4],
-    [8, 7, 0, 5, 0, 3, 0, 1, 0, 1, 2],
+    [2, 1, 0, 1, 0, 3, 0, 5, 0, 7, 8], // distance from room 1
+    [4, 3, 0, 1, 0, 1, 0, 3, 0, 5, 6], // distance from room 2
+    [6, 5, 0, 3, 0, 1, 0, 1, 0, 3, 4], // distance from room 3
+    [8, 7, 0, 5, 0, 3, 0, 1, 0, 1, 2], // distance from room 4
 ];
 
 type Map<K, V> = AHashMap<K, V>;
