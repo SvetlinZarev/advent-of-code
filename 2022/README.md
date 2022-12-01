@@ -5,7 +5,7 @@
 | Day   | Parsing (μs) | Part 1 (μs) | Part 2 (μs) | Total (μs) |
 |-------|--------------|-------------|-------------|------------|
 | 1     | 112.64       | 1.42        | 1.81        | 115.87     |
-| 2     |              |             |             |            |
+| 2     | 121.51       | 6.84        | 8.37        | 136.72     |
 | 3     |              |             |             |            |
 | 4     |              |             |             |            |
 | 5     |              |             |             |            |
@@ -31,4 +31,4 @@
 | 25    |              |             |             |            |
 | TOTAL |              |             |             |            |
 
-These results were measured on a ThinkPad W541 with `i7-4910MQ`
+These results were measured on a ThinkPad W541 with `i7-4910MQ` locked at 2.0GHz
