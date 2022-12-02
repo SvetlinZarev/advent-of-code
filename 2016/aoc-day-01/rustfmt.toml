@@ -1,5 +1,5 @@
 # Specifies which edition is used by the parser.
-edition = "2018"
+edition = "2021"
 
 # Prevent carriage returns
 newline_style = "Unix"
