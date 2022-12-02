@@ -7,39 +7,6 @@ pub enum Kind {
     Scissors,
 }
 
-impl Kind {
-    pub fn score(self) -> u32 {
-        match self {
-            Kind::Rock => 1,
-            Kind::Paper => 2,
-            Kind::Scissors => 3,
-        }
-    }
-
-    /// Return the type that the current variant wins over
-    pub fn wins(self) -> Kind {
-        match self {
-            Kind::Rock => Kind::Scissors,
-            Kind::Paper => Kind::Rock,
-            Kind::Scissors => Kind::Paper,
-        }
-    }
-
-    /// Return the type that the current variant loses to
-    pub fn loses(self) -> Kind {
-        match self {
-            Kind::Rock => Kind::Paper,
-            Kind::Paper => Kind::Scissors,
-            Kind::Scissors => Kind::Rock,
-        }
-    }
-
-    /// Return the type that the current variant neither wins, nor loses to
-    pub fn draw(self) -> Kind {
-        self
-    }
-}
-
 impl FromStr for Kind {
     type Err = String;
 
@@ -58,29 +25,6 @@ pub enum Guide {
     X,
     Y,
     Z,
-}
-
-impl Guide {
-    pub fn guess(self) -> Kind {
-        match self {
-            Guide::X => Kind::Rock,
-            Guide::Y => Kind::Paper,
-            Guide::Z => Kind::Scissors,
-        }
-    }
-
-    pub fn follow(self, opponent: Kind) -> Kind {
-        match self {
-            // We must lose, thus return the variant that will help our opponent to win
-            Guide::X => opponent.wins(),
-
-            // We must end in a draw, thus return the variant that will help us do so
-            Guide::Y => opponent.draw(),
-
-            // We must win, thus return the variant that will help our opponent to lose
-            Guide::Z => opponent.loses(),
-        }
-    }
 }
 
 impl FromStr for Guide {
@@ -102,22 +46,6 @@ pub struct Game {
     guide: Guide,
 }
 
-impl Game {
-    pub fn play<F: Fn(Guide, Kind) -> Kind>(self, guide: F) -> u32 {
-        let decoded = guide(self.guide, self.opponent);
-
-        let game = if decoded.draw() == self.opponent {
-            3
-        } else if decoded.wins() == self.opponent {
-            6
-        } else {
-            0
-        };
-
-        game + decoded.score()
-    }
-}
-
 impl FromStr for Game {
     type Err = String;
 
@@ -132,25 +60,136 @@ impl FromStr for Game {
     }
 }
 
-pub fn part_one(input: &[Game]) -> u32 {
-    input
-        .iter()
-        .map(|game| game.play(|guide, _opponent| guide.guess()))
-        .sum()
+pub mod v1 {
+    use super::*;
+
+    impl Kind {
+        pub fn score(self) -> u32 {
+            match self {
+                Kind::Rock => 1,
+                Kind::Paper => 2,
+                Kind::Scissors => 3,
+            }
+        }
+
+        /// Return the type that the current variant wins over
+        pub fn wins(self) -> Kind {
+            match self {
+                Kind::Rock => Kind::Scissors,
+                Kind::Paper => Kind::Rock,
+                Kind::Scissors => Kind::Paper,
+            }
+        }
+
+        /// Return the type that the current variant loses to
+        pub fn loses(self) -> Kind {
+            match self {
+                Kind::Rock => Kind::Paper,
+                Kind::Paper => Kind::Scissors,
+                Kind::Scissors => Kind::Rock,
+            }
+        }
+
+        /// Return the type that the current variant neither wins, nor loses to
+        pub fn draw(self) -> Kind {
+            self
+        }
+    }
+
+    impl Guide {
+        pub fn guess(self) -> Kind {
+            match self {
+                Guide::X => Kind::Rock,
+                Guide::Y => Kind::Paper,
+                Guide::Z => Kind::Scissors,
+            }
+        }
+
+        pub fn follow(self, opponent: Kind) -> Kind {
+            match self {
+                // We must lose, thus return the variant that will help our opponent to win
+                Guide::X => opponent.wins(),
+
+                // We must end in a draw, thus return the variant that will help us do so
+                Guide::Y => opponent.draw(),
+
+                // We must win, thus return the variant that will help our opponent to lose
+                Guide::Z => opponent.loses(),
+            }
+        }
+    }
+
+    impl Game {
+        pub fn play_v1<F: Fn(Guide, Kind) -> Kind>(self, guide: F) -> u32 {
+            let decoded = guide(self.guide, self.opponent);
+
+            let game = if decoded.draw() == self.opponent {
+                3
+            } else if decoded.wins() == self.opponent {
+                6
+            } else {
+                0
+            };
+
+            game + decoded.score()
+        }
+    }
+
+    pub fn part_one(input: &[Game]) -> u32 {
+        input
+            .iter()
+            .map(|game| game.play_v1(|guide, _opponent| guide.guess()))
+            .sum()
+    }
+
+    pub fn part_two(input: &[Game]) -> u32 {
+        input
+            .iter()
+            .map(|game| game.play_v1(|guide, opponent| guide.follow(opponent)))
+            .sum()
+    }
 }
 
-pub fn part_two(input: &[Game]) -> u32 {
-    input
-        .iter()
-        .map(|game| game.play(|guide, opponent| guide.follow(opponent)))
-        .sum()
+pub mod v2 {
+    use super::*;
+
+    // Precompute all valid combinations:
+    // * The row represents the other player's move
+    // * The column - my move
+    // Thus if the other player chooses "paper" and I choose "scissors",
+    // we have to select the `state[1][2]` value which is `9`, i.e. `6 + 3`:
+    // * 6 because I win
+    // * +3 because that's the value for "scissors"
+    const STATE_PART_1: [[u32; 3]; 3] = [[4, 8, 3], [1, 5, 9], [7, 2, 6]];
+
+    // Precompute all valid combinations:
+    // * The row represents the other player's move
+    // * The column - my move
+    const STATE_PART_2: [[u32; 3]; 3] = [[3, 4, 8], [1, 5, 9], [2, 6, 7]];
+
+    impl Game {
+        pub fn play_v2(self, state: &[[u32; 3]; 3]) -> u32 {
+            let a = self.opponent as usize;
+            let b = self.guide as usize;
+
+            state[a][b]
+        }
+    }
+
+    pub fn part_one(input: &[Game]) -> u32 {
+        input.iter().map(|game| game.play_v2(&STATE_PART_1)).sum()
+    }
+
+    pub fn part_two(input: &[Game]) -> u32 {
+        input.iter().map(|game| game.play_v2(&STATE_PART_2)).sum()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use aoc_shared::input::load_line_delimited_input_from_file;
 
-    use crate::{part_one, part_two, Game, Guide, Kind};
+    use crate::{v1, v2, Game, Guide, Kind};
 
     #[test]
     fn test_scores() {
@@ -203,7 +242,7 @@ mod tests {
                 opponent: Kind::Rock,
                 guide: Guide::X,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
 
         assert_eq!(
@@ -212,7 +251,7 @@ mod tests {
                 opponent: Kind::Paper,
                 guide: Guide::X,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
 
         assert_eq!(
@@ -221,7 +260,7 @@ mod tests {
                 opponent: Kind::Scissors,
                 guide: Guide::X,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
     }
 
@@ -233,7 +272,7 @@ mod tests {
                 opponent: Kind::Rock,
                 guide: Guide::Z,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
 
         assert_eq!(
@@ -242,7 +281,7 @@ mod tests {
                 opponent: Kind::Paper,
                 guide: Guide::Z,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
 
         assert_eq!(
@@ -251,7 +290,7 @@ mod tests {
                 opponent: Kind::Scissors,
                 guide: Guide::Z,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
     }
 
@@ -263,7 +302,7 @@ mod tests {
                 opponent: Kind::Rock,
                 guide: Guide::Y,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
 
         assert_eq!(
@@ -272,7 +311,7 @@ mod tests {
                 opponent: Kind::Paper,
                 guide: Guide::Y,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
 
         assert_eq!(
@@ -281,19 +320,31 @@ mod tests {
                 opponent: Kind::Scissors,
                 guide: Guide::Y,
             }
-            .play(|guide, opponent| guide.follow(opponent))
+            .play_v1(|guide, opponent| guide.follow(opponent))
         );
     }
 
     #[test]
-    fn test_part_one() {
+    fn test_v1_part_one() {
         let input = load_line_delimited_input_from_file("inputs/input.txt");
-        assert_eq!(13924, part_one(&input));
+        assert_eq!(13924, v1::part_one(&input));
     }
 
     #[test]
-    fn test_part_two() {
+    fn test_v1_part_two() {
         let input = load_line_delimited_input_from_file("inputs/input.txt");
-        assert_eq!(13448, part_two(&input));
+        assert_eq!(13448, v1::part_two(&input));
+    }
+
+    #[test]
+    fn test_v2_part_one() {
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
+        assert_eq!(13924, v2::part_one(&input));
+    }
+
+    #[test]
+    fn test_v2_part_two() {
+        let input = load_line_delimited_input_from_file("inputs/input.txt");
+        assert_eq!(13448, v2::part_two(&input));
     }
 }

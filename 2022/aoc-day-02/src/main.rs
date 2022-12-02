@@ -1,4 +1,4 @@
-use aoc_day_02::{part_one, part_two};
+use aoc_day_02::v1::{part_one, part_two};
 use aoc_shared::input::load_line_delimited_input_from_autodetect;
 
 fn main() {
