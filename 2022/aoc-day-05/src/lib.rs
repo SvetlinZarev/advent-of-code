@@ -54,7 +54,7 @@ pub fn parse_input(input: impl AsRef<str>) -> (Vec<Vec<char>>, Vec<(usize, usize
                         1 => count = part.parse().unwrap(),
                         3 => src = part.parse().unwrap(),
                         5 => dst = part.parse().unwrap(),
-                        _ => println!("unexpected input: {:?}", line)
+                        _ => panic!("unexpected input: {:?}", line)
                     }
                 }
 
