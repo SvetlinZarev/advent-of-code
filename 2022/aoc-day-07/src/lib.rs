@@ -108,15 +108,8 @@ fn disk_usage<'l>(entries: &'l [Entry]) -> HashMap<Vec<&'l str>, u32> {
                 // check if we have already processed that directory
                 directory_processed = seen.contains(&listed);
 
-                // Create the whole path once, in order to avoid unnecessary allocations
-                for to in (1..=listed.len()).rev() {
-                    // stop early if we found an already existing directory
-                    if fs.contains_key(&listed[..to]) {
-                        break;
-                    }
-
-                    fs.insert(listed[..to].to_vec(), 0);
-                }
+                // Register the path in the tracker
+                fs.entry(path.clone()).or_insert(0);
             }
 
             Entry::Root => {
@@ -139,12 +132,10 @@ fn disk_usage<'l>(entries: &'l [Entry]) -> HashMap<Vec<&'l str>, u32> {
                     continue;
                 }
 
-                // update the current directory + all parent directories
-                for to in 1..=listed.len() {
-                    match fs.get_mut(&listed[..to]) {
-                        None => panic!("unknown path: {:?}", listed),
-                        Some(total) => *total += size,
-                    }
+                // update the current directory
+                match fs.get_mut(&listed) {
+                    None => panic!("unknown path: {:?}", listed),
+                    Some(total) => *total += size,
                 }
             }
 
@@ -152,7 +143,21 @@ fn disk_usage<'l>(entries: &'l [Entry]) -> HashMap<Vec<&'l str>, u32> {
         }
     }
 
-    fs
+    let mut directories = HashMap::new();
+    for (path, size) in fs.into_iter() {
+        for to in 1..=path.len() {
+            match directories.get_mut(&path[..to]) {
+                Some(total) => {
+                    *total += size;
+                }
+                None => {
+                    directories.insert(path[..to].to_vec(), size);
+                }
+            }
+        }
+    }
+
+    directories
 }
 
 #[cfg(test)]
