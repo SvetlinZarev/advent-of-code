@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+const MAX_HEIGHT: u8 = 9;
+
 pub fn part_one(grid: &[Vec<u8>]) -> usize {
     let mut visible = HashSet::new();
 
@@ -12,6 +14,10 @@ pub fn part_one(grid: &[Vec<u8>]) -> usize {
             if height > tallest {
                 tallest = height;
                 visible.insert((r, c));
+
+                if height == MAX_HEIGHT {
+                    break;
+                }
             }
         }
 
@@ -21,6 +27,10 @@ pub fn part_one(grid: &[Vec<u8>]) -> usize {
             if height > tallest {
                 tallest = height;
                 visible.insert((r, c));
+
+                if height == MAX_HEIGHT {
+                    break;
+                }
             }
         }
     }
@@ -32,6 +42,10 @@ pub fn part_one(grid: &[Vec<u8>]) -> usize {
             if height > tallest {
                 tallest = height;
                 visible.insert((r, c));
+
+                if height == MAX_HEIGHT {
+                    break;
+                }
             }
         }
 
@@ -41,6 +55,10 @@ pub fn part_one(grid: &[Vec<u8>]) -> usize {
             if height > tallest {
                 tallest = height;
                 visible.insert((r, c));
+
+                if height == MAX_HEIGHT {
+                    break;
+                }
             }
         }
     }
