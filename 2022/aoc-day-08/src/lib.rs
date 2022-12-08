@@ -67,7 +67,7 @@ pub fn part_one(grid: &[Vec<u8>]) -> usize {
 }
 
 pub fn part_two(grid: &[Vec<u8>]) -> usize {
-    let mut map = vec![vec![(0usize, 0usize, 0usize, 0usize); grid[0].len()]; grid.len()];
+    let mut score = vec![vec![0usize; grid[0].len()]; grid.len()];
     let mut stack: Vec<usize> = vec![];
 
     for r in 0..grid.len() {
@@ -82,13 +82,13 @@ pub fn part_two(grid: &[Vec<u8>]) -> usize {
                 }
 
                 stack.pop();
-                map[r][x].0 = x - c;
+                score[r][x] = x - c;
             }
 
             stack.push(c);
         }
         for x in stack.drain(..) {
-            map[r][x].0 = x;
+            score[r][x] = x;
         }
 
         // to the right
@@ -100,13 +100,13 @@ pub fn part_two(grid: &[Vec<u8>]) -> usize {
                 }
 
                 stack.pop();
-                map[r][x].1 = c - x;
+                score[r][x] *= c - x;
             }
 
             stack.push(c);
         }
         for x in stack.drain(..) {
-            map[r][x].1 = grid[r].len() - x - 1;
+            score[r][x] *= grid[r].len() - x - 1;
         }
     }
 
@@ -120,13 +120,13 @@ pub fn part_two(grid: &[Vec<u8>]) -> usize {
                 }
 
                 stack.pop();
-                map[x][c].2 = r - x;
+                score[x][c] *= r - x;
             }
 
             stack.push(r);
         }
         for x in stack.drain(..) {
-            map[x][c].2 = grid.len() - x - 1;
+            score[x][c] *= grid.len() - x - 1;
         }
 
         // to the top
@@ -138,21 +138,17 @@ pub fn part_two(grid: &[Vec<u8>]) -> usize {
                 }
 
                 stack.pop();
-                map[x][c].3 = x - r;
+                score[x][c] *= x - r;
             }
 
             stack.push(r);
         }
         for x in stack.drain(..) {
-            map[x][c].3 = x;
+            score[x][c] *= x;
         }
     }
 
-    map.into_iter()
-        .flatten()
-        .map(|(a, b, c, d)| a * b * c * d)
-        .max()
-        .unwrap()
+    score.into_iter().flatten().max().unwrap()
 }
 
 #[cfg(test)]
