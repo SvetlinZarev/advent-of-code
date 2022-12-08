@@ -108,7 +108,7 @@ pub fn part_two(grid: &[Vec<u8>]) -> usize {
             stack.push(r);
         }
         for x in stack.drain(..) {
-            map[x][c].2 = grid[0].len() - x - 1;
+            map[x][c].2 = grid.len() - x - 1;
         }
 
         // to the top
