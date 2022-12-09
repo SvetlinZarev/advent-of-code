@@ -28,53 +28,15 @@ impl FromStr for Direction {
 }
 
 pub fn part_one(input: &[Direction]) -> usize {
-    let mut visited = HashSet::new();
-    visited.insert((0, 0));
-
-    let (mut tr, mut tc) = (0, 0);
-    let (mut hr, mut hc) = (0, 0);
-
-    for d in input.iter().copied() {
-        match d {
-            Direction::L(s) => {
-                for _ in 0..s {
-                    hc -= 1;
-                    (tr, tc) = move_tail(hr, hc, tr, tc);
-                    visited.insert((tr, tc));
-                }
-            }
-
-            Direction::R(s) => {
-                for _ in 0..s {
-                    hc += 1;
-                    (tr, tc) = move_tail(hr, hc, tr, tc);
-                    visited.insert((tr, tc));
-                }
-            }
-
-            Direction::U(s) => {
-                for _ in 0..s {
-                    hr += 1;
-                    (tr, tc) = move_tail(hr, hc, tr, tc);
-                    visited.insert((tr, tc));
-                }
-            }
-
-            Direction::D(s) => {
-                for _ in 0..s {
-                    hr -= 1;
-                    (tr, tc) = move_tail(hr, hc, tr, tc);
-                    visited.insert((tr, tc));
-                }
-            }
-        }
-    }
-
-    visited.len()
+    simulate::<2>(input)
 }
 
 pub fn part_two(input: &[Direction]) -> usize {
-    let mut rope = [(0, 0); 10];
+    simulate::<10>(input)
+}
+
+fn simulate<const N: usize>(input: &[Direction]) -> usize {
+    let mut rope = [(0, 0); N];
 
     let mut visited = HashSet::new();
     visited.insert((0, 0));
@@ -114,10 +76,10 @@ pub fn part_two(input: &[Direction]) -> usize {
     visited.len()
 }
 
-fn move_rope(rope: &mut [(i32, i32); 10], visited: &mut HashSet<(i32, i32)>) {
-    let old_tail = rope[9];
+fn move_rope<const N: usize>(rope: &mut [(i32, i32); N], visited: &mut HashSet<(i32, i32)>) {
+    let old_tail = rope[N - 1];
 
-    for h in 0..9 {
+    for h in 0..N - 1 {
         let (hr, hc) = rope[h + 0];
         let (tr, tc) = rope[h + 1];
 
@@ -129,8 +91,8 @@ fn move_rope(rope: &mut [(i32, i32); 10], visited: &mut HashSet<(i32, i32)>) {
         rope[h + 1] = (rx, cx);
     }
 
-    if old_tail != rope[9] {
-        visited.insert(rope[9]);
+    if old_tail != rope[N - 1] {
+        visited.insert(rope[N - 1]);
     }
 }
 
