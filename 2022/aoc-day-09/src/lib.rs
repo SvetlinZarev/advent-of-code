@@ -9,6 +9,26 @@ pub enum Direction {
     D(i32),
 }
 
+impl Direction {
+    fn rx_cx(self) -> (i32, i32) {
+        match self {
+            Direction::L(_) => (0, -1),
+            Direction::R(_) => (0, 1),
+            Direction::U(_) => (1, 0),
+            Direction::D(_) => (-1, 0),
+        }
+    }
+
+    fn steps(self) -> i32 {
+        match self {
+            Direction::L(steps) => steps,
+            Direction::R(steps) => steps,
+            Direction::U(steps) => steps,
+            Direction::D(steps) => steps,
+        }
+    }
+}
+
 impl FromStr for Direction {
     type Err = String;
 
@@ -41,35 +61,12 @@ fn simulate<const N: usize>(input: &[Direction]) -> usize {
     let mut visited = HashSet::default();
     visited.insert((0, 0));
 
-    for d in input.iter().copied() {
-        match d {
-            Direction::L(s) => {
-                for _ in 0..s {
-                    rope[0].1 -= 1;
-                    move_rope(&mut rope, &mut visited);
-                }
-            }
-
-            Direction::R(s) => {
-                for _ in 0..s {
-                    rope[0].1 += 1;
-                    move_rope(&mut rope, &mut visited);
-                }
-            }
-
-            Direction::U(s) => {
-                for _ in 0..s {
-                    rope[0].0 += 1;
-                    move_rope(&mut rope, &mut visited);
-                }
-            }
-
-            Direction::D(s) => {
-                for _ in 0..s {
-                    rope[0].0 -= 1;
-                    move_rope(&mut rope, &mut visited);
-                }
-            }
+    for direction in input.iter().copied() {
+        let (rx, cx) = direction.rx_cx();
+        for _ in 0..direction.steps() {
+            rope[0].0 += rx;
+            rope[0].1 += cx;
+            move_rope(&mut rope, &mut visited);
         }
     }
 
