@@ -1,16 +1,16 @@
 const ASCII_LEN: usize = (b'z' - b'a' + 1) as usize;
 
 pub fn part_one(input: &str) -> usize {
-    sliding_window(input, 4)
+    sliding_window::<4>(input)
 }
 
 pub fn part_two(input: &str) -> usize {
-    sliding_window(input, 14)
+    sliding_window::<14>(input)
 }
 
-pub fn sliding_window(input: &str, window: usize) -> usize {
+pub fn sliding_window<const W: usize>(input: &str) -> usize {
     let input = input.as_bytes();
-    if input.len() < window {
+    if input.len() < W {
         panic!("Input is too short: {}", input.len());
     }
 
@@ -18,7 +18,7 @@ pub fn sliding_window(input: &str, window: usize) -> usize {
     let mut uniq = 0;
 
     // Seed the algorithm with the first `window` bytes
-    for idx in 0..window {
+    for idx in 0..W {
         let ch = (input[idx] - b'a') as usize;
 
         seen[ch] += 1;
@@ -28,12 +28,12 @@ pub fn sliding_window(input: &str, window: usize) -> usize {
     }
 
     // Fast path: check if the first `window` bytes are the solution
-    if uniq == window {
-        return window;
+    if uniq == W {
+        return W;
     }
 
     input
-        .windows(window + 1)
+        .windows(W + 1)
         .enumerate()
         .find(|&(_idx, w)| {
             let ch = (w[0] - b'a') as usize;
@@ -42,16 +42,16 @@ pub fn sliding_window(input: &str, window: usize) -> usize {
                 uniq -= 1;
             }
 
-            let ch = (w[window] - b'a') as usize;
+            let ch = (w[W] - b'a') as usize;
             seen[ch] += 1;
             if seen[ch] == 1 {
                 uniq += 1;
             }
 
-            uniq == window
+            uniq == W
         })
         // convert the window index to character index
-        .map(|(pos, w)| pos + w.len())
+        .map(|(pos, _)| pos + W + 1)
         .expect("no answer")
 }
 

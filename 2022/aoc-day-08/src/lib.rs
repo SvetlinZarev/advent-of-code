@@ -1,9 +1,9 @@
-use std::collections::HashSet;
+use aoc_shared::hashing::HashSet;
 
 const MAX_HEIGHT: u8 = 9;
 
 pub fn part_one(grid: &[Vec<u8>]) -> usize {
-    let mut visible = HashSet::new();
+    let mut visible = HashSet::default();
 
     for r in 1..grid.len() - 1 {
         let row = &grid[r];

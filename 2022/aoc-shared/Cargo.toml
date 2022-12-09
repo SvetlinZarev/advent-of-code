@@ -9,3 +9,5 @@ crate-type = ["rlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hashbrown = { version = "0.13.1", default-features = false, features = ["inline-more"] }
+rustc-hash = { version = "1.1.0", default-features = false }

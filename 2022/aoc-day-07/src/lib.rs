@@ -1,3 +1,5 @@
+use aoc_shared::hashing::{HashMap, HashSet};
+
 const ROOT_DIR: &str = "/";
 const TOTAL_DISK_SPACE: u32 = 70_000_000;
 const REQUIRED_SPACE: u32 = 30_000_000;
@@ -64,8 +66,6 @@ pub fn parse_input(input: &str) -> Vec<Entry> {
 }
 
 pub mod v1 {
-    use std::collections::{HashMap, HashSet};
-
     use super::*;
 
     pub fn part_one(entries: &[Entry]) -> u32 {
@@ -95,8 +95,8 @@ pub mod v1 {
     }
 
     fn disk_usage<'l>(entries: &'l [Entry]) -> HashMap<Vec<&'l str>, u32> {
-        let mut fs = HashMap::new();
-        let mut seen = HashSet::new();
+        let mut fs = HashMap::default();
+        let mut seen = HashSet::default();
 
         let mut path = vec![];
         let mut listed = vec![];
@@ -146,7 +146,7 @@ pub mod v1 {
             }
         }
 
-        let mut directories = HashMap::new();
+        let mut directories = HashMap::default();
         for (path, size) in fs.into_iter() {
             for to in 1..=path.len() {
                 match directories.get_mut(&path[..to]) {
@@ -165,8 +165,6 @@ pub mod v1 {
 }
 
 pub mod v2 {
-    use std::collections::HashMap;
-
     use super::*;
 
     #[derive(Default, Debug)]

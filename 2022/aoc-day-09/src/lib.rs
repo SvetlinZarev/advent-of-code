@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use aoc_shared::hashing::HashSet;
 use std::str::FromStr;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -38,7 +38,7 @@ pub fn part_two(input: &[Direction]) -> usize {
 fn simulate<const N: usize>(input: &[Direction]) -> usize {
     let mut rope = [(0, 0); N];
 
-    let mut visited = HashSet::new();
+    let mut visited = HashSet::default();
     visited.insert((0, 0));
 
     for d in input.iter().copied() {
