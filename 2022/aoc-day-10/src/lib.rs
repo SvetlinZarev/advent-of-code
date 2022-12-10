@@ -102,34 +102,17 @@ mod tests {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_part_two() {
         let input = load_text_input_from_file("inputs/input.txt");
         let instructions = parse_input(&input);
         let answer = part_two(&instructions);
-
-        assert_eq!(
-            "████  ██  ████ █  █ ████  ██  █    ███  ",
-            answer[0].iter().collect::<String>()
-        );
-        assert_eq!(
-            "█    █  █    █ █  █    █ █  █ █    █  █ ",
-            answer[1].iter().collect::<String>()
-        );
-        assert_eq!(
-            "███  █      █  █  █   █  █  █ █    █  █ ",
-            answer[2].iter().collect::<String>()
-        );
-        assert_eq!(
-            "█    █     █   █  █  █   ████ █    ███  ",
-            answer[3].iter().collect::<String>()
-        );
-        assert_eq!(
-            "█    █  █ █    █  █ █    █  █ █    █ █  ",
-            answer[4].iter().collect::<String>()
-        );
-        assert_eq!(
-            "████  ██  ████  ██  ████ █  █ ████ █  █ ",
-            answer[5].iter().collect::<String>()
-        );
+        
+        assert_eq!("████  ██  ████ █  █ ████  ██  █    ███  ", answer[0].iter().collect::<String>());
+        assert_eq!("█    █  █    █ █  █    █ █  █ █    █  █ ", answer[1].iter().collect::<String>());
+        assert_eq!("███  █      █  █  █   █  █  █ █    █  █ ", answer[2].iter().collect::<String>());
+        assert_eq!("█    █     █   █  █  █   ████ █    ███  ", answer[3].iter().collect::<String>());
+        assert_eq!("█    █  █ █    █  █ █    █  █ █    █ █  ", answer[4].iter().collect::<String>());
+        assert_eq!("████  ██  ████  ██  ████ █  █ ████ █  █ ", answer[5].iter().collect::<String>());
     }
 }
