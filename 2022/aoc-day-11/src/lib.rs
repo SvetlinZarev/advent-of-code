@@ -114,17 +114,29 @@ pub fn part_two(monkeys: &[Monkey]) -> u64 {
     solve::<10_000, 1>(monkeys.to_vec())
 }
 
-fn solve<const ROUNDS: u32, const RELIEF: Int>(monkeys: Vec<Monkey>) -> u64 {
+fn solve<const ROUNDS: usize, const RELIEF: Int>(monkeys: Vec<Monkey>) -> u64 {
     let mut monkeys = monkeys.to_vec();
     let mut activity = vec![0; monkeys.len()];
 
-    // Key observations is that all divisors are PRIME numbers
+    // Key observations is that all divisors are PRIME numbers,
+    // might not work if they are not
     let modulo = monkeys.iter().map(|m| m.division).product::<Int>();
+
+    // Temporary holder to keep the current monkey in order to
+    // avoid multiple mutable borrows over the `monkeys` array.
+    //
+    // This works under the assumption that the monkey always
+    // passes the items to another monkey and never to itself
     let mut monkey = Monkey::default();
 
     for _ in 0..ROUNDS {
         for idx in 0..monkeys.len() {
+            // Remove the current monkey from the vector in order to avoid
+            // double mutable borrow over the `monkeys` array. We replace it
+            // with a "dummy" monkey
             std::mem::swap(&mut monkey, &mut monkeys[idx]);
+
+            // update the current monkey activity
             activity[idx] += monkey.items.len() as u64;
 
             for item in monkey.items.drain(..) {
@@ -132,21 +144,40 @@ fn solve<const ROUNDS: u32, const RELIEF: Int>(monkeys: Vec<Monkey>) -> u64 {
                 worry_level %= modulo;
                 worry_level /= RELIEF;
 
+                // Select the next monkey
                 let next_monkey = if worry_level % monkey.division == 0 {
                     monkey.on_pass as usize
                 } else {
                     monkey.on_fail as usize
                 };
 
+                // Pass the item to the next monkey
                 monkeys[next_monkey].items.push(worry_level);
             }
 
+            // Return the monkey back to the array
             std::mem::swap(&mut monkey, &mut monkeys[idx]);
         }
     }
 
-    activity.sort_unstable();
-    activity[activity.len() - 2] * activity[activity.len() - 1]
+    let (a, b) = top_two(&activity);
+    a * b
+}
+
+fn top_two(array: &[u64]) -> (u64, u64) {
+    let mut a = 0;
+    let mut b = 0;
+
+    for &x in array {
+        if x > a {
+            b = a;
+            a = x;
+        } else if x > b {
+            b = x;
+        }
+    }
+
+    (a, b)
 }
 
 #[cfg(test)]
