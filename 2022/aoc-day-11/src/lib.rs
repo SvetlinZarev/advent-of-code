@@ -118,8 +118,8 @@ fn solve<const ROUNDS: usize, const RELIEF: Int>(monkeys: Vec<Monkey>) -> u64 {
     let mut monkeys = monkeys.to_vec();
     let mut activity = vec![0; monkeys.len()];
 
-    // Key observations is that all divisors are PRIME numbers,
-    // might not work if they are not
+    // Key observations is that all divisors are PRIME numbers. If they were not,
+    // then we should have used Least Common Multiple instead
     let modulo = monkeys.iter().map(|m| m.division).product::<Int>();
 
     // Temporary holder to keep the current monkey in order to
