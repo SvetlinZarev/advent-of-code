@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 type Int = u64;
 
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
@@ -22,7 +20,7 @@ impl Operation {
 
 #[derive(Debug, Default, Clone)]
 pub struct Monkey {
-    items: VecDeque<Int>,
+    items: Vec<Int>,
     operation: Operation,
     division: Int,
     on_pass: u32,
@@ -121,25 +119,29 @@ fn solve<const ROUNDS: u32, const RELIEF: Int>(monkeys: Vec<Monkey>) -> u64 {
     let mut activity = vec![0; monkeys.len()];
 
     // Key observations is that all divisors are PRIME numbers
-    let modulo: Int = monkeys.iter().map(|m| m.division).product();
+    let modulo = monkeys.iter().map(|m| m.division).product::<Int>();
+    let mut monkey = Monkey::default();
 
     for _ in 0..ROUNDS {
-        for monkey in 0..monkeys.len() {
-            activity[monkey] += monkeys[monkey].items.len() as u64;
+        for idx in 0..monkeys.len() {
+            std::mem::swap(&mut monkey, &mut monkeys[idx]);
+            activity[idx] += monkey.items.len() as u64;
 
-            while let Some(item) = monkeys[monkey].items.pop_front() {
-                let mut worry_level = monkeys[monkey].operation.execute(item);
+            for item in monkey.items.drain(..) {
+                let mut worry_level = monkey.operation.execute(item);
                 worry_level %= modulo;
                 worry_level /= RELIEF;
 
-                let next_monkey = if worry_level % monkeys[monkey].division == 0 {
-                    monkeys[monkey].on_pass as usize
+                let next_monkey = if worry_level % monkey.division == 0 {
+                    monkey.on_pass as usize
                 } else {
-                    monkeys[monkey].on_fail as usize
+                    monkey.on_fail as usize
                 };
 
-                monkeys[next_monkey].items.push_back(worry_level);
+                monkeys[next_monkey].items.push(worry_level);
             }
+
+            std::mem::swap(&mut monkey, &mut monkeys[idx]);
         }
     }
 
