@@ -116,7 +116,7 @@ fn solve_v2_all_parts(grid: Vec<Vec<u8>>, target: u8) -> u32 {
     solve_v2(grid, sr, sc, target).unwrap()
 }
 
-// A* => move from end to start
+// BFS => move from end to start
 fn solve_v2(mut grid: Vec<Vec<u8>>, sr: usize, sc: usize, target: u8) -> Option<u32> {
     grid[sr][sc] = 0;
 
