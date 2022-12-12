@@ -2,10 +2,10 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 pub fn parse_line_delimited<I, R>(input: I) -> Vec<R>
-where
-    I: AsRef<str>,
-    R: FromStr,
-    <R as FromStr>::Err: Debug,
+    where
+        I: AsRef<str>,
+        R: FromStr,
+        <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
@@ -18,10 +18,10 @@ where
 }
 
 pub fn parse_csv<I, R>(input: I) -> Vec<R>
-where
-    I: AsRef<str>,
-    R: FromStr,
-    <R as FromStr>::Err: Debug,
+    where
+        I: AsRef<str>,
+        R: FromStr,
+        <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
@@ -37,6 +37,7 @@ pub fn parse_numeric_grid<I: AsRef<str>, T: From<u8> + Copy>(input: I) -> Vec<Ve
     input
         .as_ref()
         .lines()
+        .filter(|l| !l.is_empty())
         .map(|l| {
             l.as_bytes()
                 .iter()
@@ -50,6 +51,7 @@ pub fn parse_u8_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
     input
         .as_ref()
         .lines()
+        .filter(|l| !l.is_empty())
         .map(|l| l.as_bytes().to_vec())
         .collect()
 }
