@@ -17,18 +17,14 @@ impl Debug for Packet {
 impl Display for Packet {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Packet::Single(x) => write!(f, "[{}]", *x),
+            Packet::Single(x) => write!(f, "{}", *x),
             Packet::Many(packets) => {
                 write!(f, "[")?;
                 for (idx, packet) in packets.iter().enumerate() {
                     if idx != 0 {
                         write!(f, ",")?;
                     }
-
-                    match packet {
-                        Packet::Single(single) => write!(f, "{}", single),
-                        many @ Packet::Many(_) => write!(f, "{}", many),
-                    }?;
+                    write!(f, "{}", packet)?;
                 }
                 write!(f, "]")
             }
@@ -39,8 +35,6 @@ impl Display for Packet {
 impl FromStr for Packet {
     type Err = String;
 
-    // IMPORTANT: Currently this function incorrectly parses multi-element
-    // lists of the form `[[x]]` as a single-element list `[x]`
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.starts_with('[') {
             return Err(format!("The packet should have started with '[': {}", s).into());
@@ -77,17 +71,11 @@ impl FromStr for Packet {
                 }
 
                 b']' => {
-                    if !many.is_empty() {
-                        if let Some(value) = single.take() {
-                            many.push(Packet::Single(value));
-                        }
+                    if let Some(value) = single.take() {
+                        many.push(Packet::Single(value));
                     }
 
-                    let packet = match single.take() {
-                        None => Packet::Many(many),
-                        Some(value) => Packet::Single(value),
-                    };
-
+                    let packet = Packet::Many(many);
                     (many, single) = stack.pop().unwrap();
                     many.push(packet);
                 }
@@ -102,18 +90,11 @@ impl FromStr for Packet {
             stack
         );
 
-        if !many.is_empty() {
-            if let Some(value) = single.take() {
-                many.push(Packet::Single(value));
-            }
+        if let Some(value) = single.take() {
+            many.push(Packet::Single(value));
         }
 
-        let packet = match single.take() {
-            None => Packet::Many(many),
-            Some(value) => Packet::Single(value),
-        };
-
-        Ok(packet)
+        Ok(Packet::Many(many))
     }
 }
 
