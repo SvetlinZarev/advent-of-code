@@ -121,67 +121,22 @@ impl Ord for Packet {
     }
 }
 
-pub fn parse_input(input: &str) -> Vec<(Packet, Packet)> {
-    #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-    enum ParserState {
-        First,
-        Second,
-        End,
-    }
-
-    let mut parsed = vec![];
-    let mut first = None;
-    let mut second = None;
-
-    let mut state = ParserState::First;
-    for line in input.lines() {
-        match state {
-            ParserState::First => {
-                first = Some(line.parse().unwrap());
-                state = ParserState::Second;
-            }
-
-            ParserState::Second => {
-                second = Some(line.parse().unwrap());
-                state = ParserState::End;
-            }
-
-            ParserState::End => {
-                assert!(line.is_empty());
-
-                parsed.push((first.take().unwrap(), second.take().unwrap()));
-                state = ParserState::First;
-            }
-        }
-    }
-
-    if first.is_some() || second.is_some() {
-        parsed.push((first.take().unwrap(), second.take().unwrap()));
-    }
-
-    parsed
-}
-
-pub fn part_one(packets: &[(Packet, Packet)]) -> usize {
+pub fn part_one(packets: &[Packet]) -> usize {
     packets
-        .iter()
+        .chunks(2)
         .enumerate()
-        .filter_map(|(idx, (a, b))| match a.cmp(b) == Ordering::Less {
-            true => Some(idx + 1),
-            false => None,
-        })
+        .filter_map(
+            |(idx, chunk)| match chunk[0].cmp(&chunk[1]) == Ordering::Less {
+                true => Some(idx + 1),
+                false => None,
+            },
+        )
         .sum()
 }
 
-pub fn part_two(packets: Vec<(Packet, Packet)>) -> usize {
-    let mut packets = packets
-        .into_iter()
-        .map(|(a, b)| std::iter::once(a).chain(std::iter::once(b)))
-        .flatten()
-        .collect::<Vec<_>>();
+pub fn part_two(mut packets: Vec<Packet>) -> usize {
     packets.push(Packet::Single(2));
     packets.push(Packet::Single(6));
-
     packets.sort_unstable();
 
     let mut answer = 1;
@@ -205,21 +160,20 @@ pub fn part_two(packets: Vec<(Packet, Packet)>) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::{parse_input, part_one, part_two};
-    use aoc_shared::input::load_text_input_from_file;
+    use aoc_shared::input::load_line_delimited_input_from_file;
+
+    use crate::{part_one, part_two};
 
     #[test]
     fn test_part_one() {
-        let input = load_text_input_from_file("inputs/input.txt");
-        let parsed = parse_input(&input);
+        let parsed = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_one(&parsed);
         assert_eq!(5555, answer);
     }
 
     #[test]
     fn test_part_two() {
-        let input = load_text_input_from_file("inputs/input.txt");
-        let parsed = parse_input(&input);
+        let parsed = load_line_delimited_input_from_file("inputs/input.txt");
         let answer = part_two(parsed);
         assert_eq!(22852, answer);
     }
