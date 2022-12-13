@@ -37,10 +37,10 @@ impl FromStr for Packet {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.starts_with('[') {
-            return Err(format!("The packet should have started with '[': {}", s).into());
+            return Err(format!("The packet should have started with '[': {}", s));
         }
         if !s.ends_with(']') {
-            return Err(format!("The packet should have started with '[': {}", s).into());
+            return Err(format!("The packet should have started with '[': {}", s));
         }
 
         let s = &s[1..s.len() - 1];
@@ -80,7 +80,7 @@ impl FromStr for Packet {
                     many.push(packet);
                 }
 
-                _ => panic!("unexpected character: {}", ch as char),
+                _ => return Err(format!("unexpected character: {}", ch as char)),
             }
         }
 
