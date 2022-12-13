@@ -135,27 +135,22 @@ pub fn part_one(packets: &[Packet]) -> usize {
 }
 
 pub fn part_two(mut packets: Vec<Packet>) -> usize {
-    packets.push(Packet::Single(2));
-    packets.push(Packet::Single(6));
     packets.sort_unstable();
+    // We can push the two extra packets and then binary search for them,
+    // or we can just binary search for them and take the `Err` variant,
+    // because it points to where they should have been if they were present,
+    // without having to add them to the vector
+    //
+    // We can also simplify the packets. Instead of `[[x]]` We can just push `[x]`
 
-    let mut answer = 1;
-    let mut idx = 0;
-    while idx < packets.len() {
-        idx += 1;
-        if let Packet::Single(2) = packets[idx - 1] {
-            answer *= idx;
-            break;
-        }
-    }
-    while idx < packets.len() {
-        idx += 1;
-        if let Packet::Single(6) = packets[idx - 1] {
-            answer *= idx;
-            break;
-        }
-    }
-    answer
+    // Add +1 because Rust's indexes are 0-based, while this task uses 1-based indexing
+    let a = packets.binary_search(&Packet::Single(2)).unwrap_err() + 1;
+
+    // Add +1 because Rust's indexes are 0-based, while this task uses 1-based indexing
+    // Add one more +1 to compensate for the missing `2`, thus for a total of `+2`
+    let b = packets.binary_search(&Packet::Single(6)).unwrap_err() + 2;
+
+    a * b
 }
 
 #[cfg(test)]
