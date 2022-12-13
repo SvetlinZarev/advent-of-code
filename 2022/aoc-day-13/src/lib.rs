@@ -39,6 +39,8 @@ impl Display for Packet {
 impl FromStr for Packet {
     type Err = String;
 
+    // IMPORTANT: Currently this function incorrectly parses multi-element
+    // lists of the form `[[x]]` as a single-element list `[x]`
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.starts_with('[') {
             return Err(format!("The packet should have started with '[': {}", s).into());
