@@ -30,6 +30,9 @@ fn dfs(
         let next_rate = rate + graph[current].0;
         released = dfs(cache, graph, current, next_opened, next_rate, steps - 1);
     } else {
+        // I'm not sure if that is correct in the general case. This loop
+        // in the general case needs to be outside the else and be executed
+        // on each recursive call
         for next in graph[current].1.iter().copied() {
             let rel = dfs(cache, graph, next, opened, rate, steps - 1);
             released = released.max(rel);

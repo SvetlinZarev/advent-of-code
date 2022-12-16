@@ -62,6 +62,9 @@ fn dfs(
             }
         }
 
+        // I'm not sure if that is correct in the general case. This loop
+        // in the general case needs to be outside match and be executed
+        // on each recursive call
         (false, false) => {
             // We'll both move without opening any valves
             for next_me in graph[me].1.iter().copied() {
