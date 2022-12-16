@@ -10,6 +10,7 @@ fn main() {
         Ok(val) => val != "0",
         Err(_) => false,
     };
+    println!("GREEDY: {}", greedy);
 
     if greedy {
         println!("Part 1: {}", p1v1::part_one::<true>(&graph));

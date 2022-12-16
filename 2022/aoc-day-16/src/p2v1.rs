@@ -42,26 +42,35 @@ fn dfs<const GREEDY: bool>(
                 released = released.max(rel);
             }
 
-            //I'll open and the elephant will not
-            {
-                let next_opened = opened | 1 << me;
-                let next_rate = rate + graph[me].0;
+            if !GREEDY {
+                //I'll open and the elephant will not
+                {
+                    let next_opened = opened | 1 << me;
+                    let next_rate = rate + graph[me].0;
 
-                for next_el in graph[el].1.iter().copied() {
+                    for next_el in graph[el].1.iter().copied() {
+                        let rel = dfs::<GREEDY>(
+                            cache,
+                            graph,
+                            me,
+                            next_el,
+                            next_opened,
+                            next_rate,
+                            steps - 1,
+                        );
+                        released = released.max(rel);
+                    }
+                }
+
+                // The elephant will open and I'll not
+                let next_opened = opened | 1 << el;
+                let next_rate = rate + graph[el].0;
+
+                for next_me in graph[me].1.iter().copied() {
                     let rel =
-                        dfs::<GREEDY>(cache, graph, me, next_el, next_opened, next_rate, steps - 1);
+                        dfs::<GREEDY>(cache, graph, next_me, el, next_opened, next_rate, steps - 1);
                     released = released.max(rel);
                 }
-            }
-
-            // The elephant will open and I'll not
-            let next_opened = opened | 1 << el;
-            let next_rate = rate + graph[el].0;
-
-            for next_me in graph[me].1.iter().copied() {
-                let rel =
-                    dfs::<GREEDY>(cache, graph, next_me, el, next_opened, next_rate, steps - 1);
-                released = released.max(rel);
             }
         }
 
