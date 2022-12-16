@@ -37,3 +37,7 @@ pub fn parse_input(input: impl AsRef<str>) -> Vec<(u16, Vec<usize>)> {
 
     graph
 }
+
+// Note: This seems similar to the "Okabe and city" problem. Maybe we can
+// transform the graph to another wighted one containing only nodes with
+// flow rate > 0
