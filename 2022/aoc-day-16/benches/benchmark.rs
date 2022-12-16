@@ -17,8 +17,12 @@ fn benchmark_part_one(c: &mut Criterion) {
     let input = load_text_input_from_file("inputs/input.txt");
     let graph = parse_input(input);
 
-    c.bench_function("part-1", |b| {
-        b.iter(|| p1v1::part_one(black_box(&graph)));
+    c.bench_function("part-1 (greedy)", |b| {
+        b.iter(|| p1v1::part_one::<true>(black_box(&graph)));
+    });
+
+    c.bench_function("part-1 (full dp)", |b| {
+        b.iter(|| p1v1::part_one::<true>(black_box(&graph)));
     });
 }
 
