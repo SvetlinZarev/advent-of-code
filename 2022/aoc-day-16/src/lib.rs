@@ -3,6 +3,9 @@ use aoc_shared::hashing::HashMap;
 pub mod p1v1;
 pub mod p2v1;
 
+pub mod p1v2;
+pub mod p2v2;
+
 pub fn parse_input(input: impl AsRef<str>) -> Vec<(u16, Vec<usize>)> {
     let input = input.as_ref();
 
