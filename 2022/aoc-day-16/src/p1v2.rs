@@ -5,6 +5,8 @@ use std::collections::{BinaryHeap, VecDeque};
 // Explore only paths that are at least as good as the best X paths so far
 const BEAM_WIDTH: usize = 10;
 
+const ROUNDS: u32 = 30;
+
 pub fn part_one(graph: &[(u16, Vec<usize>)]) -> u16 {
     assert!(graph.len() <= 64);
 
@@ -17,11 +19,17 @@ pub fn part_one(graph: &[(u16, Vec<usize>)]) -> u16 {
     let mut beam = BinaryHeap::new();
 
     let mut answer = 0;
-    for _ in 0..30 {
+    for round in 0..ROUNDS {
         for _ in 0..queue.len() {
             let (opened, position, released, rate) = queue.pop_front().unwrap();
             let next_released = released + rate;
-            answer = answer.max(next_released);
+
+            // Just drain the elements in the last round,
+            // because will not use the newly generate ones
+            if round == ROUNDS - 1 {
+                answer = answer.max(next_released);
+                continue;
+            }
 
             if beam.len() < BEAM_WIDTH {
                 beam.push(Reverse(next_released));
