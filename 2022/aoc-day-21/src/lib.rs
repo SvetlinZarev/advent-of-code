@@ -78,6 +78,9 @@ pub fn part_two(mut input: HashMap<&str, Node>) -> i64 {
         panic!("The ROOT node is invalid or missing!");
     };
 
+    // Note: Another idea is to "invert" the tree in order to make `humn` the root node,
+    // then we can just run the part-1 solution on the inverted tree
+
     // The equation seems to be "monotonic", thus we can binary search for the answer.
     // Because we don't know if it's increasing/decreasing, we try one of the
     // directions, and if it does nto produce an answer, then we try the other
