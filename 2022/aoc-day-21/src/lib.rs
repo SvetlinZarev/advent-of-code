@@ -78,8 +78,20 @@ pub fn part_two(mut input: HashMap<&str, Node>) -> i64 {
         panic!("The ROOT node is invalid or missing!");
     };
 
-    // The quation seems to be "monotonic", thus we can binary search for the answer
+    // The equation seems to be "monotonic", thus we can binary search for the answer.
+    // Because we don't know if it's increasing/decreasing, we try one of the
+    // directions, and if it does nto produce an answer, then we try the other
+    binary_search(&mut input, l, r, |ord| ord.reverse())
+        .or_else(|| binary_search(&mut input, l, r, |ord| ord))
+        .expect("no solution found")
+}
 
+fn binary_search<O: Fn(Ordering) -> Ordering>(
+    input: &mut HashMap<&str, Node>,
+    l: &str,
+    r: &str,
+    ord: O,
+) -> Option<i64> {
     // Due to the integer division, there might be several numbers  that
     // seemingly give the correct answer. So we must find that range [begin; end)
     // and take the only number that gives the correct answer. Example:
@@ -114,7 +126,7 @@ pub fn part_two(mut input: HashMap<&str, Node>) -> i64 {
 
         // This might not be correct for all problem inputs
         // If it does not work for yours => remove the `.reverse()`
-        match lval.cmp(&rval).reverse() {
+        match ord(lval.cmp(&rval)) {
             Ordering::Equal => {
                 hi = mid;
                 answer = Some(hi);
@@ -125,7 +137,7 @@ pub fn part_two(mut input: HashMap<&str, Node>) -> i64 {
         }
     }
 
-    answer.expect("no solution")
+    answer
 }
 
 fn solve<'l>(input: &'l HashMap<&'l str, Node<'l>>, key: &str) -> i64 {
