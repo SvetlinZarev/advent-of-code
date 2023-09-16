@@ -2,7 +2,6 @@ use std::num::NonZeroU32;
 
 pub mod part_one;
 pub mod part_two;
-
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Instruction {
     Move(NonZeroU32),

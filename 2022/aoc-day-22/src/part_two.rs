@@ -3,6 +3,7 @@ use crate::{find_start_column, Instruction};
 type MoveFunction = fn(&[Vec<u8>], (usize, usize), (usize, usize)) -> State;
 
 const WALL: u8 = b'#';
+const SIDE_LEN: usize = 50;
 
 // HARDCODED top-left corners for my input as they appear in the
 const SQUARE_START: [(usize, usize); 6] = [
@@ -21,7 +22,8 @@ const SQUARE_START: [(usize, usize); 6] = [
 ];
 
 pub fn part_two(map: &[Vec<u8>], instructions: &[Instruction]) -> usize {
-    let (mut r, mut c) = find_start_column(map);
+    let mut c = find_start_column(map);
+    let mut r = 0;
 
     // Initial state
     let mut side = Side::Top;
@@ -33,9 +35,9 @@ pub fn part_two(map: &[Vec<u8>], instructions: &[Instruction]) -> usize {
             Instruction::RotL => facing = facing.rotate_left(),
             Instruction::Move(steps) => {
                 let mut top_left = SQUARE_START[side.index()];
-                let mut move_fn = select_move_function(side, facing);
+                let mut move_fn = select_move_function::<SIDE_LEN>(facing);
 
-                let mut steps = steps;
+                let mut steps = steps.get();
                 while steps > 0 {
                     match move_fn(map, top_left, (r, c)) {
                         State::Wall => {
@@ -63,9 +65,10 @@ pub fn part_two(map: &[Vec<u8>], instructions: &[Instruction]) -> usize {
                             // state: side, facing, position, top-left corner
                             side = new_side;
                             facing = new_facing;
-                            move_fn = select_move_function(side, facing);
+                            move_fn = select_move_function::<SIDE_LEN>(facing);
                             top_left = SQUARE_START[side.index()];
-
+                            r = rx;
+                            c = cx;
                             // we've moved to another side of the cube
                             steps -= 1;
                         }
@@ -75,7 +78,8 @@ pub fn part_two(map: &[Vec<u8>], instructions: &[Instruction]) -> usize {
         }
     }
 
-    1000 * r + 4 * c + facing.index()
+    println!("R: {}; C: {}; F: {}", r + 1, c + 1, facing.index());
+    1000 * (r + 1) + 4 * (c + 1) + facing.index()
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -110,7 +114,7 @@ impl Facing {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
     Top = 0,
     Right = 1,
@@ -140,11 +144,23 @@ fn up<const N: usize>(
 ) -> State {
     let (r, c) = position;
     let (r0, c0) = top_left;
-    let (r1, c1) = (r0 + N, c0 + N);
+    let (r1, c1) = (r0 + N - 1, c0 + N - 1);
 
-    // The r1/c1 bounds are exclusive! verify that we are withing the square
-    assert!(r0 <= r && r < r1);
-    assert!(c0 <= c && c < c1);
+    // The r1/c1 bounds are inclusive! Verify that we are within the square
+    assert!(
+        r0 <= r && r <= r1,
+        "r0 ({}) <= r ({}) <= r1 ({})",
+        r0,
+        r,
+        r1
+    );
+    assert!(
+        c0 <= c && c <= c1,
+        "c0 ({}) <= c ({}) <= c1 ({})",
+        c0,
+        c,
+        c1
+    );
 
     // Verify that there is such square
     assert!(grid.len() >= r1);
@@ -169,18 +185,30 @@ fn down<const N: usize>(
 ) -> State {
     let (r, c) = position;
     let (r0, c0) = top_left;
-    let (r1, c1) = (r0 + N, c0 + N);
+    let (r1, c1) = (r0 + N - 1, c0 + N - 1);
 
-    // The r1/c1 bounds are exclusive! verify that we are withing the square
-    assert!(r0 <= r && r < r1);
-    assert!(c0 <= c && c < c1);
+    // The r1/c1 bounds are inclusive! Verify that we are within the square
+    assert!(
+        r0 <= r && r <= r1,
+        "r0 ({}) <= r ({}) <= r1 ({})",
+        r0,
+        r,
+        r1
+    );
+    assert!(
+        c0 <= c && c <= c1,
+        "c0 ({}) <= c ({}) <= c1 ({})",
+        c0,
+        c,
+        c1
+    );
 
     // Verify that there is such square
     assert!(grid.len() >= r1);
     assert!(grid[r0].len() >= c1);
     assert!(grid[r1].len() >= c1);
 
-    if r + 1 >= r1 {
+    if r + 1 > r1 {
         return State::OutOfBounds;
     }
 
@@ -198,11 +226,23 @@ fn left<const N: usize>(
 ) -> State {
     let (r, c) = position;
     let (r0, c0) = top_left;
-    let (r1, c1) = (r0 + N, c0 + N);
+    let (r1, c1) = (r0 + N - 1, c0 + N - 1);
 
-    // The r1/c1 bounds are exclusive! verify that we are withing the square
-    assert!(r0 <= r && r < r1);
-    assert!(c0 <= c && c < c1);
+    // The r1/c1 bounds are inclusive! Verify that we are within the square
+    assert!(
+        r0 <= r && r <= r1,
+        "r0 ({}) <= r ({}) <= r1 ({})",
+        r0,
+        r,
+        r1
+    );
+    assert!(
+        c0 <= c && c <= c1,
+        "c0 ({}) <= c ({}) <= c1 ({})",
+        c0,
+        c,
+        c1
+    );
 
     // Verify that there is such square
     assert!(grid.len() >= r1);
@@ -227,18 +267,30 @@ fn right<const N: usize>(
 ) -> State {
     let (r, c) = position;
     let (r0, c0) = top_left;
-    let (r1, c1) = (r0 + N, c0 + N);
+    let (r1, c1) = (r0 + N - 1, c0 + N - 1);
 
-    // The r1/c1 bounds are exclusive! verify that we are withing the square
-    assert!(r0 <= r && r < r1);
-    assert!(c0 <= c && c < c1);
+    // The r1/c1 bounds are inclusive! Verify that we are within the square
+    assert!(
+        r0 <= r && r <= r1,
+        "r0 ({}) <= r ({}) <= r1 ({})",
+        r0,
+        r,
+        r1
+    );
+    assert!(
+        c0 <= c && c <= c1,
+        "c0 ({}) <= c ({}) <= c1 ({})",
+        c0,
+        c,
+        c1
+    );
 
     // Verify that there is such square
     assert!(grid.len() >= r1);
     assert!(grid[r0].len() >= c1);
     assert!(grid[r1].len() >= c1);
 
-    if c + 1 >= c1 {
+    if c + 1 > c1 {
         return State::OutOfBounds;
     }
 
@@ -260,92 +312,93 @@ fn wrap(side: Side, facing: Facing, position: (usize, usize)) -> (Side, Facing, 
     }
 }
 
-fn wrap_top(facing: Facing, position: (usize, usize)) -> (Side, Facing, usize, usize) {
+fn wrap_top(facing: Facing, (r, c): (usize, usize)) -> (Side, Facing, usize, usize) {
     match facing {
-        Facing::Right => (Side::Right, Facing::Down, position.0, position.1 + 1),
-        Facing::Down => (Side::Front, Facing::Down, position.0 + 1, position.1),
-        Facing::Left => {}
-        Facing::Up => {}
+        Facing::Right => (Side::Right, Facing::Right, r, c + 1),
+        Facing::Down => (Side::Front, Facing::Down, r + 1, c),
+        Facing::Left => (Side::Left, Facing::Right, 3 * SIDE_LEN - 1 - r, 0),
+        Facing::Up => (Side::Back, Facing::Right, 3 * SIDE_LEN + c - SIDE_LEN, 0),
     }
 }
 
-fn wrap_right(facing: Facing, position: (usize, usize)) -> (Side, Facing, usize, usize) {
-    todo!()
-}
-fn wrap_left(facing: Facing, position: (usize, usize)) -> (Side, Facing, usize, usize) {
-    todo!()
-}
-fn wrap_front(facing: Facing, position: (usize, usize)) -> (Side, Facing, usize, usize) {
-    todo!()
-}
-fn wrap_back(facing: Facing, position: (usize, usize)) -> (Side, Facing, usize, usize) {
-    todo!()
-}
-fn wrap_down(facing: Facing, position: (usize, usize)) -> (Side, Facing, usize, usize) {
-    todo!()
-}
-
-fn select_move_function(side: Side, facing: Facing) -> MoveFunction {
-    match side {
-        Side::Top => select_move_function_top(facing),
-        Side::Right => select_move_function_right(facing),
-        Side::Left => select_move_function_left(facing),
-        Side::Front => select_move_function_front(facing),
-        Side::Back => select_move_function_back(facing),
-        Side::Down => select_move_function_down(facing),
+fn wrap_right(facing: Facing, (r, c): (usize, usize)) -> (Side, Facing, usize, usize) {
+    match facing {
+        Facing::Right => (
+            Side::Down,
+            Facing::Left,
+            2 * SIDE_LEN + (SIDE_LEN - 1 - r),
+            99,
+        ),
+        Facing::Down => (
+            Side::Front,
+            Facing::Left,
+            SIDE_LEN + c - 2 * SIDE_LEN,
+            2 * SIDE_LEN - 1,
+        ),
+        Facing::Left => (Side::Top, Facing::Left, r, c - 1),
+        Facing::Up => (Side::Back, Facing::Up, 4 * SIDE_LEN - 1, c - 2 * SIDE_LEN),
     }
 }
 
-fn select_move_function_top(facing: Facing) -> MoveFunction {
+fn wrap_left(facing: Facing, (r, c): (usize, usize)) -> (Side, Facing, usize, usize) {
     match facing {
-        Facing::Right => right,
-        Facing::Down => down,
-        Facing::Left => left,
-        Facing::Up => up,
+        Facing::Right => (Side::Down, Facing::Right, r, c + 1),
+        Facing::Down => (Side::Back, Facing::Down, r + 1, c),
+        Facing::Left => (Side::Top, Facing::Right, 3 * SIDE_LEN - r - 1, SIDE_LEN),
+        Facing::Up => (Side::Front, Facing::Right, SIDE_LEN + c, SIDE_LEN),
     }
 }
 
-fn select_move_function_right(facing: Facing) -> MoveFunction {
+fn wrap_front(facing: Facing, (r, c): (usize, usize)) -> (Side, Facing, usize, usize) {
     match facing {
-        Facing::Right => up,
-        Facing::Down => right,
-        Facing::Left => down,
-        Facing::Up => left,
+        Facing::Right => (
+            Side::Right,
+            Facing::Up,
+            SIDE_LEN - 1,
+            2 * SIDE_LEN + r - SIDE_LEN,
+        ),
+        Facing::Down => (Side::Down, Facing::Down, r + 1, c),
+        Facing::Left => (Side::Left, Facing::Down, 2 * SIDE_LEN, r - SIDE_LEN),
+        Facing::Up => (Side::Top, Facing::Up, r - 1, c),
+    }
+}
+fn wrap_back(facing: Facing, (r, c): (usize, usize)) -> (Side, Facing, usize, usize) {
+    match facing {
+        Facing::Right => (
+            Side::Down,
+            Facing::Up,
+            3 * SIDE_LEN - 1,
+            SIDE_LEN + r - 3 * SIDE_LEN,
+        ),
+        Facing::Down => (Side::Right, Facing::Down, 0, 2 * SIDE_LEN + c),
+        Facing::Left => (Side::Top, Facing::Down, 0, r - 3 * SIDE_LEN + SIDE_LEN),
+        Facing::Up => (Side::Left, Facing::Up, r - 1, c),
+    }
+}
+fn wrap_down(facing: Facing, (r, c): (usize, usize)) -> (Side, Facing, usize, usize) {
+    match facing {
+        Facing::Right => (
+            Side::Right,
+            Facing::Left,
+            3 * SIDE_LEN - r - 1,
+            3 * SIDE_LEN - 1,
+        ),
+        Facing::Down => (
+            Side::Back,
+            Facing::Left,
+            3 * SIDE_LEN + c - SIDE_LEN,
+            SIDE_LEN - 1,
+        ),
+        Facing::Left => (Side::Left, Facing::Left, r, c - 1),
+        Facing::Up => (Side::Front, Facing::Up, r - 1, c),
     }
 }
 
-fn select_move_function_left(facing: Facing) -> MoveFunction {
+fn select_move_function<const N: usize>(facing: Facing) -> MoveFunction {
     match facing {
-        Facing::Right => up,
-        Facing::Down => right,
-        Facing::Left => down,
-        Facing::Up => left,
-    }
-}
-
-fn select_move_function_front(facing: Facing) -> MoveFunction {
-    match facing {
-        Facing::Right => right,
-        Facing::Down => down,
-        Facing::Left => left,
-        Facing::Up => up,
-    }
-}
-
-fn select_move_function_back(facing: Facing) -> MoveFunction {
-    match facing {
-        Facing::Right => down,
-        Facing::Down => left,
-        Facing::Left => up,
-        Facing::Up => right,
-    }
-}
-
-fn select_move_function_down(facing: Facing) -> MoveFunction {
-    match facing {
-        Facing::Right => right,
-        Facing::Down => up,
-        Facing::Left => left,
-        Facing::Up => down,
+        Facing::Right => right::<N>,
+        Facing::Down => down::<N>,
+        Facing::Left => left::<N>,
+        Facing::Up => up::<N>,
     }
 }
