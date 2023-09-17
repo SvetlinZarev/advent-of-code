@@ -215,5 +215,5 @@ is `1000 * 5 + 4 * 7 + 3 = 5031`.
 Fold the map into a cube, then follow the path given in the monkeys' notes. What
 is the final password?
 
-##### Your puzzle answer was `XXX`.
+##### Your puzzle answer was `104385`.
 

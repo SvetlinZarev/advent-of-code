@@ -78,7 +78,7 @@ pub fn part_two(map: &[Vec<u8>], instructions: &[Instruction]) -> usize {
         }
     }
 
-    println!("R: {}; C: {}; F: {}", r + 1, c + 1, facing.index());
+    //println!("R: {}; C: {}; F: {}", r + 1, c + 1, facing.index());
     1000 * (r + 1) + 4 * (c + 1) + facing.index()
 }
 
@@ -400,5 +400,22 @@ fn select_move_function<const N: usize>(facing: Facing) -> MoveFunction {
         Facing::Down => down::<N>,
         Facing::Left => left::<N>,
         Facing::Up => up::<N>,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use aoc_shared::input::load_text_input_from_file;
+
+    use crate::parse_input;
+    use crate::part_two::part_two;
+
+    #[test]
+    fn test_part_one() {
+        let input = load_text_input_from_file("inputs/input.txt");
+        let (map, instr) = parse_input(input);
+
+        let answer = part_two(&map, &instr);
+        assert_eq!(104385, answer);
     }
 }
