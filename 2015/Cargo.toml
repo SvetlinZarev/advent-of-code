@@ -21,3 +21,4 @@ lto = "fat"
 
 [workspace.dependencies]
 criterion = "0.5"
+regex = "1"

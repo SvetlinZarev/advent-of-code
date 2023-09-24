@@ -9,3 +9,4 @@ crate-type = ["rlib"]
 
 [dependencies]
 aoc-2015-common = { path = "../aoc-2015-common" }
+regex.workspace = true

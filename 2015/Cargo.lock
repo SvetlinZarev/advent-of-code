@@ -247,6 +247,7 @@ name = "aoc-2015-25"
 version = "0.1.0"
 dependencies = [
  "aoc-2015-common",
+ "regex",
 ]
 
 [[package]]
