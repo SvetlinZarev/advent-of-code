@@ -2,7 +2,7 @@
 name = "aoc-2015"
 version = "0.1.0"
 authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
-edition = "2018"
+edition = "2021"
 
 [[bin]]
 name = "aoc"
@@ -33,3 +33,4 @@ aoc-2015-21 = { path = "../aoc-2015-21" }
 aoc-2015-22 = { path = "../aoc-2015-22" }
 aoc-2015-23 = { path = "../aoc-2015-23" }
 aoc-2015-24 = { path = "../aoc-2015-24" }
+aoc-2015-25 = { path = "../aoc-2015-25" }

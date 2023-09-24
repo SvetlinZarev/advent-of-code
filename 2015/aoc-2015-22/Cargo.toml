@@ -2,7 +2,7 @@
 name = "aoc-2015-22"
 version = "0.1.0"
 authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["rlib"]

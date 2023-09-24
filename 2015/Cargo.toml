@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
     "./aoc-2015*",
 ]
@@ -16,5 +17,7 @@ lto = "thin"
 
 [profile.release]
 codegen-units = 1
-lto = "thin"
+lto = "fat"
 
+[workspace.dependencies]
+criterion = "0.5"

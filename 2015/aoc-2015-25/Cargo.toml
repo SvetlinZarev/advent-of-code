@@ -1,5 +1,5 @@
 [package]
-name = "aoc-2015-23"
+name = "aoc-2015-25"
 version = "0.1.0"
 authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
 edition = "2021"

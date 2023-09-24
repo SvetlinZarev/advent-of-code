@@ -2,7 +2,7 @@
 name = "aoc-2015-08"
 version = "0.1.0"
 authors = ["Svetlin Zarev <svetlin.zarev@zarev.net>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["rlib"]
@@ -11,7 +11,7 @@ crate-type = ["rlib"]
 aoc-2015-common = { path = "../aoc-2015-common" }
 
 [dev-dependencies]
-criterion = "0.3"
+criterion.workspace = true
 
 [[bench]]
 name = "benchmark"
