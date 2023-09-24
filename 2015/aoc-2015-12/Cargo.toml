@@ -9,6 +9,6 @@ crate-type = ["rlib"]
 
 [dependencies]
 aoc-2015-common = { path = "../aoc-2015-common" }
-regex = "1"
+regex.workspace = true
 serde = "1"
 serde_json = "1"
