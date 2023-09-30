@@ -1,7 +1,7 @@
 use aoc_shared::input::load_text_input_from_file;
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
 
-use aoc_day_10::{parse_input, part_two};
+use aoc_day_10::{parse_input, part_one, part_two};
 
 criterion_group!(
     benches,
@@ -25,7 +25,7 @@ fn benchmark_part_one(c: &mut Criterion) {
     c.bench_function("part-1", |b| {
         b.iter_batched(
             || (start_node, graph.clone()),
-            |(start_node, graph)| part_two(start_node, graph),
+            |(start_node, graph)| part_one(start_node, graph),
             BatchSize::PerIteration,
         )
     });
