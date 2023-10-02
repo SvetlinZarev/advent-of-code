@@ -26,7 +26,7 @@
 | 22    |              |             |             |            |
 | 23    |              |             |             |            |
 | 24    |              |             |             |            |
-| 25    |              |             |             |            |
+| 25    | 2            | 25_134      | N/A         | 25_136     |
 | TOTAL |              |             |             |            |
 
 These results were measured on a ThinkPad W541 with `i7-4910MQ` locked at 2.0GHz
