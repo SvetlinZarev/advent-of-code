@@ -1,4 +1,4 @@
-Day 15: Timing is Everything ---
+Day 15: Timing is Everything
 
 The halls open into an interior plaza containing a large kinetic sculpture. The
 sculpture is in a sealed enclosure and seems to involve a set of identical

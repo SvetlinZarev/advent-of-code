@@ -1,4 +1,4 @@
-Day 9: Explosives in Cyberspace ---
+Day 9: Explosives in Cyberspace
 
 Wandering around a secure area, you come across a datalink port to a new part of
 the network. After briefly scanning it for interesting files, you find one file
