@@ -17,6 +17,23 @@ where
         .unwrap()
 }
 
+pub fn parse_line_delimited_after_row<I, R>(input: I, skip: usize) -> Vec<R>
+where
+    I: AsRef<str>,
+    R: FromStr,
+    <R as FromStr>::Err: Debug,
+{
+    input
+        .as_ref()
+        .lines()
+        .skip(skip)
+        .map(|l| l.trim())
+        .filter(|&l| !l.is_empty())
+        .map(|l| l.parse())
+        .collect::<Result<_, _>>()
+        .unwrap()
+}
+
 pub fn parse_csv<I, R>(input: I) -> Vec<R>
 where
     I: AsRef<str>,
