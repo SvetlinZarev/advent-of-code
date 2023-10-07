@@ -1,9 +1,7 @@
 use std::str::FromStr;
 
 use lazy_static::lazy_static;
-use regex::Regex;
-
-const DIR: &[(isize, isize)] = &[(-1, 0), (0, -1), (0, 1), (1, 0)];
+use regex::Regex; //67
 
 lazy_static! {
     static ref REGEX_INFO: Regex = Regex::new(
@@ -93,8 +91,35 @@ pub fn part_one_v2(input: &mut [Info]) -> usize {
     pairs
 }
 
-pub fn part_two(_input: &[Info]) -> u32 {
-    0
+pub fn part_two(input: &[Info]) -> u32 {
+    const TARGET: char = '🌟';
+    const WALL: char = '🟥';
+    const NODE: char = '🟩';
+    const HOLE: char = '🟢';
+
+    let max_x = input.iter().map(|info| info.x).max().unwrap() as usize;
+    let max_y = input.iter().map(|info| info.y).max().unwrap() as usize;
+    println!("ROWS: {}; COLS: {}", max_y + 1, max_x + 1);
+
+    let mut grid = vec![vec![NODE; max_x + 1]; max_y + 1];
+    for info in input.iter().copied() {
+        grid[info.y as usize][info.x as usize] = match info.used {
+            0 => HOLE,
+            x if x > 99 => WALL,
+            _ => NODE,
+        }
+    }
+    grid[0][max_x] = TARGET;
+
+    for row in grid {
+        for col in row {
+            print!("{}", col);
+        }
+        println!();
+    }
+
+    // The answer was found by manually counting the steps on the above visualization
+    233
 }
 
 #[cfg(test)]

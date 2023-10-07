@@ -9,7 +9,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let input = load_text_input_from_autodetect();
     let input = parse_line_delimited_after_row(input, 2);
     println!("Part 1: {:?}", part_one_v1(&input));
-    println!("Part 2: {:?}", part_two(&input));
+
+    part_two(&input);
 
     Ok(())
 }

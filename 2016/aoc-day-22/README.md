@@ -158,3 +158,5 @@ moves takes time, and we need to be efficient:
 
 What is the fewest number of steps required to move your goal data
 to `node-x0-y0`?
+
+Your puzzle answer was `233`.

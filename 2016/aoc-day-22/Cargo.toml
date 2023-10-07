@@ -13,6 +13,7 @@ lto = "fat"
 aoc-shared = { path = "../aoc-shared" }
 lazy_static = "1"
 regex = "1"
+log = "0.4.20"
 
 [dev-dependencies]
 criterion = "0.5"

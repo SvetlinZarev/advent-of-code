@@ -30,6 +30,7 @@ dependencies = [
  "aoc-shared",
  "criterion",
  "lazy_static",
+ "log",
  "regex",
 ]
 
