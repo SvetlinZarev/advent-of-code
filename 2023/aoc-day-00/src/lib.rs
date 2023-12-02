@@ -17,7 +17,6 @@ mod tests {
         let input = load_text_input_from_file("inputs/input.txt");
 
         let answer = part_one(&input);
-
         assert_eq!(0, answer);
     }
 
@@ -26,7 +25,6 @@ mod tests {
         let input = load_text_input_from_file("inputs/input.txt");
 
         let answer = part_two(&input);
-
         assert_eq!(0, answer);
     }
 }
