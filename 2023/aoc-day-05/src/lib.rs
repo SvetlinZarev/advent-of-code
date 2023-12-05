@@ -135,7 +135,7 @@ fn next_value(key: u64, src: &BTreeMap<u64, (u64, u64)>) -> u64 {
 pub fn part_two_v1(input: &Input) -> u64 {
     let mut answer = u64::MAX;
 
-    for seeds in input.seeds.chunks(2) {
+    for seeds in input.seeds.chunks_exact(2) {
         let soil = calc_range(&[(seeds[0], seeds[0] + seeds[1])], &input.seed_to_soil);
         let fertilizer = calc_range(&soil, &input.soil_to_fertilizer);
         let water = calc_range(&fertilizer, &input.fertilizer_to_water);
@@ -196,7 +196,7 @@ fn calc_range(keys: &[(u64, u64)], src: &BTreeMap<u64, (u64, u64)>) -> Vec<(u64,
 pub fn part_two_v2(input: &Input) -> u64 {
     let mut answer = u64::MAX;
 
-    for seeds in input.seeds.chunks(2) {
+    for seeds in input.seeds.chunks_exact(2) {
         let key = (seeds[0], seeds[0] + seeds[1]);
         remap_range(key, &input.seed_to_soil, |key| {
             remap_range(key, &input.soil_to_fertilizer, |key| {
@@ -257,6 +257,64 @@ fn remap_range(
     }
 }
 
+pub fn part_two_v3(input: &Input) -> u64 {
+    let mut answer = u64::MAX;
+
+    let ans = &mut |key: (u64, u64)| answer = answer.min(key.0);
+    let h2l = &mut |key| remap_range_dyn(key, &input.humidity_to_location, ans);
+    let t2h = &mut |key| remap_range_dyn(key, &input.temp_to_humidity, h2l);
+    let l2t = &mut |key| remap_range_dyn(key, &input.light_to_temp, t2h);
+    let w2l = &mut |key| remap_range_dyn(key, &input.water_to_light, l2t);
+    let f2w = &mut |key| remap_range_dyn(key, &input.fertilizer_to_water, w2l);
+    let s2f = &mut |key| remap_range_dyn(key, &input.soil_to_fertilizer, f2w);
+    let s2s = &mut |key| remap_range_dyn(key, &input.seed_to_soil, s2f);
+
+    for seeds in input.seeds.chunks_exact(2) {
+        s2s((seeds[0], seeds[0] + seeds[1]));
+    }
+
+    answer
+}
+
+fn remap_range_dyn(
+    key: (u64, u64),
+    src: &BTreeMap<u64, (u64, u64)>,
+    consume: &mut dyn FnMut((u64, u64)),
+) {
+    let (start, mut end) = key;
+
+    while end > start {
+        match src.range(..end).last() {
+            None => {
+                consume((start, end));
+                break;
+            }
+
+            Some((&src_range, &(dst_range, range_len))) => {
+                // in case the ranges are not overlapping at all
+                if src_range + range_len <= start {
+                    consume((start, end));
+                    break;
+                }
+
+                // right part outside of src-range
+                if src_range + range_len < end {
+                    consume((src_range + range_len, end));
+                    end = src_range + range_len;
+                }
+
+                // overlapping part
+                let begin = start.max(src_range);
+                consume((
+                    remap(begin, src_range, dst_range),
+                    remap(end, src_range, dst_range),
+                ));
+                end = begin;
+            }
+        }
+    }
+}
+
 fn remap(key: u64, src: u64, dst: u64) -> u64 {
     dst + (key - src)
 }
@@ -277,7 +335,7 @@ mod tests {
     }
 
     #[test]
-    fn test_part_two() {
+    fn test_part_two_v1() {
         let input = load_text_input_from_file("inputs/input.txt");
         let input = parse_input(input);
 
@@ -291,6 +349,15 @@ mod tests {
         let input = parse_input(input);
 
         let answer = part_two_v2(&input);
+        assert_eq!(57_451_709, answer);
+    }
+
+    #[test]
+    fn test_part_two_v3() {
+        let input = load_text_input_from_file("inputs/input.txt");
+        let input = parse_input(input);
+
+        let answer = part_two_v3(&input);
         assert_eq!(57_451_709, answer);
     }
 }

@@ -32,11 +32,15 @@ fn benchmark_part_two(c: &mut Criterion) {
     let input = load_text_input_from_file("inputs/input.txt");
     let input = parse_input(input);
 
-    c.bench_function("part-2/v1", |b| {
+    c.bench_function("part-2/v1 - alloc", |b| {
         b.iter(|| part_two_v1(&input));
     });
 
-    c.bench_function("part-2/v2", |b| {
+    c.bench_function("part-2/v2 - static dispatch", |b| {
+        b.iter(|| part_two_v2(&input));
+    });
+
+    c.bench_function("part-2/v3 - dynamic dispatch", |b| {
         b.iter(|| part_two_v2(&input));
     });
 }
