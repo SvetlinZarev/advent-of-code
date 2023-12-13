@@ -1,6 +1,12 @@
 use std::hash::{BuildHasher, Hasher};
 use std::marker::PhantomData;
 
+pub type FxHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
+pub type FxHashSet<T> = rustc_hash::FxHashSet<T>;
+
+pub type FnvHashMap<K, V> = std::collections::HashMap<K, V, HashBuilder<FnvHasher>>;
+pub type FnvHashSet<T> = std::collections::HashSet<T, HashBuilder<FnvHasher>>;
+
 #[derive(Debug, Copy, Clone)]
 pub struct FnvHasher(u64);
 
