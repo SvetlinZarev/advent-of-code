@@ -2,7 +2,7 @@ use aoc_shared::input::load_text_input_from_file;
 use aoc_shared::parsing::parse_u8_grid;
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use aoc_day_14::{part_one, part_two};
+use aoc_day_14::{part_one, part_two_v1, part_two_v2};
 
 criterion_group!(benches, benchmark_part_one, benchmark_part_two);
 criterion_main!(benches);
@@ -17,10 +17,14 @@ fn benchmark_part_one(c: &mut Criterion) {
 }
 
 fn benchmark_part_two(c: &mut Criterion) {
-    let input = load_text_input_from_file("inputs/input.txt");
-    let input = parse_u8_grid(input);
+    let input_string = load_text_input_from_file("inputs/input.txt");
+    let input = parse_u8_grid(&input_string);
 
-    c.bench_function("part-2", |b| {
-        b.iter(|| part_two(&input));
+    c.bench_function("part-2/v1", |b| {
+        b.iter(|| part_two_v1(&input));
+    });
+
+    c.bench_function("part-2/v2", |b| {
+        b.iter(|| part_two_v2(input_string.as_bytes()));
     });
 }
