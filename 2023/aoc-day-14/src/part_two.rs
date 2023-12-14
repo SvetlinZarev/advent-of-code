@@ -56,9 +56,8 @@ fn tilt_north(grid: &mut Vec<Vec<u8>>) {
                     }
 
                     if p != r {
-                        let x = grid[p][c];
-                        grid[p][c] = grid[r][c];
-                        grid[r][c] = x;
+                        grid[p][c] = OVAL;
+                        grid[r][c] = EMPTY;
                     }
                 }
 
@@ -91,9 +90,8 @@ fn tilt_south(grid: &mut Vec<Vec<u8>>) {
                     }
 
                     if p != r {
-                        let x = grid[p][c];
-                        grid[p][c] = grid[r][c];
-                        grid[r][c] = x;
+                        grid[p][c] = OVAL;
+                        grid[r][c] = EMPTY;
                     }
                 }
 
@@ -122,7 +120,10 @@ fn tilt_west(grid: &mut Vec<Vec<u8>>) {
                         p += 1;
                     }
 
-                    grid[r].swap(c, p);
+                    if p != c {
+                        grid[r][p] = OVAL;
+                        grid[r][c] = EMPTY;
+                    }
                 }
 
                 EMPTY => {
@@ -149,7 +150,10 @@ fn tilt_east(grid: &mut Vec<Vec<u8>>) {
                         p -= 1;
                     }
 
-                    grid[r].swap(c, p);
+                    if p != c {
+                        grid[r][p] = OVAL;
+                        grid[r][c] = EMPTY;
+                    }
                 }
 
                 EMPTY => {
