@@ -80,7 +80,7 @@ fn energize(input: &Vec<&[u8]>, r: usize, c: usize, d: Direction) -> usize {
     let cols = input[0].len();
 
     let mut seen = vec![0u8; rows * cols];
-    seen[0 * cols + 0] |= 1 << (d as u32);
+    seen[r * cols + c] |= 1 << (d as u32);
 
     let mut stack = vec![];
     stack.push((r, c, d));
