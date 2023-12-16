@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Direction {
     Up = 0,
@@ -46,6 +48,31 @@ pub fn part_two(input: &Vec<&[u8]>) -> usize {
     }
 
     answer
+}
+
+pub fn part_two_rayon(input: &Vec<&[u8]>) -> usize {
+    let rows = input.len();
+    let cols = input[0].len();
+
+    (0..rows)
+        .par_bridge()
+        .map(|r| energize(input, r, 0, Direction::Right))
+        .chain(
+            (0..rows)
+                .par_bridge()
+                .map(|r| energize(input, r, cols - 1, Direction::Left)),
+        )
+        .chain(
+            (0..cols)
+                .par_bridge()
+                .map(|c| energize(input, 0, c, Direction::Down)),
+        )
+        .chain(
+            (0..cols)
+                .par_bridge()
+                .map(|c| energize(input, rows - 1, c, Direction::Up)),
+        )
+        .reduce(|| 0, |a, b| a.max(b))
 }
 
 fn energize(input: &Vec<&[u8]>, r: usize, c: usize, d: Direction) -> usize {
