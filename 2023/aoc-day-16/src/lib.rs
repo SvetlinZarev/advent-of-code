@@ -30,6 +30,9 @@ pub fn part_one(input: &Vec<&[u8]>) -> usize {
 pub fn part_two(input: &Vec<&[u8]>) -> usize {
     let rows = input.len();
     let cols = input[0].len();
+    for r in 0..rows {
+        assert_eq!(cols, input[r].len());
+    }
 
     let mut answer = 0;
     for r in 0..rows {
@@ -48,12 +51,9 @@ pub fn part_two(input: &Vec<&[u8]>) -> usize {
 fn energize(input: &Vec<&[u8]>, r: usize, c: usize, d: Direction) -> usize {
     let rows = input.len();
     let cols = input[0].len();
-    for r in 0..rows {
-        assert_eq!(cols, input[r].len());
-    }
 
-    let mut seen = vec![vec![0u8; cols]; rows];
-    seen[0][0] |= 1 << (d as u32);
+    let mut seen = vec![0u8; rows * cols];
+    seen[0 * cols + 0] |= 1 << (d as u32);
 
     let mut stack = vec![];
     stack.push((r, c, d));
@@ -97,10 +97,7 @@ fn energize(input: &Vec<&[u8]>, r: usize, c: usize, d: Direction) -> usize {
         }
     }
 
-    seen.into_iter()
-        .flat_map(|x| x.into_iter())
-        .filter(|&x| x != 0)
-        .count()
+    seen.into_iter().filter(|&x| x != 0).count()
 }
 
 fn follow(
@@ -109,7 +106,7 @@ fn follow(
     r: usize,
     c: usize,
     d: Direction,
-    seen: &mut [Vec<u8>],
+    seen: &mut [u8],
     queue: &mut Vec<(usize, usize, Direction)>,
 ) {
     let Some((r, c)) = d.apply(r, c) else {
@@ -120,11 +117,11 @@ fn follow(
         return;
     }
 
-    if seen[r][c] & (1 << d as u32) != 0 {
+    if seen[r * cols + c] & (1 << d as u32) != 0 {
         return;
     }
 
-    seen[r][c] |= 1 << d as u32;
+    seen[r * cols + c] |= 1 << d as u32;
     queue.push((r, c, d));
 }
 
