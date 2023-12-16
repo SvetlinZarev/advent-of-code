@@ -23,11 +23,11 @@ enum Next {
     Split(Direction, Direction),
 }
 
-pub fn part_one(input: &Vec<Vec<u8>>) -> usize {
+pub fn part_one(input: &Vec<&[u8]>) -> usize {
     energize(input, 0, 0, Direction::Right)
 }
 
-pub fn part_two(input: &Vec<Vec<u8>>) -> usize {
+pub fn part_two(input: &Vec<&[u8]>) -> usize {
     let rows = input.len();
     let cols = input[0].len();
 
@@ -45,7 +45,7 @@ pub fn part_two(input: &Vec<Vec<u8>>) -> usize {
     answer
 }
 
-fn energize(input: &[Vec<u8>], r: usize, c: usize, d: Direction) -> usize {
+fn energize(input: &Vec<&[u8]>, r: usize, c: usize, d: Direction) -> usize {
     let rows = input.len();
     let cols = input[0].len();
     for r in 0..rows {
@@ -131,14 +131,14 @@ fn follow(
 #[cfg(test)]
 mod tests {
     use aoc_shared::input::load_text_input_from_file;
-    use aoc_shared::parsing::parse_u8_grid;
+    use aoc_shared::parsing::parse_u8_grid_borrowed;
 
     use super::*;
 
     #[test]
     fn test_part_one() {
         let input = load_text_input_from_file("inputs/input.txt");
-        let input = parse_u8_grid(input);
+        let input = parse_u8_grid_borrowed(&input);
 
         let answer = part_one(&input);
         assert_eq!(7_608, answer);
@@ -147,7 +147,7 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = load_text_input_from_file("inputs/input.txt");
-        let input = parse_u8_grid(input);
+        let input = parse_u8_grid_borrowed(&input);
 
         let answer = part_two(&input);
         assert_eq!(8_221, answer);

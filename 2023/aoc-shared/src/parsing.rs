@@ -2,10 +2,10 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 pub fn parse_line_delimited<I, R>(input: I) -> Vec<R>
-where
-    I: AsRef<str>,
-    R: FromStr,
-    <R as FromStr>::Err: Debug,
+    where
+        I: AsRef<str>,
+        R: FromStr,
+        <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
@@ -18,10 +18,10 @@ where
 }
 
 pub fn parse_line_delimited_after_row<I, R>(input: I, skip: usize) -> Vec<R>
-where
-    I: AsRef<str>,
-    R: FromStr,
-    <R as FromStr>::Err: Debug,
+    where
+        I: AsRef<str>,
+        R: FromStr,
+        <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
@@ -35,10 +35,10 @@ where
 }
 
 pub fn parse_csv<I, R>(input: I) -> Vec<R>
-where
-    I: AsRef<str>,
-    R: FromStr,
-    <R as FromStr>::Err: Debug,
+    where
+        I: AsRef<str>,
+        R: FromStr,
+        <R as FromStr>::Err: Debug,
 {
     input
         .as_ref()
@@ -68,6 +68,14 @@ pub fn parse_u8_grid<I: AsRef<str>>(input: I) -> Vec<Vec<u8>> {
         .as_ref()
         .lines()
         .map(|l| l.as_bytes().to_vec())
+        .collect()
+}
+
+pub fn parse_u8_grid_borrowed<I: AsRef<str>>(input: &I) -> Vec<&[u8]> {
+    input
+        .as_ref()
+        .lines()
+        .map(|l| l.as_bytes())
         .collect()
 }
 
@@ -112,5 +120,12 @@ mod tests {
         let lines = "1\n\n\n\n2\n\n\r\n\r\n3";
         let parsed = parse_line_delimited(lines);
         assert_eq!(&[1u32, 2, 3], parsed.as_slice());
+    }
+
+    #[test]
+    fn test_parse_u8_grid_borrowed() {
+        let input = "abc\ndef\nghi";
+        let parsed = parse_u8_grid_borrowed(&input);
+        assert_eq!(vec!["abc".as_bytes(), "def".as_bytes(), "ghi".as_bytes()], parsed);
     }
 }
