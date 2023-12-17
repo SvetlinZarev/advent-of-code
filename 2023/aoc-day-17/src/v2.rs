@@ -42,7 +42,7 @@ pub fn part_two(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 10;
     const SKIP_STEPS: usize = 3;
     const LEN: usize = MAX_STEPS - SKIP_STEPS;
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Direction::Right])
+    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Direction::Right, Direction::Down])
 }
 
 pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
