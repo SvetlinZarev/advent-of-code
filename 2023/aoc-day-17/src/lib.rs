@@ -72,17 +72,16 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
     let rows = grid.len() / cols;
 
     let mut queue = BinaryHeap::with_capacity(queue_size);
-    let mut seen: [[Vec<u32>; 2]; LEN] =
-        std::array::from_fn(|_| [vec![u32::MAX; grid.len()], vec![u32::MAX; grid.len()]]);
+    let mut seen = [vec![u32::MAX; grid.len()], vec![u32::MAX; grid.len()]];
 
     // Mark the starting cell as visited
-    seen[LEN - 1][Direction::Right.vertical() as usize][0] = 0;
+    seen[Direction::Right.vertical() as usize][0] = 0;
 
     // Seed the queue with the starting elements
     for d in initial_dir.iter().copied() {
         let (mut r, mut c, mut loss) = step(grid, rows, cols, 0, 0, d, SKIP).unwrap();
 
-        for s in SKIP..STEPS {
+        for _ in SKIP..STEPS {
             let Some((nr, nc)) = d.apply(r, c) else {
                 break;
             };
@@ -94,7 +93,7 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
             (r, c) = (nr, nc);
             loss += (grid[r * cols + c] - b'0') as u32;
 
-            seen[s - SKIP][d.vertical() as usize][r * cols + c] = loss;
+            seen[d.vertical() as usize][r * cols + c] = loss;
             queue.push((Reverse(loss), (r, c), d));
         }
     }
@@ -110,7 +109,7 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
             };
             cost += loss;
 
-            for s in SKIP..STEPS {
+            for _ in SKIP..STEPS {
                 let Some((nr, nc)) = d.apply(r, c) else {
                     break;
                 };
@@ -121,8 +120,8 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
                 (r, c) = (nr, nc);
 
                 cost += (grid[r * cols + c] - b'0') as u32;
-                if cost < seen[s - SKIP][d.vertical() as usize][r * cols + c] {
-                    seen[s - SKIP][d.vertical() as usize][r * cols + c] = cost;
+                if cost < seen[d.vertical() as usize][r * cols + c] {
+                    seen[d.vertical() as usize][r * cols + c] = cost;
                     queue.push((Reverse(cost), (r, c), d));
                 }
             }
