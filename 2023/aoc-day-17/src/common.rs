@@ -1,0 +1,45 @@
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
+pub enum Direction {
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3,
+}
+
+impl Direction {
+    pub fn apply(self, r: usize, c: usize) -> Option<(usize, usize)> {
+        match self {
+            Direction::Up => r.checked_sub(1).and_then(|r| Some((r, c))),
+            Direction::Down => Some((r + 1, c)),
+            Direction::Left => c.checked_sub(1).and_then(|c| Some((r, c))),
+            Direction::Right => Some((r, c + 1)),
+        }
+    }
+
+    pub fn rotr(self) -> Self {
+        match self {
+            Direction::Up => Direction::Right,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
+            Direction::Right => Direction::Down,
+        }
+    }
+
+    pub fn rotl(self) -> Self {
+        match self {
+            Direction::Up => Direction::Left,
+            Direction::Down => Direction::Right,
+            Direction::Left => Direction::Down,
+            Direction::Right => Direction::Up,
+        }
+    }
+
+    pub fn vertical(self) -> bool {
+        match self {
+            Direction::Up => true,
+            Direction::Down => true,
+            Direction::Left => false,
+            Direction::Right => false,
+        }
+    }
+}
