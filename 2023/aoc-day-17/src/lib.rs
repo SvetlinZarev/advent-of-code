@@ -114,13 +114,13 @@ pub fn part_two(input: &[u8]) -> u32 {
 
     let mut queue = BinaryHeap::with_capacity(34_000);
     let mut seen = [
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
+        vec![vec![false; input.len()]; 4],
     ];
 
     let (mut ir, mut ic) = (0, 3);
@@ -138,7 +138,7 @@ pub fn part_two(input: &[u8]) -> u32 {
         (ir, ic) = (nr, nc);
         init_loss += (input[ir * cols + ic] - b'0') as u32;
 
-        seen[s - MIN_STEPS][Direction::Right as usize][ir * cols + ic] = init_loss;
+        seen[s - MIN_STEPS][Direction::Right as usize][ir * cols + ic] = true;
         queue.push((Reverse(init_loss), (ir, ic), Direction::Right));
     }
 
@@ -165,8 +165,8 @@ pub fn part_two(input: &[u8]) -> u32 {
                 (r, c) = (nr, nc);
 
                 cost += (input[r * cols + c] - b'0') as u32;
-                if cost < seen[s - MIN_STEPS][d as usize][r * cols + c] {
-                    seen[s - MIN_STEPS][d as usize][r * cols + c] = cost;
+                if !seen[s - MIN_STEPS][d as usize][r * cols + c] {
+                    seen[s - MIN_STEPS][d as usize][r * cols + c] = true;
                     queue.push((Reverse(cost), (r, c), d));
                 }
             }
