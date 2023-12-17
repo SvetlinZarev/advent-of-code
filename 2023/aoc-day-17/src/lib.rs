@@ -72,11 +72,11 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
     let rows = grid.len() / cols;
 
     let mut queue = BinaryHeap::with_capacity(queue_size);
-    let mut seen: [[Vec<bool>; 2]; LEN] =
-        std::array::from_fn(|_| [vec![false; grid.len()], vec![false; grid.len()]]);
+    let mut seen: [[Vec<u32>; 2]; LEN] =
+        std::array::from_fn(|_| [vec![u32::MAX; grid.len()], vec![u32::MAX; grid.len()]]);
 
     // Mark the starting cell as visited
-    seen[LEN - 1][Direction::Right.vertical() as usize][0] = true;
+    seen[LEN - 1][Direction::Right.vertical() as usize][0] = 0;
 
     // Seed the queue with the starting elements
     for d in initial_dir.iter().copied() {
@@ -94,7 +94,7 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
             (r, c) = (nr, nc);
             loss += (grid[r * cols + c] - b'0') as u32;
 
-            seen[s - SKIP][d.vertical() as usize][r * cols + c] = true;
+            seen[s - SKIP][d.vertical() as usize][r * cols + c] = loss;
             queue.push((Reverse(loss), (r, c), d));
         }
     }
@@ -121,8 +121,8 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
                 (r, c) = (nr, nc);
 
                 cost += (grid[r * cols + c] - b'0') as u32;
-                if !seen[s - SKIP][d.vertical() as usize][r * cols + c] {
-                    seen[s - SKIP][d.vertical() as usize][r * cols + c] = true;
+                if cost < seen[s - SKIP][d.vertical() as usize][r * cols + c] {
+                    seen[s - SKIP][d.vertical() as usize][r * cols + c] = cost;
                     queue.push((Reverse(cost), (r, c), d));
                 }
             }
