@@ -58,11 +58,11 @@ pub fn part_one(input: &[u8]) -> u32 {
     let rows = input.len() / cols;
 
     let mut seen = [
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
-        vec![vec![u32::MAX; input.len()]; 4],
+        [vec![false; input.len()], vec![false; input.len()]],
+        [vec![false; input.len()], vec![false; input.len()]],
+        [vec![false; input.len()], vec![false; input.len()]],
     ];
-    seen[MAX_STEPS - 1][Direction::Right as usize][0 * cols + 0] = 0u32;
+    seen[MAX_STEPS - 1][Direction::Right.vertical() as usize][0 * cols + 0] = true;
 
     let mut queue = BinaryHeap::with_capacity(64);
     queue.push((
@@ -77,35 +77,24 @@ pub fn part_one(input: &[u8]) -> u32 {
             return loss;
         }
 
-        let left = d.rotl();
-        let right = d.rotr();
-
         if let Some((nr, nc)) = d.apply(r, c) {
             if steps > 0 && nr < rows && nc < cols - 1 {
                 let cost = loss + (input[nr * cols + nc] - b'0') as u32;
-                if cost < seen[steps - 1][d as usize][nr * cols + nc] {
-                    seen[steps - 1][d as usize][nr * cols + nc] = cost;
+                if !seen[steps - 1][d.vertical() as usize][nr * cols + nc] {
+                    seen[steps - 1][d.vertical() as usize][nr * cols + nc] = true;
                     queue.push((Reverse(cost), Reverse(steps - 1), (nr, nc), d));
                 }
             }
         }
 
-        if let Some((nr, nc)) = left.apply(r, c) {
-            if nr < rows && nc < cols - 1 {
-                let cost = loss + (input[nr * cols + nc] - b'0') as u32;
-                if cost < seen[2][left as usize][nr * cols + nc] {
-                    seen[2][left as usize][nr * cols + nc] = cost;
-                    queue.push((Reverse(cost), Reverse(MAX_STEPS - 1), (nr, nc), left));
-                }
-            }
-        }
-
-        if let Some((nr, nc)) = right.apply(r, c) {
-            if nr < rows && nc < cols - 1 {
-                let cost = loss + (input[nr * cols + nc] - b'0') as u32;
-                if cost < seen[2][right as usize][nr * cols + nc] {
-                    seen[2][right as usize][nr * cols + nc] = cost;
-                    queue.push((Reverse(cost), Reverse(MAX_STEPS - 1), (nr, nc), right));
+        for d in [d.rotl(), d.rotr()] {
+            if let Some((nr, nc)) = d.apply(r, c) {
+                if nr < rows && nc < cols - 1 {
+                    let cost = loss + (input[nr * cols + nc] - b'0') as u32;
+                    if !seen[MAX_STEPS - 1][d.vertical() as usize][nr * cols + nc] {
+                        seen[MAX_STEPS - 1][d.vertical() as usize][nr * cols + nc] = true;
+                        queue.push((Reverse(cost), Reverse(MAX_STEPS - 1), (nr, nc), d));
+                    }
                 }
             }
         }
