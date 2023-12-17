@@ -47,35 +47,35 @@ impl Direction {
     }
 }
 
-pub fn part_one(input: &[u8]) -> u32 {
+pub fn part_one(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 3;
     const SKIP_STEPS: usize = 0;
     const LEN: usize = MAX_STEPS - SKIP_STEPS;
+    const QUEUE_SIZE: usize = 2 * 1024;
 
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Direction::Right, Direction::Down], 64)
+    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN, QUEUE_SIZE>(input, &[Direction::Right, Direction::Down])
 }
 
-pub fn part_two(input: &[u8]) -> u32 {
+pub fn part_two(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 10;
     const SKIP_STEPS: usize = 3;
     const LEN: usize = MAX_STEPS - SKIP_STEPS;
-
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Direction::Right], 34_000)
+    const QUEUE_SIZE: usize = 8 * 1024;
+    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN, QUEUE_SIZE>(input, &[Direction::Right])
 }
 
-pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
+pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize, const QSIZE: usize>(
     grid: &[u8],
     initial_dir: &[Direction],
-    queue_size: usize,
-) -> u32 {
+) -> u16 {
     let cols = grid.iter().position(|&x| x == b'\n').unwrap() + 1;
     let rows = grid.len() / cols;
 
-    let mut queue = BinaryHeap::with_capacity(queue_size);
-    let mut seen = [vec![u32::MAX; grid.len()], vec![u32::MAX; grid.len()]];
+    let mut queue = BinaryHeap::with_capacity(QSIZE);
+    let mut seen = vec![u16::MAX; grid.len() * 2];
 
     // Mark the starting cell as visited
-    seen[Direction::Right.vertical() as usize][0] = 0;
+    seen[Direction::Right.vertical() as usize * grid.len()] = 0;
 
     // Seed the queue with the starting elements
     for d in initial_dir.iter().copied() {
@@ -91,9 +91,9 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
             }
 
             (r, c) = (nr, nc);
-            loss += (grid[r * cols + c] - b'0') as u32;
+            loss += (grid[r * cols + c] - b'0') as u16;
 
-            seen[d.vertical() as usize][r * cols + c] = loss;
+            seen[d.vertical() as usize * grid.len() + r * cols + c] = loss;
             queue.push((Reverse(loss), (r, c), d));
         }
     }
@@ -119,9 +119,9 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
                 }
                 (r, c) = (nr, nc);
 
-                cost += (grid[r * cols + c] - b'0') as u32;
-                if cost < seen[d.vertical() as usize][r * cols + c] {
-                    seen[d.vertical() as usize][r * cols + c] = cost;
+                cost += (grid[r * cols + c] - b'0') as u16;
+                if cost < seen[d.vertical() as usize * grid.len() + r * cols + c] {
+                    seen[d.vertical() as usize * grid.len() + r * cols + c] = cost;
                     queue.push((Reverse(cost), (r, c), d));
                 }
             }
@@ -139,7 +139,7 @@ fn step(
     c: usize,
     d: Direction,
     s: usize,
-) -> Option<(usize, usize, u32)> {
+) -> Option<(usize, usize, u16)> {
     let (mut rx, mut cx) = (r, c);
     let mut cost = 0;
 
@@ -153,7 +153,7 @@ fn step(
         }
 
         (rx, cx) = (nr, nc);
-        cost += (input[rx * cols + cx] - b'0') as u32;
+        cost += (input[rx * cols + cx] - b'0') as u16;
     }
 
     Some((rx, cx, cost))
