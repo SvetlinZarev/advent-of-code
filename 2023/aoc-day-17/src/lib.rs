@@ -49,91 +49,54 @@ impl Direction {
 
 pub fn part_one(input: &[u8]) -> u32 {
     const MAX_STEPS: usize = 3;
+    const SKIP_STEPS: usize = 0;
+    const LEN: usize = MAX_STEPS - SKIP_STEPS;
 
-    let cols = input.iter().position(|&x| x == b'\n').unwrap() + 1;
-    let rows = input.len() / cols;
-
-    let mut seen = [
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-    ];
-    seen[MAX_STEPS - 1][Direction::Right.vertical() as usize][0 * cols + 0] = true;
-
-    let mut queue = BinaryHeap::with_capacity(64);
-    queue.push((
-        Reverse(0u32),
-        Reverse(MAX_STEPS - 1),
-        (0usize, 0usize),
-        Direction::Right,
-    ));
-
-    while let Some((Reverse(loss), Reverse(steps), (r, c), d)) = queue.pop() {
-        if (r, c) == (rows - 1, cols - 2) {
-            return loss;
-        }
-
-        if let Some((nr, nc)) = d.apply(r, c) {
-            if steps > 0 && nr < rows && nc < cols - 1 {
-                let cost = loss + (input[nr * cols + nc] - b'0') as u32;
-                if !seen[steps - 1][d.vertical() as usize][nr * cols + nc] {
-                    seen[steps - 1][d.vertical() as usize][nr * cols + nc] = true;
-                    queue.push((Reverse(cost), Reverse(steps - 1), (nr, nc), d));
-                }
-            }
-        }
-
-        for d in [d.rotl(), d.rotr()] {
-            if let Some((nr, nc)) = d.apply(r, c) {
-                if nr < rows && nc < cols - 1 {
-                    let cost = loss + (input[nr * cols + nc] - b'0') as u32;
-                    if !seen[MAX_STEPS - 1][d.vertical() as usize][nr * cols + nc] {
-                        seen[MAX_STEPS - 1][d.vertical() as usize][nr * cols + nc] = true;
-                        queue.push((Reverse(cost), Reverse(MAX_STEPS - 1), (nr, nc), d));
-                    }
-                }
-            }
-        }
-    }
-
-    unreachable!()
+    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Direction::Right, Direction::Down], 64)
 }
 
 pub fn part_two(input: &[u8]) -> u32 {
     const MAX_STEPS: usize = 10;
-    const MIN_STEPS: usize = 4;
+    const SKIP_STEPS: usize = 3;
+    const LEN: usize = MAX_STEPS - SKIP_STEPS;
 
-    let cols = input.iter().position(|&x| x == b'\n').unwrap() + 1;
-    let rows = input.len() / cols;
+    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Direction::Right], 34_000)
+}
 
-    let mut queue = BinaryHeap::with_capacity(34_000);
-    let mut seen = [
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-        [vec![false; input.len()], vec![false; input.len()]],
-    ];
+pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
+    grid: &[u8],
+    initial_dir: &[Direction],
+    queue_size: usize,
+) -> u32 {
+    let cols = grid.iter().position(|&x| x == b'\n').unwrap() + 1;
+    let rows = grid.len() / cols;
 
-    let (mut ir, mut ic) = (0, 3);
-    let mut init_loss = input[1] as u32 + input[2] as u32 + input[3] as u32 - 3 * b'0' as u32;
+    let mut queue = BinaryHeap::with_capacity(queue_size);
+    let mut seen: [[Vec<bool>; 2]; LEN] =
+        std::array::from_fn(|_| [vec![false; grid.len()], vec![false; grid.len()]]);
 
-    for s in MIN_STEPS..=MAX_STEPS {
-        let Some((nr, nc)) = Direction::Right.apply(ir, ic) else {
-            continue;
-        };
+    // Mark the starting cell as visited
+    seen[LEN - 1][Direction::Right.vertical() as usize][0] = true;
 
-        if nr >= rows || nc >= cols - 1 {
-            continue;
+    // Seed the queue with the starting elements
+    for d in initial_dir.iter().copied() {
+        let (mut r, mut c, mut loss) = step(grid, rows, cols, 0, 0, d, SKIP).unwrap();
+
+        for s in SKIP..STEPS {
+            let Some((nr, nc)) = d.apply(r, c) else {
+                break;
+            };
+
+            if nr >= rows || nc >= cols - 1 {
+                break;
+            }
+
+            (r, c) = (nr, nc);
+            loss += (grid[r * cols + c] - b'0') as u32;
+
+            seen[s - SKIP][d.vertical() as usize][r * cols + c] = true;
+            queue.push((Reverse(loss), (r, c), d));
         }
-
-        (ir, ic) = (nr, nc);
-        init_loss += (input[ir * cols + ic] - b'0') as u32;
-
-        seen[s - MIN_STEPS][Direction::Right.vertical() as usize][ir * cols + ic] = true;
-        queue.push((Reverse(init_loss), (ir, ic), Direction::Right));
     }
 
     while let Some((Reverse(loss), (r, c), d)) = queue.pop() {
@@ -142,13 +105,12 @@ pub fn part_two(input: &[u8]) -> u32 {
         }
 
         for d in [d.rotl(), d.rotr()] {
-            let Some((mut r, mut c, mut cost)) = follow(input, rows, cols, r, c, d, MIN_STEPS - 1)
-            else {
+            let Some((mut r, mut c, mut cost)) = step(grid, rows, cols, r, c, d, SKIP) else {
                 continue;
             };
             cost += loss;
 
-            for s in MIN_STEPS..=MAX_STEPS {
+            for s in SKIP..STEPS {
                 let Some((nr, nc)) = d.apply(r, c) else {
                     break;
                 };
@@ -158,9 +120,9 @@ pub fn part_two(input: &[u8]) -> u32 {
                 }
                 (r, c) = (nr, nc);
 
-                cost += (input[r * cols + c] - b'0') as u32;
-                if !seen[s - MIN_STEPS][d.vertical() as usize][r * cols + c] {
-                    seen[s - MIN_STEPS][d.vertical() as usize][r * cols + c] = true;
+                cost += (grid[r * cols + c] - b'0') as u32;
+                if !seen[s - SKIP][d.vertical() as usize][r * cols + c] {
+                    seen[s - SKIP][d.vertical() as usize][r * cols + c] = true;
                     queue.push((Reverse(cost), (r, c), d));
                 }
             }
@@ -170,7 +132,7 @@ pub fn part_two(input: &[u8]) -> u32 {
     unreachable!()
 }
 
-fn follow(
+fn step(
     input: &[u8],
     rows: usize,
     cols: usize,
