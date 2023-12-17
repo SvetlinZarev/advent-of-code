@@ -47,10 +47,6 @@ impl Direction {
     }
 }
 
-pub fn run(input: &str) -> i64 {
-    part_one(input.as_bytes()) as i64
-}
-
 pub fn part_one(input: &[u8]) -> u32 {
     const MAX_STEPS: usize = 3;
 
