@@ -16,6 +16,15 @@ impl Direction {
         }
     }
 
+    pub fn apply_signed(self, r: isize, c: isize) -> (isize, isize) {
+        match self {
+            Direction::Up => (r - 1, c),
+            Direction::Down => (r + 1, c),
+            Direction::Left => (r, c - 1),
+            Direction::Right => (r, c + 1),
+        }
+    }
+
     pub fn rotr(self) -> Self {
         match self {
             Direction::Up => Direction::Right,

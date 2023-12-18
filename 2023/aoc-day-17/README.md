@@ -28,7 +28,7 @@ particular city block.
 
 For example:
 
-```
+```text
 2413432311323
 3215453535623
 3255245654254
@@ -59,7 +59,7 @@ turn right.
 
 One way to minimize heat loss is this path:
 
-```
+```text
 2>>34^>>>1323
 32v>>>35v5623
 32552456v>>54
@@ -102,7 +102,7 @@ can move a maximum of ten consecutive blocks without turning.
 In the above example, an ultra crucible could follow this path to minimize heat
 loss:
 
-```
+```text
 2>>>>>>>>1323
 32154535v5623
 32552456v4254
@@ -123,7 +123,7 @@ loss of `94`.
 
 Here's another example:
 
-```
+```text
 111111111111
 999999999991
 999999999991
@@ -133,7 +133,7 @@ Here's another example:
 
 Sadly, an ultra crucible would need to take an unfortunate path like this one:
 
-```
+```text
 1>>>>>>>1111
 9999999v9991
 9999999v9991

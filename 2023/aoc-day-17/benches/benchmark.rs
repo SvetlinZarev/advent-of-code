@@ -16,6 +16,10 @@ fn benchmark_part_one(c: &mut Criterion) {
     c.bench_function("part-1/v2", |b| {
         b.iter(|| v2::part_one(input.as_bytes()));
     });
+
+    c.bench_function("part-1/v3", |b| {
+        b.iter(|| v2::part_one(input.as_bytes()));
+    });
 }
 
 fn benchmark_part_two(c: &mut Criterion) {
@@ -26,6 +30,10 @@ fn benchmark_part_two(c: &mut Criterion) {
     });
 
     c.bench_function("part-2/v2", |b| {
+        b.iter(|| v2::part_two(input.as_bytes()));
+    });
+
+    c.bench_function("part-2/v3", |b| {
         b.iter(|| v2::part_two(input.as_bytes()));
     });
 }
