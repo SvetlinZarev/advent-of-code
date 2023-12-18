@@ -1,7 +1,9 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-use crate::common::{Direction, step};
+use aoc_shared::grid::Direction;
+
+use crate::common::step;
 
 pub fn part_one(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 3;

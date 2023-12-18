@@ -1,4 +1,6 @@
-use crate::common::{Direction, step};
+use aoc_shared::grid::Direction;
+
+use crate::common::step;
 
 struct BucketQueue<T> {
     buckets: Vec<Vec<T>>,
