@@ -1,5 +1,5 @@
 use aoc_shared::input::load_text_input_from_file;
-use criterion::{Criterion, criterion_group, criterion_main};
+use criterion::{criterion_group, criterion_main, Criterion};
 
 use aoc_day_17::{v1, v2, v4};
 

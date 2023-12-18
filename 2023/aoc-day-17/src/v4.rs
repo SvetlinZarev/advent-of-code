@@ -1,55 +1,22 @@
 use aoc_shared::grid::Point;
 
-struct BucketQueue<T> {
-    buckets: Vec<Vec<T>>,
-    min_cost: usize,
-}
-
-impl<T> BucketQueue<T> {
-    pub fn new(buckets: usize) -> Self {
-        return Self {
-            buckets: Vec::from_iter((0..buckets).map(|_| vec![])),
-            min_cost: buckets,
-        };
-    }
-
-    pub fn push(&mut self, cost: usize, data: T) {
-        self.buckets[cost].push(data);
-        self.min_cost = self.min_cost.min(cost);
-    }
-
-    pub fn pop(&mut self) -> Option<T> {
-        for idx in self.min_cost..self.buckets.len() {
-            if !self.buckets[idx].is_empty() {
-                self.min_cost = idx;
-                return self.buckets[idx].pop();
-            }
-        }
-
-        None
-    }
-}
+use crate::common::BucketQueue;
 
 pub fn part_one(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 3;
     const SKIP_STEPS: usize = 0;
-    const LEN: usize = MAX_STEPS - SKIP_STEPS;
 
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Point::RIGHT, Point::DOWN])
+    dijkstra::<SKIP_STEPS, MAX_STEPS>(input, &[Point::RIGHT, Point::DOWN])
 }
 
 pub fn part_two(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 10;
     const SKIP_STEPS: usize = 3;
-    const LEN: usize = MAX_STEPS - SKIP_STEPS;
 
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN>(input, &[Point::RIGHT, Point::DOWN])
+    dijkstra::<SKIP_STEPS, MAX_STEPS>(input, &[Point::RIGHT, Point::DOWN])
 }
 
-pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
-    grid: &[u8],
-    initial_dir: &[Point],
-) -> u16 {
+pub fn dijkstra<const SKIP: usize, const STEPS: usize>(grid: &[u8], initial_dir: &[Point]) -> u16 {
     let cols = grid.iter().position(|&x| x == b'\n').unwrap() + 1;
     let rows = grid.len() / cols;
     let target = Point::new(cols as i64 - 2, rows as i64 - 1);
@@ -127,7 +94,6 @@ pub fn step(
 
     Some((x, cost))
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -8,21 +8,20 @@ use crate::common::step;
 pub fn part_one(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 3;
     const SKIP_STEPS: usize = 0;
-    const LEN: usize = MAX_STEPS - SKIP_STEPS;
     const QUEUE_SIZE: usize = 2 * 1024;
 
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN, QUEUE_SIZE>(input, &[Direction::Right, Direction::Down])
+    dijkstra::<SKIP_STEPS, MAX_STEPS, QUEUE_SIZE>(input, &[Direction::Right, Direction::Down])
 }
 
 pub fn part_two(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 10;
     const SKIP_STEPS: usize = 3;
-    const LEN: usize = MAX_STEPS - SKIP_STEPS;
     const QUEUE_SIZE: usize = 8 * 1024;
-    dijkstra::<SKIP_STEPS, MAX_STEPS, LEN, QUEUE_SIZE>(input, &[Direction::Right])
+
+    dijkstra::<SKIP_STEPS, MAX_STEPS, QUEUE_SIZE>(input, &[Direction::Right])
 }
 
-pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize, const QSIZE: usize>(
+pub fn dijkstra<const SKIP: usize, const STEPS: usize, const QSIZE: usize>(
     grid: &[u8],
     initial_dir: &[Direction],
 ) -> u16 {
