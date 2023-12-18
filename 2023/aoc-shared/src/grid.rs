@@ -33,6 +33,34 @@ impl Point {
     pub const fn manhattan(self, other: Self) -> i64 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
     }
+
+    pub const fn not_negative_coordinates(self) -> bool {
+        (self.x >= 0) & (self.y >= 0)
+    }
+
+    pub const fn rotl(self) -> Self {
+        Self {
+            x: -self.y,
+            y: self.x,
+        }
+    }
+
+    pub const fn rotr(self) -> Self {
+        Self {
+            x: self.y,
+            y: -self.x,
+        }
+    }
+
+    #[inline(always)]
+    pub const fn r(self) -> usize {
+        self.y as usize
+    }
+
+    #[inline(always)]
+    pub const fn c(self) -> usize {
+        self.x as usize
+    }
 }
 
 impl Add for Point {
