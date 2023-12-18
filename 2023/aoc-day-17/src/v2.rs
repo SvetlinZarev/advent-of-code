@@ -1,4 +1,4 @@
-use crate::common::Direction;
+use crate::common::{Direction, step};
 
 struct BucketQueue<T> {
     buckets: Vec<Vec<T>>,
@@ -63,16 +63,13 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
         let (mut r, mut c, mut loss) = step(grid, rows, cols, 0, 0, d, SKIP).unwrap();
 
         for _ in SKIP..STEPS {
-            let Some((nr, nc)) = d.apply(r, c) else {
+            let Some((nr, nc, cst)) = step(grid, rows, cols, r, c, d, 1) else {
                 break;
             };
 
-            if nr >= rows || nc >= cols - 1 {
-                break;
-            }
-
-            (r, c) = (nr, nc);
-            loss += (grid[r * cols + c] - b'0') as u16;
+            r = nr;
+            c = nc;
+            loss += cst;
 
             seen[d.vertical() as usize * grid.len() + r * cols + c] = loss;
             queue.push(loss as usize, (loss, r, c, d));
@@ -91,16 +88,14 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
             cost += loss;
 
             for _ in SKIP..STEPS {
-                let Some((nr, nc)) = d.apply(r, c) else {
+                let Some((nr, nc, cst)) = step(grid, rows, cols, r, c, d, 1) else {
                     break;
                 };
 
-                if nr >= rows || nc >= cols - 1 {
-                    break;
-                }
-                (r, c) = (nr, nc);
+                r = nr;
+                c = nc;
+                cost += cst;
 
-                cost += (grid[r * cols + c] - b'0') as u16;
                 if cost < seen[d.vertical() as usize * grid.len() + r * cols + c] {
                     seen[d.vertical() as usize * grid.len() + r * cols + c] = cost;
                     queue.push(cost as usize, (cost, r, c, d));
@@ -112,33 +107,6 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize, const LEN: usize>(
     unreachable!()
 }
 
-fn step(
-    input: &[u8],
-    rows: usize,
-    cols: usize,
-    r: usize,
-    c: usize,
-    d: Direction,
-    s: usize,
-) -> Option<(usize, usize, u16)> {
-    let (mut rx, mut cx) = (r, c);
-    let mut cost = 0;
-
-    for _ in 0..s {
-        let Some((nr, nc)) = d.apply(rx, cx) else {
-            return None;
-        };
-
-        if nr >= rows || nc >= cols - 1 {
-            return None;
-        }
-
-        (rx, cx) = (nr, nc);
-        cost += (input[rx * cols + cx] - b'0') as u16;
-    }
-
-    Some((rx, cx, cost))
-}
 
 #[cfg(test)]
 mod tests {
