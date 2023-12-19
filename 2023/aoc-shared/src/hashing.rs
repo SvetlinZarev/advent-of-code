@@ -1,11 +1,13 @@
-use std::hash::{BuildHasher, Hasher};
+use std::hash::{BuildHasher, BuildHasherDefault, Hasher};
 use std::marker::PhantomData;
 
 pub type FxHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
 pub type FxHashSet<T> = rustc_hash::FxHashSet<T>;
+pub type FxHashBuilder = BuildHasherDefault<rustc_hash::FxHasher>;
 
 pub type FnvHashMap<K, V> = std::collections::HashMap<K, V, HashBuilder<FnvHasher>>;
 pub type FnvHashSet<T> = std::collections::HashSet<T, HashBuilder<FnvHasher>>;
+pub type FnvHasherBuilder = BuildHasherDefault<FnvHasher>;
 
 #[derive(Debug, Copy, Clone)]
 pub struct FnvHasher(u64);

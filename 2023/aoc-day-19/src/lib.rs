@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt::Debug;
 use std::num::NonZeroUsize;
 
-use aoc_shared::hashing::FxHashMap;
+use aoc_shared::hashing::{FxHashBuilder, FxHashMap};
 
 type HashMap<K, V> = FxHashMap<K, V>;
 
@@ -220,10 +220,15 @@ impl Xmas {
 }
 
 pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>), Box<dyn Error>> {
-    let mut rules = RuleSet { rules: vec![] };
+    const RULE_CAPACITY: usize = 700;
+    const DATA_CAPACITY: usize = 200;
+
+    let mut rules = RuleSet {
+        rules: Vec::with_capacity(RULE_CAPACITY),
+    };
 
     let mut lines = input.lines();
-    let mut rule_names = HashMap::default();
+    let mut rule_names = HashMap::with_capacity_and_hasher(RULE_CAPACITY, FxHashBuilder::default());
 
     //always put the "in" rule at position 0; Push dummy rule to reserve the sport
     rule_names.insert("in", 0);
@@ -287,6 +292,8 @@ pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>)
     let mut data = vec![];
 
     if parse_data {
+        data.reserve(DATA_CAPACITY);
+
         while let Some(line) = lines.next() {
             let mut xmas = Xmas::default();
 
