@@ -249,8 +249,9 @@ pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>)
                 break;
             }
 
-            let key = &r[..1];
-            let op = &r[1..2];
+            let key = &r[..1].as_bytes()[0];
+            let op = &r[1..2].as_bytes()[0];
+
             let Some((val, target)) = r[2..].rsplit_once(':') else {
                 return Err(format!("Invalid sub-rule: {:?}", r).into());
             };
@@ -258,29 +259,20 @@ pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>)
             let action = to_action(&mut rule_names, target);
 
             let val = val.parse()?;
-            let check = match key {
-                "x" => match op {
-                    ">" => Check::X(1 + val, u32::MAX),
-                    "<" => Check::X(u32::MIN, val),
-                    _ => return Err(format!("Invalid sub-rule: {:?}", r).into()),
-                },
-                "m" => match op {
-                    ">" => Check::M(1 + val, u32::MAX),
-                    "<" => Check::M(u32::MIN, val),
-                    _ => return Err(format!("Invalid sub-rule: {:?}", r).into()),
-                },
-                "a" => match op {
-                    ">" => Check::A(1 + val, u32::MAX),
-                    "<" => Check::A(u32::MIN, val),
-                    _ => return Err(format!("Invalid sub-rule: {:?}", r).into()),
-                },
-                "s" => match op {
-                    ">" => Check::S(1 + val, u32::MAX),
-                    "<" => Check::S(u32::MIN, val),
-                    _ => return Err(format!("Invalid sub-rule: {:?}", r).into()),
-                },
+            let (lo, hi) = match op {
+                b'>' => (val + 1, u32::MAX),
+                b'<' => (u32::MIN, val),
                 _ => return Err(format!("Invalid sub-rule: {:?}", r).into()),
             };
+
+            let check = match key {
+                b'x' => Check::X(lo, hi),
+                b'm' => Check::M(lo, hi),
+                b'a' => Check::A(lo, hi),
+                b's' => Check::S(lo, hi),
+                _ => return Err(format!("Invalid sub-rule: {:?}", r).into()),
+            };
+
             rule.checks[rule.size] = (check, action);
             rule.size += 1;
         }
@@ -299,15 +291,15 @@ pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>)
             let mut xmas = Xmas::default();
 
             for part in line[1..line.len() - 1].split(',') {
-                let key = &part[..1];
+                let key = &part[..1].as_bytes()[0];
                 let value = &part[2..];
                 let value = value.parse()?;
 
                 match key {
-                    "x" => xmas.x = value,
-                    "m" => xmas.m = value,
-                    "a" => xmas.a = value,
-                    "s" => xmas.s = value,
+                    b'x' => xmas.x = value,
+                    b'm' => xmas.m = value,
+                    b'a' => xmas.a = value,
+                    b's' => xmas.s = value,
                     _ => return Err(format!("Invalid xmas definition: {:?}", line).into()),
                 }
             }
@@ -319,21 +311,20 @@ pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>)
     Ok((rules, data))
 }
 
-fn rule_position<'l>(rule_names: &mut HashMap<&'l str, usize>, name: &'l str) -> usize {
-    let mut pos = rule_names.len();
-    pos = *rule_names.entry(name).or_insert(pos);
-    pos
-}
-
 fn to_action<'l>(rule_names: &mut HashMap<&'l str, usize>, target: &'l str) -> Action {
     match target {
         "A" => Action::Accept,
         "R" => Action::Reject,
         _ => {
             let pos = rule_position(rule_names, target);
-            Action::Next(unsafe { NonZeroUsize::new_unchecked(pos) })
+            Action::Next(NonZeroUsize::new(pos).unwrap())
         }
     }
+}
+
+fn rule_position<'l>(rule_names: &mut HashMap<&'l str, usize>, name: &'l str) -> usize {
+    let pos = rule_names.len();
+    *rule_names.entry(name).or_insert(pos)
 }
 
 pub fn part_one(rules: &RuleSet, data: &[Xmas]) -> u32 {
