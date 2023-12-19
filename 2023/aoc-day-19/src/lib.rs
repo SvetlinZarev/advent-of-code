@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt::Debug;
 use std::num::NonZeroUsize;
@@ -82,13 +81,10 @@ impl Rule {
         max: Xmas,
         on_accept: &mut dyn FnMut(Xmas, Xmas),
     ) {
-        let mut queue = VecDeque::with_capacity(24);
-        queue.push_back((min, max));
+        let mut range = Some((min, max));
 
         for idx in 0..self.size {
-            for _ in 0..queue.len() {
-                let (min, max) = queue.pop_front().unwrap();
-
+            if let Some((min, max)) = range.take() {
                 let (mut p, mut q) = (min, max); // passes check
                 let (m, mut n) = (min, max); // does not pass check: left
                 let (mut l, r) = (min, max); // does not pass check: right
@@ -158,17 +154,18 @@ impl Rule {
                     }
                 }
 
+                // Because we are always splitting the range in TWO parts,
+                // one of the two non-overlapping parts is actually invalid.
+                // Thus we can produce at most 1 range for the next iteration
                 if is_valid_range(m, n) {
-                    queue.push_back((m, n));
-                }
-
-                if is_valid_range(l, r) {
-                    queue.push_back((l, r));
+                    range = Some((m, n));
+                } else if is_valid_range(l, r) {
+                    range = Some((l, r));
                 }
             }
         }
 
-        for (min, max) in queue {
+        if let Some((min, max)) = range.take() {
             match self.default {
                 Action::Next(next) => rules[next.get()].accepted_ranges(rules, min, max, on_accept),
                 Action::Accept => on_accept(min, max),
