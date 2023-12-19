@@ -1,6 +1,5 @@
 use std::error::Error;
 use std::fmt::Debug;
-use std::num::NonZeroUsize;
 
 use aoc_shared::hashing::{FxHashBuilder, FxHashMap};
 
@@ -16,13 +15,8 @@ impl RuleSet {
         self.rules[0].apply(&self.rules, xmas, on_accept);
     }
 
-    pub fn accepted_combinations(
-        &self,
-        min: Xmas,
-        max: Xmas,
-        on_accept: &mut dyn FnMut(Xmas, Xmas),
-    ) {
-        self.rules[0].accepted_ranges(&self.rules, min, max, on_accept)
+    pub fn combinations(&self, min: Xmas, max: Xmas, on_comb: &mut dyn FnMut(Xmas, Xmas)) {
+        self.rules[0].combinations(&self.rules, min, max, on_comb)
     }
 }
 
@@ -60,26 +54,18 @@ impl Rule {
         }
 
         match action {
-            Action::Next(next) => {
-                rules[next.get()].apply(rules, xmas, on_accept);
-            }
-
-            Action::Accept => {
-                on_accept(xmas);
-            }
-
-            Action::Reject => {
-                // do nothing
-            }
+            Action::Next(rule) => rules[rule].apply(rules, xmas, on_accept),
+            Action::Accept => on_accept(xmas),
+            Action::Reject => { /* do nothing */ }
         }
     }
 
-    pub fn accepted_ranges(
+    pub fn combinations(
         &self,
         rules: &[Rule],
         min: Xmas,
         max: Xmas,
-        on_accept: &mut dyn FnMut(Xmas, Xmas),
+        on_comb: &mut dyn FnMut(Xmas, Xmas),
     ) {
         let mut range = Some((min, max));
 
@@ -139,13 +125,13 @@ impl Rule {
                 match self.checks[idx].1 {
                     Action::Next(rule) => {
                         if is_valid_range(p, q) {
-                            rules[rule.get()].accepted_ranges(rules, p, q, on_accept);
+                            rules[rule].combinations(rules, p, q, on_comb);
                         }
                     }
 
                     Action::Accept => {
                         if is_valid_range(p, q) {
-                            on_accept(p, q);
+                            on_comb(p, q);
                         }
                     }
 
@@ -167,8 +153,8 @@ impl Rule {
 
         if let Some((min, max)) = range.take() {
             match self.default {
-                Action::Next(next) => rules[next.get()].accepted_ranges(rules, min, max, on_accept),
-                Action::Accept => on_accept(min, max),
+                Action::Next(rule) => rules[rule].combinations(rules, min, max, on_comb),
+                Action::Accept => on_comb(min, max),
                 Action::Reject => { /* do nothing */ }
             }
         }
@@ -176,7 +162,7 @@ impl Rule {
 }
 
 fn is_valid_range(min: Xmas, max: Xmas) -> bool {
-    (min.x < max.x) & (min.m < max.m) & (min.a < max.a) && (min.s < max.s)
+    (min.x < max.x) & (min.m < max.m) & (min.a < max.a) & (min.s < max.s)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -200,7 +186,7 @@ impl Check {
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Action {
-    Next(NonZeroUsize),
+    Next(usize),
     Accept,
     Reject,
 }
@@ -220,6 +206,7 @@ impl Xmas {
 }
 
 pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>), Box<dyn Error>> {
+    const START_NODE: &'static str = "in";
     const RULE_CAPACITY: usize = 700;
     const DATA_CAPACITY: usize = 200;
 
@@ -227,12 +214,13 @@ pub fn parse_input(input: &str, parse_data: bool) -> Result<(RuleSet, Vec<Xmas>)
         rules: Vec::with_capacity(RULE_CAPACITY),
     };
 
-    let mut lines = input.lines();
     let mut rule_names = HashMap::with_capacity_and_hasher(RULE_CAPACITY, FxHashBuilder::default());
 
     //always put the "in" rule at position 0; Push dummy rule to reserve the sport
-    rule_names.insert("in", 0);
+    rule_names.insert(START_NODE, 0);
     rules.rules.push(Rule::default());
+
+    let mut lines = input.lines();
 
     // parse the rules
     while let Some(line) = lines.next() {
@@ -324,7 +312,7 @@ fn to_action<'l>(rule_names: &mut HashMap<&'l str, usize>, target: &'l str) -> A
         "R" => Action::Reject,
         _ => {
             let pos = rule_position(rule_names, target);
-            Action::Next(NonZeroUsize::new(pos).unwrap())
+            Action::Next(pos)
         }
     }
 }
@@ -361,7 +349,7 @@ pub fn part_two(rules: &RuleSet) -> u64 {
         s: 4001,
     };
 
-    rules.accepted_combinations(min, max, &mut |min, max| {
+    rules.combinations(min, max, &mut |min, max| {
         answer += (max.x - min.x) as u64
             * (max.m - min.m) as u64
             * (max.a - min.a) as u64
