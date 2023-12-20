@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use aoc_shared::hashing::FxHashMap;
-use num_integer::Integer;
+use num::Integer;
 
 type HashMap<K, V> = FxHashMap<K, V>;
 
@@ -77,7 +77,7 @@ pub fn load_graph(input: &str) -> HashMap<&str, (Kind, Vec<&str>)> {
 }
 
 pub fn part_one(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
-    let (mut conjunctions, _) = init_conjugation_state(graph);
+    let (mut conjunctions, _) = init_conjunction_state(graph);
     let mut flip_flops = HashMap::default();
     let mut queue = VecDeque::new();
 
@@ -113,7 +113,7 @@ pub fn part_one(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
 }
 
 pub fn part_two(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
-    let (mut conjunctions, final_node) = init_conjugation_state(graph);
+    let (mut conjunctions, final_node) = init_conjunction_state(graph);
     let mut flip_flops = HashMap::default();
     let mut queue = VecDeque::new();
 
@@ -187,11 +187,11 @@ fn handle_node<'l>(
 
         Kind::Conjunction => {
             let Some(inputs) = conjunctions.get_mut(dst) else {
-                panic!("Cannot find conjugation state for {:?}", dst);
+                panic!("Cannot find conjunction state for {:?}", dst);
             };
 
             let Some(state) = inputs.get_mut(src) else {
-                panic!("Cannot find input {:?} for conjugation {:?}", src, dst);
+                panic!("Cannot find input {:?} for conjunction {:?}", src, dst);
             };
 
             *state = pulse.into_state();
@@ -207,16 +207,16 @@ fn handle_node<'l>(
     }
 }
 
-fn init_conjugation_state<'l>(
+fn init_conjunction_state<'l>(
     graph: &HashMap<&'l str, (Kind, Vec<&'l str>)>,
 ) -> (HashMap<&'l str, HashMap<&'l str, State>>, &'l str) {
     let mut conjunctions = HashMap::default();
-    let mut final_conjugation = "";
+    let mut final_conjunction = "";
 
     for (&current, (_, next)) in graph.iter() {
         for node in next.iter().copied() {
             if FINAL_NODE == node {
-                final_conjugation = current;
+                final_conjunction = current;
                 continue;
             }
 
@@ -233,8 +233,8 @@ fn init_conjugation_state<'l>(
         }
     }
 
-    assert_ne!(final_conjugation, "");
-    (conjunctions, final_conjugation)
+    assert_ne!(final_conjunction, "");
+    (conjunctions, final_conjunction)
 }
 
 #[cfg(test)]

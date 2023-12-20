@@ -11,7 +11,7 @@ lto = "fat"
 
 [dependencies]
 aoc-shared = { path = "../aoc-shared" }
-num-integer = "0.1"
+num = "0.4"
 
 [dev-dependencies]
 criterion = "0.5"
