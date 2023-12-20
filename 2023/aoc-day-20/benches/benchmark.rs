@@ -1,7 +1,7 @@
 use aoc_shared::input::load_text_input_from_file;
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use aoc_day_20::{load_graph, part_one, part_two};
+use aoc_day_20::v1::{load_graph, part_one, part_two};
 
 criterion_group!(
     benches,
