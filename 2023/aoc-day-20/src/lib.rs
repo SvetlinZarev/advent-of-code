@@ -82,7 +82,7 @@ pub fn load_graph(input: &str) -> HashMap<&str, (Kind, Vec<&str>)> {
 }
 
 pub fn part_one(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
-    let mut conjunctions = init_conjugation_state(graph);
+    let (mut conjunctions, _) = init_conjugation_state(graph);
     let mut flip_flops = HashMap::default();
     let mut queue = VecDeque::new();
 
@@ -118,7 +118,7 @@ pub fn part_one(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
 }
 
 pub fn part_two(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
-    let mut conjunctions = init_conjugation_state(graph);
+    let (mut conjunctions, final_node) = init_conjugation_state(graph);
     let mut flip_flops = HashMap::default();
     let mut queue = VecDeque::new();
 
@@ -126,20 +126,6 @@ pub fn part_two(graph: &HashMap<&str, (Kind, Vec<&str>)>) -> u64 {
     let Some((_, start_nodes)) = &graph.get(START_NODE) else {
         panic!("Cannot find the Broadcast node in the graph");
     };
-
-    // find the final conjugation node
-    let mut final_node = "";
-    for &node in conjunctions.keys() {
-        let Some((_, next)) = graph.get(node) else {
-            panic!("Cannot find conjugation {:?} in the graph", node);
-        };
-
-        if next.iter().any(|&x| FINAL_NODE == x) {
-            final_node = node;
-            break;
-        }
-    }
-    assert_ne!(final_node, "");
 
     let mut answer = 1;
     'next_node: for &start_node in start_nodes {
@@ -228,11 +214,14 @@ fn handle_node<'l>(
 
 fn init_conjugation_state<'l>(
     graph: &HashMap<&'l str, (Kind, Vec<&'l str>)>,
-) -> HashMap<&'l str, HashMap<&'l str, State>> {
+) -> (HashMap<&'l str, HashMap<&'l str, State>>, &'l str) {
     let mut conjunctions = HashMap::default();
+    let mut final_conjugation = "";
+
     for (&current, (_, next)) in graph.iter() {
         for node in next.iter().copied() {
             if FINAL_NODE == node {
+                final_conjugation = current;
                 continue;
             }
 
@@ -248,7 +237,9 @@ fn init_conjugation_state<'l>(
             }
         }
     }
-    conjunctions
+
+    assert_ne!(final_conjugation, "");
+    (conjunctions, final_conjugation)
 }
 
 #[cfg(test)]
