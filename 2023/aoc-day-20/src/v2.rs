@@ -97,6 +97,64 @@ pub fn load_graph(input: &str) -> Vec<(Kind, Vec<usize>)> {
     graph
 }
 
+pub fn part_one(graph: &[(Kind, Vec<usize>)]) -> u64 {
+    let mut ff_state = vec![State::Low; graph.len()];
+    let mut cn_state = vec![vec![]; graph.len()];
+    let mut queue = VecDeque::new();
+
+    for node in 0..graph.len() {
+        let (_, children) = &graph[node];
+
+        for next in children.iter().copied() {
+            if graph[next].0 == Kind::Conjunction {
+                cn_state[next].push((node, State::Low));
+            }
+        }
+    }
+
+    let mut lows = 0;
+    let mut highs = 0;
+
+    for _ in 0..1000 {
+        queue.push_back((START, START, Pulse::Low));
+
+        while let Some((src, dst, pulse)) = queue.pop_front() {
+            match pulse {
+                Pulse::Low => lows += 1,
+                Pulse::High => highs += 1,
+            }
+
+            let (kind, next) = &graph[dst];
+            let output = match kind {
+                Kind::FlipFlop => match pulse {
+                    Pulse::High => continue,
+                    Pulse::Low => {
+                        ff_state[dst] = ff_state[dst].invert();
+                        ff_state[dst].into_pulse()
+                    }
+                },
+                Kind::Conjunction => {
+                    let inputs = &mut cn_state[dst];
+                    let (_, state) = inputs.iter_mut().find(|(input, _)| *input == src).unwrap();
+                    *state = pulse.into_state();
+
+                    match inputs.iter().all(|&(_, state)| state == State::High) {
+                        true => Pulse::Low,
+                        false => Pulse::High,
+                    }
+                }
+                Kind::Broadcaster => pulse,
+            };
+
+            for node in next.iter().copied() {
+                queue.push_back((dst, node, output));
+            }
+        }
+    }
+
+    lows * highs
+}
+
 pub fn part_two(graph: &[(Kind, Vec<usize>)]) -> u64 {
     let mut answer = 1;
 
@@ -176,6 +234,15 @@ mod tests {
     use aoc_shared::input::load_text_input_from_file;
 
     use super::*;
+
+    #[test]
+    fn test_part_one() {
+        let input = load_text_input_from_file("inputs/input.txt");
+        let graph = load_graph(&input);
+
+        let answer = part_one(&graph);
+        assert_eq!(763_500_168, answer);
+    }
 
     #[test]
     fn test_part_two() {
