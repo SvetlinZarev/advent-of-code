@@ -1,8 +1,15 @@
-use std::collections::HashMap;
 use std::error::Error;
 use std::str::FromStr;
 
-use num_integer::Integer;
+use aoc_shared::hashing::FxHashMap;
+use num::Integer;
+
+type HashMap<K, V> = FxHashMap<K, V>;
+
+pub fn run(input: &str) -> i64 {
+    let input = parse_input(input);
+    part_two(&input) as i64
+}
 
 #[derive(Debug)]
 pub struct Input<'a> {
@@ -31,13 +38,14 @@ impl FromStr for Dir {
 pub fn parse_input(input: &str) -> Input {
     let (lr, net) = input.split_once('\n').unwrap();
     let lr = lr
-        .trim()
         .split_inclusive("")
         .filter(|x| !x.is_empty())
         .map(|x| x.parse().unwrap())
         .collect();
 
-    let mut map = HashMap::new();
+    let mut map = HashMap::default();
+    map.reserve(1024);
+
     net.trim()
         .lines()
         .map(|l| (&l[0..3], &l[7..10], &l[12..15]))
