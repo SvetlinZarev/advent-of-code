@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{BTreeSet, VecDeque};
 use std::hash::Hash;
 
 use aoc_shared::hashing::FxHashSet;
@@ -107,6 +107,19 @@ fn settle(mut bricks: Vec<Brick>) -> Vec<Brick> {
     // Sort by the Z axis, so we can process them from bottom to top
     bricks.sort_unstable_by_key(|t| t.a.z);
 
+    // Take advantage of the ordering of the KEYS
+    // It will allow us to find the tallest bricks
+    // after settling faster than checking all
+    // previous bricks:
+    // ```rust
+    //    for pos in 0..idx {
+    //        if intersects_xy(&bricks[idx], &bricks[pos]) {
+    //            bottom = bottom.max(bricks[pos].top() + 1);
+    //        }
+    //    }
+    // ```
+    let mut settled = BTreeSet::new();
+
     for idx in 0..bricks.len() {
         // As the ground is 0, the min bottom level
         // is 1 (i.e. sitting on the ground)
@@ -114,10 +127,11 @@ fn settle(mut bricks: Vec<Brick>) -> Vec<Brick> {
 
         // Check if the brick at IDX will settle on top of
         // another previously processed brick, or it will
-        // fall on the ground
-        for pos in 0..idx {
+        // fall on the ground (see the comment above `settled`)
+        for (top, pos) in settled.iter().copied().rev() {
             if intersects_xy(&bricks[idx], &bricks[pos]) {
-                bottom = bottom.max(bricks[pos].top() + 1);
+                bottom = bottom.max(top + 1);
+                break;
             }
         }
 
@@ -126,6 +140,9 @@ fn settle(mut bricks: Vec<Brick>) -> Vec<Brick> {
         let fall = bricks[idx].bottom() - bottom;
         bricks[idx].a.z -= fall;
         bricks[idx].b.z -= fall;
+
+        // mark the new brick as settled
+        settled.insert((bricks[idx].b.z, idx));
     }
 
     // re-sort the bricks because changing the Z values might
