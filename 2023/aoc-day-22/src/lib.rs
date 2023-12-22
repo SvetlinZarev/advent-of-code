@@ -102,9 +102,10 @@ fn solve(bricks: impl Into<Vec<Brick>>, mut on_falling: impl FnMut(usize)) {
 }
 
 // settle the bricks on the ground given the initial snapshot from the input
+// and return them sorted in ascending Z order
 fn settle(mut bricks: Vec<Brick>) -> Vec<Brick> {
     // Sort by the Z axis, so we can process them from bottom to top
-    bricks.sort_unstable_by_key(|t| (t.a.z, t.a.x, t.a.y));
+    bricks.sort_unstable_by_key(|t| t.a.z);
 
     for idx in 0..bricks.len() {
         // As the ground is 0, the min bottom level
@@ -127,18 +128,27 @@ fn settle(mut bricks: Vec<Brick>) -> Vec<Brick> {
         bricks[idx].b.z -= fall;
     }
 
+    // re-sort the bricks because changing the Z values might
+    // have gotten them out of order
+    bricks.sort_unstable_by_key(|t| t.a.z);
     bricks
 }
 
 fn brick_supports(bricks: &[Brick]) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
-    // Note: Because we applied corrections to the Z axis
-    // in `settle()`the bricks are no-longer sorted by their Z axis
+    // Note: assume that the bricks are sorted in Z order
 
     let mut above = vec![vec![]; bricks.len()];
     let mut below = vec![vec![]; bricks.len()];
 
     for i in 0..bricks.len() {
         for j in i + 1..bricks.len() {
+            // because the bricks are sorted in Z order,
+            // all following bricks will have higher Z value,
+            // thus we can skip checking them
+            if bricks[j].bottom() > bricks[i].top() + 1 {
+                break;
+            }
+
             if bricks[j].bottom() == bricks[i].top() + 1 {
                 // Brick J sits right on top of brick I.
                 //
