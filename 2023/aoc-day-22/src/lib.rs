@@ -73,7 +73,7 @@ fn parse_point(input: &str) -> Point {
 
 fn solve(bricks: impl Into<Vec<Brick>>, mut on_falling: impl FnMut(usize)) {
     let bricks = settle(bricks.into());
-    let (above, below) = brick_supports(&bricks);
+    let (supports, supported_by) = brick_supports(&bricks);
 
     let mut queue = VecDeque::with_capacity(bricks.len());
     let mut falling = HashSet::default();
@@ -86,10 +86,13 @@ fn solve(bricks: impl Into<Vec<Brick>>, mut on_falling: impl FnMut(usize)) {
         while let Some(brick) = queue.pop_front() {
             falling.insert(brick);
 
-            for starting_to_fall in above[brick].iter().copied() {
-                // if there is a brick, below that one, that has not fallen,
-                // then this one won't fall too
-                if is_subset(&below[starting_to_fall], &falling) {
+            for starting_to_fall in supports[brick].iter().copied() {
+                // If there is a brick, below that one, that has not fallen,
+                // then this one won't fall too.
+                //
+                // I.e. all supports need to have fallen in order for the supported
+                // brick to fall too
+                if is_subset(&supported_by[starting_to_fall], &falling) {
                     queue.push_back(starting_to_fall);
                 }
             }
@@ -154,8 +157,11 @@ fn settle(mut bricks: Vec<Brick>) -> Vec<Brick> {
 fn brick_supports(bricks: &[Brick]) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
     // Note: assume that the bricks are sorted in Z order
 
-    let mut above = vec![vec![]; bricks.len()];
-    let mut below = vec![vec![]; bricks.len()];
+    // Track which bricks are being supported by brick at IDX
+    let mut supports = vec![vec![]; bricks.len()];
+
+    // Track which bricks are acting as a support for the brick at IDX
+    let mut supported_by = vec![vec![]; bricks.len()];
 
     for i in 0..bricks.len() {
         for j in i + 1..bricks.len() {
@@ -172,17 +178,17 @@ fn brick_supports(bricks: &[Brick]) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
                 // If their XY planes intersect, then brick I will
                 // act as a support for brick J.
                 if intersects_xy(&bricks[i], &bricks[j]) {
-                    // J sits on I
-                    above[i].push(j);
+                    // Brick I supports brick J
+                    supports[i].push(j);
 
-                    // I acts as a support for J
-                    below[j].push(i);
+                    // Brick J is being supported by brick I
+                    supported_by[j].push(i);
                 }
             }
         }
     }
 
-    (above, below)
+    (supports, supported_by)
 }
 
 fn intersects_xy(a: &Brick, b: &Brick) -> bool {
