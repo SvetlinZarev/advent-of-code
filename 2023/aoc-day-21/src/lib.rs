@@ -4,6 +4,7 @@ use aoc_shared::hashing::FxHashSet;
 
 type HashSet<T> = FxHashSet<T>;
 
+
 const DIR: [(isize, isize); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
 /*
    General observations:
@@ -139,8 +140,9 @@ pub fn part_two(input: &str) -> i64 {
     let (a, b, c) = simplified_lagrange(values[0], values[1], values[2]);
 
     // With the above coefficients, interpolate the value at x=202300
-    let target = (STEPS as i64 - rows as i64 / 2) / rows as i64;
-    a * target.pow(2) + b * target + c
+    let target = ((STEPS as i64 - rows as i64 / 2) / rows as i64) as f64;
+    let answer = a * target.powi(2) + b * target + c;
+    answer as i64
 }
 
 pub fn simulate_unbounded(
@@ -194,7 +196,10 @@ pub fn simulate_unbounded(
     }
 }
 
-fn simplified_lagrange(y0: i64, y1: i64, y2: i64) -> (i64, i64, i64) {
+fn simplified_lagrange(y0: i64, y1: i64, y2: i64) -> (f64, f64, f64) {
+    let y0 = y0 as f64;
+    let y1 = y1 as f64;
+    let y2 = y2 as f64;
     /*
      Lagrange's Interpolation formula for `ax^2 + bx + c`
      with `x=[0,1,2]` and `y=[y0,y1,y2]` we have
@@ -208,8 +213,8 @@ fn simplified_lagrange(y0: i64, y1: i64, y2: i64) -> (i64, i64, i64) {
 
     https://en.wikipedia.org/wiki/Lagrange_polynomial
     */
-    let a = y0 / 2 - y1 + y2 / 2;
-    let b = -3 * y0 / 2 + 2 * y1 - y2 / 2;
+    let a = y0 / 2.0 - y1 + y2 / 2.0;
+    let b = -3.0 * y0 / 2.0 + 2.0 * y1 - y2 / 2.0;
     let c = y0;
 
     (a, b, c)
