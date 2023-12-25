@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use z3::ast::{Ast, Int};
 use z3::{Config, Context, Solver};
 
@@ -8,18 +6,6 @@ pub struct X3D {
     x: i64,
     y: i64,
     z: i64,
-}
-
-impl Add for X3D {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            z: self.z + rhs.z,
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
