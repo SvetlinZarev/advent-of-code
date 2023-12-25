@@ -1,5 +1,5 @@
 [package]
-name = "aoc-day-00"
+name = "aoc-day-25"
 version = "0.0.0"
 edition = "2021"
 
@@ -11,10 +11,3 @@ lto = "fat"
 
 [dependencies]
 aoc-shared = { path = "../aoc-shared" }
-
-[dev-dependencies]
-criterion = "0.5"
-
-[[bench]]
-name = "benchmark"
-harness = false
