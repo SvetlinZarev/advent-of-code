@@ -10,4 +10,11 @@ codegen-units = 1
 lto = "fat"
 
 [dependencies]
-aoc-shared = { path = "../aoc-shared" }
+aoc-shared = { path = "../aoc-shared"}
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "benchmark"
+harness = false
