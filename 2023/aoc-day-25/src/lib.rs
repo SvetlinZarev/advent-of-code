@@ -4,6 +4,7 @@ type HashMap<K, V> = FxHashMap<K, V>;
 
 pub mod v1;
 pub mod v2;
+pub mod v3;
 
 pub fn parse_input(input: &str) -> (Vec<Vec<usize>>, Vec<(usize, usize)>) {
     let mut labels = HashMap::default();

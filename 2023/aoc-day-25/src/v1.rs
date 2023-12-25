@@ -1,8 +1,15 @@
+use rand::prelude::*;
+
 use crate::{count_reachable, parse_input};
 
 pub fn part_one(input: &str) -> usize {
-    let (mut graph, connections) = parse_input(input);
+    let (mut graph, mut connections) = parse_input(input);
 
+    // protect against malicious input
+    connections.shuffle(&mut thread_rng());
+
+    // Select 2 edges to remove and then run Tarjan's bridge finding
+    // algorithm to find the third.
     for i in 0..connections.len() - 1 {
         println!("Progress: {}/{}", i + 1, connections.len());
 
@@ -17,6 +24,7 @@ pub fn part_one(input: &str) -> usize {
             graph[p].retain(|&x| x != q);
             graph[q].retain(|&x| x != p);
 
+            // If we find a third bridge, then we know the first and second edges we removed are correct
             if let Some((m, n)) = critical_connection(&graph) {
                 // remove the third connection
                 graph[m].retain(|&x| x != n);

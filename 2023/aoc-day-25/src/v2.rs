@@ -3,6 +3,12 @@ use std::collections::{BinaryHeap, VecDeque};
 
 use crate::{count_reachable, parse_input};
 
+/*
+   Run a BFS starting from each node and increment a counter for each edge once we cross it.
+   The edges, that split the graph in 2 should have the highest count, as they bear the load
+   every time we cross from the first sub-graph the second.
+*/
+
 pub fn part_one(input: &str) -> usize {
     let (mut graph, _) = parse_input(input);
 
