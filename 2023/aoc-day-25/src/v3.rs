@@ -23,7 +23,7 @@ pub fn part_one(input: &str) -> usize {
         }
 
         let mut cuts = 0;
-        for &(a, b) in connections.iter() {
+        for &(a, b) in edges.iter() {
             if uf.find(a) != uf.find(b) {
                 cuts += 1;
             }
