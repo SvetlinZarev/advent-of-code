@@ -1,13 +1,12 @@
-use std::hash::{BuildHasher, BuildHasherDefault, Hasher};
-use std::marker::PhantomData;
+use std::hash::{BuildHasherDefault, Hasher};
 
+pub type FxHashBuilder = BuildHasherDefault<rustc_hash::FxHasher>;
 pub type FxHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
 pub type FxHashSet<T> = rustc_hash::FxHashSet<T>;
-pub type FxHashBuilder = BuildHasherDefault<rustc_hash::FxHasher>;
 
-pub type FnvHashMap<K, V> = std::collections::HashMap<K, V, HashBuilder<FnvHasher>>;
-pub type FnvHashSet<T> = std::collections::HashSet<T, HashBuilder<FnvHasher>>;
 pub type FnvHasherBuilder = BuildHasherDefault<FnvHasher>;
+pub type FnvHashMap<K, V> = std::collections::HashMap<K, V, FnvHasherBuilder>;
+pub type FnvHashSet<T> = std::collections::HashSet<T, FnvHasherBuilder>;
 
 #[derive(Debug, Copy, Clone)]
 pub struct FnvHasher(u64);
@@ -32,26 +31,5 @@ impl Hasher for FnvHasher {
             hash = hash.wrapping_mul(0x100000001b3);
         }
         *self = FnvHasher(hash);
-    }
-}
-
-#[derive(Copy, Clone)]
-pub struct HashBuilder<H> {
-    _phantom: PhantomData<H>,
-}
-
-impl<H: Hasher + Default> BuildHasher for HashBuilder<H> {
-    type Hasher = H;
-
-    fn build_hasher(&self) -> Self::Hasher {
-        H::default()
-    }
-}
-
-impl<H: Hasher + Default> Default for HashBuilder<H> {
-    fn default() -> Self {
-        HashBuilder {
-            _phantom: PhantomData,
-        }
     }
 }

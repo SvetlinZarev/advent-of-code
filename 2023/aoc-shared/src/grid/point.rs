@@ -34,10 +34,12 @@ impl Point {
         (self.x - other.x).abs() + (self.y - other.y).abs()
     }
 
+    #[inline(always)]
     pub const fn not_negative_coordinates(self) -> bool {
         (self.x >= 0) & (self.y >= 0)
     }
 
+    #[inline(always)]
     pub const fn rotl(self) -> Self {
         Self {
             x: -self.y,
@@ -45,6 +47,7 @@ impl Point {
         }
     }
 
+    #[inline(always)]
     pub const fn rotr(self) -> Self {
         Self {
             x: self.y,
@@ -120,68 +123,5 @@ impl MulAssign<i64> for Point {
     fn mul_assign(&mut self, rhs: i64) {
         self.x *= rhs;
         self.y *= rhs;
-    }
-}
-
-
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
-pub enum Direction {
-    Up = 0,
-    Down = 1,
-    Left = 2,
-    Right = 3,
-}
-
-impl Direction {
-    #[inline(always)]
-    pub fn apply(self, r: usize, c: usize) -> Option<(usize, usize)> {
-        match self {
-            Direction::Up => r.checked_sub(1).and_then(|r| Some((r, c))),
-            Direction::Down => Some((r + 1, c)),
-            Direction::Left => c.checked_sub(1).and_then(|c| Some((r, c))),
-            Direction::Right => Some((r, c + 1)),
-        }
-    }
-
-    #[inline(always)]
-    pub const fn apply_signed(self, r: isize, c: isize) -> (isize, isize) {
-        match self {
-            Direction::Up => (r - 1, c),
-            Direction::Down => (r + 1, c),
-            Direction::Left => (r, c - 1),
-            Direction::Right => (r, c + 1),
-        }
-    }
-
-    #[inline(always)]
-    pub const fn rotr(self) -> Self {
-        match self {
-            Direction::Up => Direction::Right,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
-            Direction::Right => Direction::Down,
-        }
-    }
-
-    pub const fn rotl(self) -> Self {
-        match self {
-            Direction::Up => Direction::Left,
-            Direction::Down => Direction::Right,
-            Direction::Left => Direction::Down,
-            Direction::Right => Direction::Up,
-        }
-    }
-
-    pub const fn vertical(self) -> bool {
-        match self {
-            Direction::Up => true,
-            Direction::Down => true,
-            Direction::Left => false,
-            Direction::Right => false,
-        }
-    }
-
-    pub const fn horizontal(self) -> bool {
-        !self.vertical()
     }
 }

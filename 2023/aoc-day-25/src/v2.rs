@@ -1,6 +1,8 @@
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, VecDeque};
 
+use aoc_shared::util::BitSet;
+
 use crate::{count_reachable, parse_input};
 
 /*
@@ -12,9 +14,7 @@ use crate::{count_reachable, parse_input};
 pub fn part_one(input: &str) -> usize {
     let (mut graph, _) = parse_input(input);
 
-    let seen_size =
-        graph.len() / usize::BITS as usize + ((graph.len() % usize::BITS as usize) != 0) as usize;
-    let mut seen = vec![0usize; seen_size];
+    let mut seen = BitSet::new(graph.len());
     let mut freq = vec![0u16; graph.len().pow(2)];
     let mut queue = VecDeque::new();
 
@@ -24,12 +24,12 @@ pub fn part_one(input: &str) -> usize {
     for node in (0..graph.len()).step_by(50) {
         queue.push_back(node);
 
-        seen.fill(0);
-        mark_seen(&mut seen, node);
+        seen.clear();
+        seen.set(node);
 
         while let Some(node) = queue.pop_front() {
             for next in graph[node].iter().copied() {
-                if mark_seen(&mut seen, next) {
+                if seen.mark(next) {
                     let a = node.min(next);
                     let b = node.max(next);
                     freq[a * graph.len() + b] += 1;
@@ -69,17 +69,6 @@ pub fn part_one(input: &str) -> usize {
     return set_a * set_b;
 }
 
-fn mark_seen(seen: &mut [usize], n: usize) -> bool {
-    let pos = n / usize::BITS as usize;
-    let bit = n % usize::BITS as usize;
-
-    if seen[pos] & (1 << bit) == 0 {
-        seen[pos] |= 1 << bit;
-        return true;
-    }
-
-    false
-}
 
 #[cfg(test)]
 mod tests {

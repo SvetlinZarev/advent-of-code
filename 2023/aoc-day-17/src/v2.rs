@@ -1,6 +1,7 @@
+use aoc_shared::algo::BucketQueue;
 use aoc_shared::grid::Direction;
 
-use crate::common::{step, BucketQueue};
+use crate::common::step;
 
 pub fn part_one(input: &[u8]) -> u16 {
     const MAX_STEPS: usize = 3;

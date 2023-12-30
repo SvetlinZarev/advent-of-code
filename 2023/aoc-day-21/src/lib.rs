@@ -1,11 +1,10 @@
 use std::collections::VecDeque;
 
+use aoc_shared::grid::DIR4;
 use aoc_shared::hashing::FxHashSet;
 
 type HashSet<T> = FxHashSet<T>;
 
-
-const DIR: [(isize, isize); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
 /*
    General observations:
    * the elf switches between "odd" and "even" positions on each step
@@ -48,7 +47,7 @@ pub fn simulate_bounded(
 ) -> usize {
     let input = input.as_bytes();
 
-    let mut state = vec![false; input.len() * 2];
+    let mut seen = vec![false; input.len() * 2];
     let mut queue = VecDeque::with_capacity(4096);
 
     queue.push_back((start_r as isize, start_c as isize));
@@ -58,7 +57,7 @@ pub fn simulate_bounded(
         for _ in 0..queue.len() {
             let (r, c) = queue.pop_front().unwrap();
 
-            for (dr, dc) in DIR {
+            for (dr, dc) in DIR4 {
                 let r = r + dr;
                 let c = c + dc;
                 if r < 0 || c < 0 {
@@ -76,8 +75,8 @@ pub fn simulate_bounded(
                 }
 
                 let cache_key = is_odd * input.len() + r * cols + c;
-                if !state[cache_key] {
-                    state[cache_key] = true;
+                if !seen[cache_key] {
+                    seen[cache_key] = true;
                     queue.push_back((r as isize, c as isize));
                 }
             }
@@ -86,10 +85,10 @@ pub fn simulate_bounded(
 
     let (from, to) = match steps % 2 == 0 {
         false => (0, input.len()),
-        true => (input.len(), state.len()),
+        true => (input.len(), seen.len()),
     };
 
-    state[from..to].iter().copied().filter(|&x| x).count()
+    seen[from..to].iter().copied().filter(|&x| x).count()
 }
 
 pub fn part_two(input: &str) -> i64 {
@@ -176,7 +175,7 @@ pub fn simulate_unbounded(
         for _ in 0..queue.len() {
             let (r, c) = queue.pop_front().unwrap();
 
-            for (dr, dc) in DIR {
+            for (dr, dc) in DIR4 {
                 let r = r + dr;
                 let c = c + dc;
 

@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
+use aoc_shared::grid::DIR4;
 use aoc_shared::hashing::FxHashMap;
 
-const DIR: [(isize, isize); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
 const START_RC: (usize, usize) = (0, 1);
 
 type HashMap<K, V> = FxHashMap<K, V>;
@@ -40,7 +40,7 @@ fn compress_graph(
             continue;
         }
 
-        for (dr, dc) in DIR {
+        for (dr, dc) in DIR4 {
             if let Some((nr, nc, cost)) = walk(grid, rows, cols, r, c, dr, dc) {
                 // Check if that starting node has already been explored
                 // If so - do not add it to the queue
@@ -127,7 +127,7 @@ fn walk(
         c = (c as isize + pc) as usize;
 
         len += 1;
-        dirs = DIR.as_slice().into_iter();
+        dirs = DIR4.as_slice().into_iter();
     }
 }
 

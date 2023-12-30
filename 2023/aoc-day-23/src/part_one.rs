@@ -1,8 +1,9 @@
-const DIR: [(isize, isize); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
+use aoc_shared::grid::DIR4;
+use aoc_shared::util::BitSet;
 
 pub fn part_one(input: &str) -> usize {
     let grid = input.as_bytes();
-    let mut seen = vec![false; grid.len()];
+    let mut seen = BitSet::new(grid.len());
 
     let cols = grid.iter().position(|&x| x == b'\n').unwrap() + 1;
     let rows = grid.len() / cols;
@@ -12,7 +13,7 @@ pub fn part_one(input: &str) -> usize {
 
 fn dfs(
     grid: &[u8],
-    seen: &mut [bool],
+    seen: &mut BitSet,
     rows: usize,
     cols: usize,
     r: usize,
@@ -24,7 +25,7 @@ fn dfs(
 
     let mut len = None;
 
-    for (dr, dc) in DIR {
+    for (dr, dc) in DIR4 {
         let nr = r as isize + dr;
         let nc = c as isize + dc;
         if nr < 0 || nc < 0 {
@@ -46,14 +47,12 @@ fn dfs(
             _ => {}
         }
 
-        if !seen[nr * cols + nc] {
-            seen[nr * cols + nc] = true;
-
+        if seen.mark(nr * cols + nc) {
             if let Some(path) = dfs(grid, seen, rows, cols, nr, nc) {
                 len = Some(path + 1).max(len);
             }
 
-            seen[nr * cols + nc] = false;
+            seen.unset(nr * cols + nc);
         }
     }
 
