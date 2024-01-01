@@ -1,5 +1,6 @@
 use aoc_shared::algo::BucketQueue;
 use aoc_shared::grid::Direction;
+use aoc_shared::util::BitSet;
 
 use crate::common::step;
 
@@ -24,9 +25,7 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize>(
     let cols = grid.iter().position(|&x| x == b'\n').unwrap() + 1;
     let rows = grid.len() / cols;
 
-    let seen_capacity = rows * cols * 2 / (usize::BITS as usize)
-        + (rows * cols * 2 % (usize::BITS as usize) != 0) as usize;
-    let mut seen = vec![0usize; seen_capacity];
+    let mut seen = BitSet::new(rows * cols * 2);
     let mut queue = BucketQueue::new((rows + cols) * 9);
 
     // Seed the queue with the starting elements
@@ -51,11 +50,9 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize>(
             return loss;
         }
 
-        let (cell, bit) = cache_idx(rows, cols, r, c, d);
-        if seen[cell] & (1 << bit) != 0 {
+        if !seen.mark(cache_idx(rows, cols, r, c, d)) {
             continue;
         }
-        seen[cell] |= 1 << bit;
 
         for d in [d.rotl(), d.rotr()] {
             let Some((mut r, mut c, mut cost)) = step(grid, rows, cols, r, c, d, SKIP) else {
@@ -72,8 +69,7 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize>(
                 c = nc;
                 cost += cst;
 
-                let (cell, bit) = cache_idx(rows, cols, r, c, d);
-                if seen[cell] & (1 << bit) == 0 {
+                if !seen.is_set(cache_idx(rows, cols, r, c, d)) {
                     queue.push(cost as usize, (cost, r, c, d));
                 }
             }
@@ -84,12 +80,8 @@ pub fn dijkstra<const SKIP: usize, const STEPS: usize>(
 }
 
 #[inline(always)]
-fn cache_idx(rows: usize, cols: usize, r: usize, c: usize, d: Direction) -> (usize, usize) {
-    let key = d.vertical() as usize * rows * cols + r * cols + c;
-    let cell = key / usize::BITS as usize;
-    let bit = key % usize::BITS as usize;
-
-    (cell, bit)
+fn cache_idx(rows: usize, cols: usize, r: usize, c: usize, d: Direction) -> usize {
+    d.vertical() as usize * rows * cols + r * cols + c
 }
 
 #[cfg(test)]
