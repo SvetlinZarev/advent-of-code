@@ -26,6 +26,6 @@
 | 22  | N/A          | 546         | 561.8ms     | 561.9ms    |
 | 23  | 2            | 83          | N/A         | 85         |
 | 24  | 3            | 67.5ms      | 70.5ms      | 138ms      |
-| 25  |              |             |             |            |
+| 25  | 17           | 308ms (v2)  | N/A         | 308ms      |
 
 These results were measured on a ThinkPad W541 with `i7-4910MQ` locked at 2.0GHz
