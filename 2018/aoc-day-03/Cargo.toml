@@ -1,5 +1,5 @@
 [package]
-name = "aoc-day-00"
+name = "aoc-day-03"
 version = "0.0.0"
 edition = "2021"
 
@@ -9,8 +9,12 @@ edition = "2021"
 codegen-units = 1
 lto = "thin"
 
+[profile.test]
+opt-level = 1
+
 [dependencies]
 aoc-shared = { path = "../aoc-shared" }
+regex = "1.11.1"
 
 [dev-dependencies]
 criterion = "0.5"
