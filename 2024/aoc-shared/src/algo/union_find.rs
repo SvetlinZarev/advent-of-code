@@ -16,7 +16,7 @@ impl UnionFind {
         }
     }
 
-    fn reset(&mut self) {
+    pub fn reset(&mut self) {
         self.groups = self.sizes.len();
         self.sizes.fill(1);
         self.parents
