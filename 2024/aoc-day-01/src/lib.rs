@@ -72,13 +72,7 @@ pub fn part_two_v1(a: &Vec<u32>, b: &Vec<u32>) -> u32 {
 }
 
 pub fn part_two_v2(a: &Vec<u32>, b: &Vec<u32>) -> u32 {
-    let mut seen = FxHashSet::default();
-    seen.reserve(a.len() + 64);
-
-    a.iter().for_each(|&x| {
-        seen.insert(x);
-    });
-
+    let seen = a.iter().copied().collect::<FxHashSet<_>>();
     b.iter()
         .fold(0, |acc, &val| acc + val * seen.contains(&val) as u32)
 }
