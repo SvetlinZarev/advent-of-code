@@ -1,7 +1,9 @@
 use aoc_shared::input::load_text_input_from_file;
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
-use aoc_day_01::{parse_input_fast, parse_input_generic, part_one, part_two_v1, part_two_v2};
+use aoc_day_01::{
+    parse_input_fast, parse_input_generic, parse_input_swar, part_one, part_two_v1, part_two_v2,
+};
 
 criterion_group!(
     benches,
@@ -14,12 +16,16 @@ criterion_main!(benches);
 fn benchmark_input_parsing(c: &mut Criterion) {
     let input = load_text_input_from_file("inputs/input.txt");
 
+    c.bench_function("parsing/generic", |b| {
+        b.iter(|| parse_input_generic(&input));
+    });
+
     c.bench_function("parsing/fast", |b| {
         b.iter(|| parse_input_fast(&input));
     });
 
-    c.bench_function("parsing/generic", |b| {
-        b.iter(|| parse_input_generic(&input));
+    c.bench_function("parsing/swar", |b| {
+        b.iter(|| parse_input_swar(&input));
     });
 }
 
