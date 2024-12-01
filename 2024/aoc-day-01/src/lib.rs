@@ -5,13 +5,11 @@ use std::error::Error;
 pub fn parse_input_swar(input: &str) -> Result<(Vec<u32>, Vec<u32>), Box<dyn Error>> {
     const LINE_LENGTH: usize = 14;
 
-    let mut x = vec![];
-    let mut y = vec![];
+    let elements = input.len() / LINE_LENGTH;
+    let mut x = vec![0; elements];
+    let mut y = vec![0; elements];
 
-    x.reserve(input.len() / LINE_LENGTH);
-    y.reserve(input.len() / LINE_LENGTH);
-
-    for line in input.as_bytes().chunks_exact(LINE_LENGTH) {
+    for (idx, line) in input.as_bytes().chunks_exact(LINE_LENGTH).enumerate() {
         let a = parse_swar([
             b'0', b'0', b'0', line[0], line[1], line[2], line[3], line[4],
         ]);
@@ -19,8 +17,8 @@ pub fn parse_input_swar(input: &str) -> Result<(Vec<u32>, Vec<u32>), Box<dyn Err
             b'0', b'0', b'0', line[8], line[9], line[10], line[11], line[12],
         ]);
 
-        x.push(a as u32);
-        y.push(b as u32);
+        x[idx] = a as u32;
+        y[idx] = b as u32;
     }
 
     Ok((x, y))
@@ -46,13 +44,11 @@ fn parse_swar(input: [u8; 8]) -> u64 {
 pub fn parse_input_fast(input: &str) -> Result<(Vec<u32>, Vec<u32>), Box<dyn Error>> {
     const LINE_LENGTH: usize = 14;
 
-    let mut x = vec![];
-    let mut y = vec![];
+    let elements = input.len() / LINE_LENGTH;
+    let mut x = vec![0; elements];
+    let mut y = vec![0; elements];
 
-    x.reserve(input.len() / LINE_LENGTH);
-    y.reserve(input.len() / LINE_LENGTH);
-
-    for line in input.as_bytes().chunks_exact(LINE_LENGTH) {
+    for (idx, line) in input.as_bytes().chunks_exact(LINE_LENGTH).enumerate() {
         let a0 = (line[0] - b'0') as u32 * 10_000;
         let a1 = (line[1] - b'0') as u32 * 1_000;
         let a2 = (line[2] - b'0') as u32 * 100;
@@ -67,8 +63,8 @@ pub fn parse_input_fast(input: &str) -> Result<(Vec<u32>, Vec<u32>), Box<dyn Err
         let b4 = (line[12] - b'0') as u32 * 1;
         let b = b0 + b1 + b2 + b3 + b4;
 
-        x.push(a);
-        y.push(b);
+        x[idx] = a;
+        y[idx] = b;
     }
 
     Ok((x, y))
