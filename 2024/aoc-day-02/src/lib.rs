@@ -1,4 +1,4 @@
-pub fn part_one(input: &str) -> u32 {
+pub fn part_one_v1(input: &str) -> u32 {
     let mut safe = 0;
 
     for line in input.lines() {
@@ -21,6 +21,52 @@ fn is_safe_1<CMP: Fn(u32, u32) -> bool, DIFF: Fn(u32, u32) -> bool>(
 ) -> bool {
     nums.windows(2)
         .all(|w| cmp_fn(w[0], w[1]) && diff_fn(w[0], w[1]))
+}
+
+pub fn part_one_v2(input: &str) -> u32 {
+    let mut safe = 0;
+
+    let mut prev = 0u32;
+    let mut curr = 0u32;
+
+    let mut inc_ok = true;
+    let mut dec_ok = true;
+
+    for &ch in input.as_bytes() {
+        match ch {
+            b'0'..=b'9' => {
+                curr *= 10;
+                curr += (ch - b'0') as u32;
+            }
+
+            b' ' => {
+                if prev > 0 {
+                    inc_ok &= prev < curr && (1..4).contains(&(curr - prev));
+                    dec_ok &= prev > curr && (1..4).contains(&(prev - curr));
+                }
+
+                prev = curr;
+                curr = 0;
+            }
+
+            b'\n' => {
+                inc_ok &= prev < curr && (1..4).contains(&(curr - prev));
+                dec_ok &= prev > curr && (1..4).contains(&(prev - curr));
+
+                safe += (inc_ok | dec_ok) as u32;
+
+                // reset state
+                prev = 0;
+                curr = 0;
+                inc_ok = true;
+                dec_ok = true;
+            }
+
+            _ => unreachable!()
+        }
+    }
+
+    safe
 }
 
 pub fn part_two(input: &str) -> u32 {
@@ -102,10 +148,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part_one() {
+    fn test_part_one_v1() {
         let input = load_text_input_from_file("inputs/input.txt");
 
-        let answer = part_one(&input);
+        let answer = part_one_v1(&input);
+        assert_eq!(591, answer);
+    }
+
+    #[test]
+    fn test_part_one_v2() {
+        let input = load_text_input_from_file("inputs/input.txt");
+
+        let answer = part_one_v2(&input);
         assert_eq!(591, answer);
     }
 
