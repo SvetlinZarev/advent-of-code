@@ -50,6 +50,13 @@ impl BitSet {
     }
 
     #[inline(always)]
+    pub fn count_ones(&self) -> usize {
+        self.bits
+            .iter()
+            .fold(0, |acc, &x| acc + x.count_ones() as usize)
+    }
+
+    #[inline(always)]
     fn keys(&self, bit: usize) -> (usize, usize) {
         let idx = bit / usize::BITS as usize;
         let pos = bit % usize::BITS as usize;
