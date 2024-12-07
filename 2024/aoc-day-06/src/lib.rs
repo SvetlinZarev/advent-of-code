@@ -110,7 +110,9 @@ pub fn part_two_v2(input: &str) -> u32 {
     let start_row = start_idx / width;
     let start_col = start_idx % width;
 
-    let mut visited = vec![0u8; grid.len()];
+    let mut visited = vec![0u8; grid.len() * 2];
+    //let mut clone = vec![0u8; grid.len()];
+    let (visited, clone) = visited.split_at_mut(input.len());
 
     let mut row = start_row;
     let mut col = start_col;
@@ -119,29 +121,20 @@ pub fn part_two_v2(input: &str) -> u32 {
     let mut answer = 0;
 
     loop {
-        let vis_idx = (row * width + col) as usize;
-        visited[vis_idx] |= 1 << dir as usize;
-
         let (r, c) = dir.apply_signed(row, col);
         if r < 0 || c < 0 || r >= height || c + 1 >= width {
             break;
         }
 
+        visited[(row * width + col) as usize] |= 1 << dir as usize;
+
         if grid[(r * width + c) as usize] == b'#' {
             dir = dir.rotr();
         } else {
-            if visited[(r * width + c) as usize] == 0 {
-                answer += check_loop(
-                    grid,
-                    &mut visited.clone(),
-                    height,
-                    width,
-                    row,
-                    col,
-                    r,
-                    c,
-                    dir,
-                );
+            let not_walked_over = visited[(r * width + c) as usize] == 0;
+            if not_walked_over {
+                clone.copy_from_slice(visited);
+                answer += check_loop(grid, clone, height, width, row, col, r, c, dir);
             }
 
             row = r;
@@ -152,6 +145,7 @@ pub fn part_two_v2(input: &str) -> u32 {
     answer
 }
 
+#[inline(always)]
 fn check_loop(
     grid: &[u8],
     visited: &mut [u8],
@@ -168,11 +162,14 @@ fn check_loop(
     let mut dir = dir;
 
     loop {
-        visited[(row * width + col) as usize] |= 1 << dir as usize;
-
         let (r, c) = dir.apply_signed(row, col);
         if r < 0 || c < 0 || r >= height || c + 1 >= width {
             return 0;
+        }
+
+        visited[(row * width + col) as usize] |= 1 << dir as usize;
+        if visited[(r * width + c) as usize] & (1 << dir as usize) != 0 {
+            return 1;
         }
 
         if grid[(r * width + c) as usize] == b'#' || (r, c) == (obs_r, obs_c) {
@@ -180,10 +177,6 @@ fn check_loop(
         } else {
             row = r;
             col = c;
-
-            if visited[(row * width + col) as usize] & (1 << dir as usize) != 0 {
-                return 1;
-            }
         }
     }
 }
