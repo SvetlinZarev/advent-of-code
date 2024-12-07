@@ -88,25 +88,24 @@ fn check_num_rev<const CONCAT: bool>(current: u64, nums: &[u64]) -> bool {
     }
 
     let last = nums[nums.len() - 1];
-    let next_nums = &nums[..nums.len() - 1];
     if current < last {
         return false;
     }
 
     let diff = current - last;
+    let next_nums = &nums[..nums.len() - 1];
 
+    // Inverse: multiplication
     if current % last == 0 {
         if check_num_rev::<CONCAT>(current / last, next_nums) {
             return true;
         }
     }
 
+    // Inverse: concatenation
     if CONCAT {
-        // we don;t have 0s in the input
-        let p = last.ilog10() + 1;
-        let div = 10u64.pow(p);
-
-        if diff % div == 0 {
+        let div = fast_divisor_calc(last);
+        if diff >= div && diff % div == 0 {
             let next = diff / div;
             if check_num_rev::<CONCAT>(next, next_nums) {
                 return true;
@@ -114,7 +113,17 @@ fn check_num_rev<const CONCAT: bool>(current: u64, nums: &[u64]) -> bool {
         }
     }
 
+    // Inverse: addition
     check_num_rev::<CONCAT>(diff, next_nums)
+}
+
+fn fast_divisor_calc(n: u64) -> u64 {
+    match n {
+        0..10 => 10,
+        10..100 => 100,
+        100..1000 => 1000,
+        _ => 10u64.pow(n.ilog10() + 1),
+    }
 }
 
 #[cfg(test)]
