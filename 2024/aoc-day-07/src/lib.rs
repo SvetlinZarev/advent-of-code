@@ -1,28 +1,34 @@
+use std::error::Error;
+
 pub fn part_one_v1(input: &str) -> u64 {
     solve(input, |expected, nums| {
         check_num_fwd::<false>(expected, &nums[1..], nums[0])
     })
+    .unwrap()
 }
 
 pub fn part_one_v2(input: &str) -> u64 {
     solve(input, |expected, nums| {
         check_num_rev::<false>(expected, nums)
     })
+    .unwrap()
 }
 
 pub fn part_two_v1(input: &str) -> u64 {
     solve(input, |expected, nums| {
         check_num_fwd::<true>(expected, &nums[1..], nums[0])
     })
+    .unwrap()
 }
 
 pub fn part_two_v2(input: &str) -> u64 {
     solve(input, |expected, nums| {
         check_num_rev::<true>(expected, nums)
     })
+    .unwrap()
 }
 
-pub fn solve<C: Fn(u64, &[u64]) -> bool>(input: &str, check_num: C) -> u64 {
+pub fn solve<C: Fn(u64, &[u64]) -> bool>(input: &str, check_num: C) -> Result<u64, Box<dyn Error>> {
     let mut sum = 0;
 
     let mut buffer = vec![];
@@ -30,9 +36,9 @@ pub fn solve<C: Fn(u64, &[u64]) -> bool>(input: &str, check_num: C) -> u64 {
         buffer.clear();
 
         let (expected, rest) = line.split_once(':').unwrap();
-        let expected = expected.parse::<u64>().unwrap();
+        let expected = expected.parse::<u64>()?;
         for val in rest.trim_ascii_start().split_ascii_whitespace() {
-            buffer.push(val.parse::<u64>().unwrap());
+            buffer.push(val.parse::<u64>()?);
         }
 
         if check_num(expected, &buffer) {
@@ -40,19 +46,12 @@ pub fn solve<C: Fn(u64, &[u64]) -> bool>(input: &str, check_num: C) -> u64 {
         }
     }
 
-    sum
+    Ok(sum)
 }
 
 fn check_num_fwd<const CONCAT: bool>(expected: u64, nums: &[u64], val: u64) -> bool {
     if nums.is_empty() {
         return expected == val;
-    }
-
-    let a = val + nums[0];
-    if a <= expected {
-        if check_num_fwd::<CONCAT>(expected, &nums[1..], a) {
-            return true;
-        }
     }
 
     let b = val * nums[0];
@@ -73,6 +72,13 @@ fn check_num_fwd<const CONCAT: bool>(expected: u64, nums: &[u64], val: u64) -> b
         }
     }
 
+    let a = val + nums[0];
+    if a <= expected {
+        if check_num_fwd::<CONCAT>(expected, &nums[1..], a) {
+            return true;
+        }
+    }
+
     false
 }
 
@@ -83,12 +89,11 @@ fn check_num_rev<const CONCAT: bool>(current: u64, nums: &[u64]) -> bool {
 
     let last = nums[nums.len() - 1];
     let next_nums = &nums[..nums.len() - 1];
-
-    if current >= last {
-        if check_num_rev::<CONCAT>(current - last, next_nums) {
-            return true;
-        }
+    if current < last {
+        return false;
     }
+
+    let diff = current - last;
 
     if current % last == 0 {
         if check_num_rev::<CONCAT>(current / last, next_nums) {
@@ -96,20 +101,20 @@ fn check_num_rev<const CONCAT: bool>(current: u64, nums: &[u64]) -> bool {
         }
     }
 
-    if CONCAT && current >= last {
+    if CONCAT {
         // we don;t have 0s in the input
         let p = last.ilog10() + 1;
         let div = 10u64.pow(p);
 
-        if (current - last) % div == 0 {
-            let next = (current - last) / div;
+        if diff % div == 0 {
+            let next = diff / div;
             if check_num_rev::<CONCAT>(next, next_nums) {
                 return true;
             }
         }
     }
 
-    false
+    check_num_rev::<CONCAT>(diff, next_nums)
 }
 
 #[cfg(test)]

@@ -1,4 +1,4 @@
-# Day 7: Bridge Repair ---
+# Day 7: Bridge Repair
 
 The Historians take you to a familiar rope bridge over a river in the middle of
 a jungle. The Chief isn't on this side of the bridge, though; maybe he's on the
