@@ -1,9 +1,25 @@
-pub fn part_one(input: &str) -> u64 {
-    solve(input, check_num_1)
+pub fn part_one_v1(input: &str) -> u64 {
+    solve(input, |expected, nums| {
+        check_num_fwd::<false>(expected, &nums[1..], nums[0])
+    })
 }
 
-pub fn part_two(input: &str) -> u64 {
-    solve(input, check_num_2)
+pub fn part_one_v2(input: &str) -> u64 {
+    solve(input, |expected, nums| {
+        check_num_rev::<false>(expected, nums)
+    })
+}
+
+pub fn part_two_v1(input: &str) -> u64 {
+    solve(input, |expected, nums| {
+        check_num_fwd::<true>(expected, &nums[1..], nums[0])
+    })
+}
+
+pub fn part_two_v2(input: &str) -> u64 {
+    solve(input, |expected, nums| {
+        check_num_rev::<true>(expected, nums)
+    })
 }
 
 pub fn solve<C: Fn(u64, &[u64]) -> bool>(input: &str, check_num: C) -> u64 {
@@ -27,63 +43,69 @@ pub fn solve<C: Fn(u64, &[u64]) -> bool>(input: &str, check_num: C) -> u64 {
     sum
 }
 
-fn check_num_1(expected: u64, nums: &[u64]) -> bool {
-    check_sum_dfs_1(expected, &nums[1..], nums[0])
-}
-
-fn check_sum_dfs_1(expected: u64, nums: &[u64], val: u64) -> bool {
+fn check_num_fwd<const CONCAT: bool>(expected: u64, nums: &[u64], val: u64) -> bool {
     if nums.is_empty() {
         return expected == val;
     }
 
     let a = val + nums[0];
-    let b = val * nums[0];
-
     if a <= expected {
-        if check_sum_dfs_1(expected, &nums[1..], a) {
+        if check_num_fwd::<CONCAT>(expected, &nums[1..], a) {
             return true;
         }
     }
 
+    let b = val * nums[0];
     if b <= expected {
-        if check_sum_dfs_1(expected, &nums[1..], b) {
+        if check_num_fwd::<CONCAT>(expected, &nums[1..], b) {
             return true;
+        }
+    }
+
+    if CONCAT {
+        let log = nums[0].ilog10() + 1;
+        let c = val * 10u64.pow(log) + nums[0];
+
+        if c <= expected {
+            if check_num_fwd::<CONCAT>(expected, &nums[1..], c) {
+                return true;
+            }
         }
     }
 
     false
 }
 
-fn check_num_2(expected: u64, nums: &[u64]) -> bool {
-    check_sum_dfs_2(expected, &nums[1..], nums[0])
-}
-
-fn check_sum_dfs_2(expected: u64, nums: &[u64], val: u64) -> bool {
-    if nums.is_empty() {
-        return expected == val;
+fn check_num_rev<const CONCAT: bool>(current: u64, nums: &[u64]) -> bool {
+    if current == 0 || nums.is_empty() {
+        return current == 0 && nums.is_empty();
     }
 
-    let a = val + nums[0];
-    let b = val * nums[0];
+    let last = nums[nums.len() - 1];
+    let next_nums = &nums[..nums.len() - 1];
 
-    let log = nums[0].ilog10() + 1;
-    let c = val * 10u64.pow(log) + nums[0];
-
-    if a <= expected {
-        if check_sum_dfs_2(expected, &nums[1..], a) {
+    if current >= last {
+        if check_num_rev::<CONCAT>(current - last, next_nums) {
             return true;
         }
     }
 
-    if b <= expected {
-        if check_sum_dfs_2(expected, &nums[1..], b) {
+    if current % last == 0 {
+        if check_num_rev::<CONCAT>(current / last, next_nums) {
             return true;
         }
     }
 
-    if c <= expected {
-        if check_sum_dfs_2(expected, &nums[1..], c) {
-            return true;
+    if CONCAT && current >= last {
+        // we don;t have 0s in the input
+        let p = last.ilog10() + 1;
+        let div = 10u64.pow(p);
+
+        if (current - last) % div == 0 {
+            let next = (current - last) / div;
+            if check_num_rev::<CONCAT>(next, next_nums) {
+                return true;
+            }
         }
     }
 
@@ -97,18 +119,34 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part_one() {
+    fn test_part_one_v1() {
         let input = load_text_input_from_file("inputs/input.txt");
 
-        let answer = part_one(&input);
+        let answer = part_one_v1(&input);
         assert_eq!(3598800864292, answer);
     }
 
     #[test]
-    fn test_part_two() {
+    fn test_part_one_v2() {
         let input = load_text_input_from_file("inputs/input.txt");
 
-        let answer = part_two(&input);
+        let answer = part_one_v2(&input);
+        assert_eq!(3598800864292, answer);
+    }
+
+    #[test]
+    fn test_part_two_v1() {
+        let input = load_text_input_from_file("inputs/input.txt");
+
+        let answer = part_two_v1(&input);
+        assert_eq!(340362529351427, answer);
+    }
+
+    #[test]
+    fn test_part_two_v2() {
+        let input = load_text_input_from_file("inputs/input.txt");
+
+        let answer = part_two_v2(&input);
         assert_eq!(340362529351427, answer);
     }
 }
