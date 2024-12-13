@@ -70,43 +70,33 @@ pub fn parse_input(input: &str) -> Result<Vec<Game>, Box<dyn Error>> {
 }
 
 pub fn part_one(input: &[Game]) -> u64 {
-    let mut tokens = 0;
-
-    for g in input {
-        let a = (g.b.y * g.p.x - g.b.x * g.p.y) / (g.b.y * g.a.x - g.b.x * g.a.y);
-        let ok_a = (g.b.y * g.p.x - g.b.x * g.p.y) % (g.b.y * g.a.x - g.b.x * g.a.y);
-
-        let b = (g.a.y * g.p.x - g.a.x * g.p.y) / (g.a.y * g.b.x - g.a.x * g.b.y);
-        let ok_b = (g.a.y * g.p.x - g.a.x * g.p.y) % (g.a.y * g.b.x - g.a.x * g.b.y);
-
-        if ok_a == 0 && ok_b == 0 {
-            debug_assert!((0..=100).contains(&a));
-            debug_assert!((0..=100).contains(&b));
-
-            tokens += (3 * a + b) as u64;
-        }
-    }
-
-    tokens
+    solve::<0>(input)
 }
 
 pub fn part_two(input: &[Game]) -> u64 {
     const DIFF: i64 = 10_000_000_000_000;
+    solve::<DIFF>(input)
+}
 
+pub fn solve<const DIFF: i64>(games: &[Game]) -> u64 {
     let mut tokens = 0;
 
-    for g in input {
-        let a = (g.b.y * (g.p.x + DIFF) - g.b.x * (g.p.y + DIFF)) / (g.b.y * g.a.x - g.b.x * g.a.y);
-        let ok_a =
-            (g.b.y * (g.p.x + DIFF) - g.b.x * (g.p.y + DIFF)) % (g.b.y * g.a.x - g.b.x * g.a.y);
-
-        let b = (g.a.y * (g.p.x + DIFF) - g.a.x * (g.p.y + DIFF)) / (g.a.y * g.b.x - g.a.x * g.b.y);
-        let ok_b =
-            (g.a.y * (g.p.x + DIFF) - g.a.x * (g.p.y + DIFF)) % (g.a.y * g.b.x - g.a.x * g.b.y);
-
-        if ok_a == 0 && ok_b == 0 {
-            tokens += (3 * a + b) as u64;
+    for g in games {
+        let dividend_a = g.b.y * (g.p.x + DIFF) - g.b.x * (g.p.y + DIFF);
+        let divisor_a = g.b.y * g.a.x - g.b.x * g.a.y;
+        let (a, ok_a) = (dividend_a / divisor_a, dividend_a % divisor_a);
+        if ok_a != 0 {
+            continue;
         }
+
+        let dividend_b = g.a.y * (g.p.x + DIFF) - g.a.x * (g.p.y + DIFF);
+        let divisor_b = g.a.y * g.b.x - g.a.x * g.b.y;
+        let (b, ok_b) = (dividend_b / divisor_b, dividend_b % divisor_b);
+        if ok_b != 0 {
+            continue;
+        }
+
+        tokens += (3 * a + b) as u64;
     }
 
     tokens
