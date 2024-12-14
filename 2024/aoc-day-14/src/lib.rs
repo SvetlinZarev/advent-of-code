@@ -6,12 +6,6 @@ use std::sync::LazyLock;
 const WIDTH: i32 = 101;
 const HEIGHT: i32 = 103;
 
-const Q_EAST: i32 = WIDTH / 2;
-const Q_WEST: i32 = WIDTH / 2 + 1;
-
-const Q_SOUTH: i32 = HEIGHT / 2;
-const Q_NORTH: i32 = HEIGHT / 2 + 1;
-
 static REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^p=(\d+),(\d+) v=(-?\d+),(-?\d+)$").unwrap());
 
@@ -59,6 +53,12 @@ pub fn parse_input(input: &str) -> Result<Vec<Robot>, Box<dyn Error>> {
 
 pub fn part_one(robots: &Vec<Robot>) -> u32 {
     const SECONDS: i32 = 100;
+
+    const Q_EAST: i32 = WIDTH / 2;
+    const Q_WEST: i32 = WIDTH / 2 + 1;
+
+    const Q_SOUTH: i32 = HEIGHT / 2;
+    const Q_NORTH: i32 = HEIGHT / 2 + 1;
 
     let (mut q1, mut q2, mut q3, mut q4) = (0, 0, 0, 0);
 
@@ -176,6 +176,84 @@ pub fn part_two_v2(robots: &Vec<Robot>) -> u64 {
     0
 }
 
+pub fn part_two_v3(robots: &[Robot]) -> u32 {
+    let (sec_y, sec_x) = variance_offset(robots);
+
+    for step in 1..HEIGHT {
+        let value = step * HEIGHT + sec_y;
+        if (value - sec_x) % WIDTH == 0 {
+            return value as u32;
+        }
+    }
+
+    0
+}
+
+// Same as V3, but solved with math
+pub fn part_two_v4(robots: &Vec<Robot>) -> u32 {
+    const INV_W: i32 = 51; // Precomputed inverse of WIDTH mod HEIGHT
+
+    let (sec_y, sec_x) = variance_offset(robots);
+
+    // The X/Y repeat in a cycle of WIDTH/HEIGHT steps respectively
+    //
+    // t = bx (mod W)
+    // t = by (mod H)
+    //
+    // As t = bx (mod W), then t = bx + k*W
+    //
+    // bx + k*W = by (mod H)
+    // k*W = by - bx (mod H)
+    // k = inverse(W)*(by - bx) (mod H)
+
+    let t = sec_x + INV_W * (sec_y - sec_x) * WIDTH;
+    t.rem_euclid(WIDTH * HEIGHT) as u32
+}
+
+// Assume that when the robots form a Christmas tree,
+// they stay as close as possible to the center, thus the
+// total absolute distance to the center is minimal
+//
+// This distance is minimal at different times for X & Y `(sec_x, sec_y)`,
+// so we must find both. Then it's a question of modular arithmetic,
+// to find a value that satisfies both
+fn variance_offset(robots: &[Robot]) -> (i32, i32) {
+    // Randomly assume that the Christmas tree is somewhat in the center
+    const CY: i32 = HEIGHT / 2;
+    const CX: i32 = WIDTH / 2;
+
+    let mut var_x = u32::MAX;
+    let mut var_y = u32::MAX;
+
+    let mut sec_x = 0;
+    let mut sec_y = 0;
+
+    for seconds in 1..WIDTH.max(HEIGHT) {
+        let mut variance_x = 0;
+        let mut variance_y = 0;
+
+        for robot in robots.iter() {
+            let x = (robot.x + robot.vx * seconds).wrapping_rem_euclid(WIDTH);
+            let y = (robot.y + robot.vy * seconds).wrapping_rem_euclid(HEIGHT);
+
+            variance_x += CX.abs_diff(x);
+            variance_y += CY.abs_diff(y);
+        }
+
+        if variance_x < var_x {
+            var_x = variance_x;
+            sec_x = seconds;
+        }
+
+        if variance_y < var_y {
+            var_y = variance_y;
+            sec_y = seconds;
+        }
+    }
+
+    (sec_y, sec_x)
+}
+
 #[cfg(test)]
 mod tests {
     use aoc_shared::input::load_text_input_from_file;
@@ -206,6 +284,24 @@ mod tests {
         let parsed = parse_input(&input).unwrap();
 
         let answer = part_two_v2(&parsed);
+        assert_eq!(7138, answer);
+    }
+
+    #[test]
+    fn test_part_two_v3() {
+        let input = load_text_input_from_file("inputs/input.txt");
+        let parsed = parse_input(&input).unwrap();
+
+        let answer = part_two_v3(&parsed);
+        assert_eq!(7138, answer);
+    }
+
+    #[test]
+    fn test_part_two_v4() {
+        let input = load_text_input_from_file("inputs/input.txt");
+        let parsed = parse_input(&input).unwrap();
+
+        let answer = part_two_v4(&parsed);
         assert_eq!(7138, answer);
     }
 }
