@@ -59,9 +59,14 @@ pub fn parse_input(input: &str) -> Result<Input, Box<dyn Error>> {
                 _ => grid.push(ch),
             },
 
-            ParseState::ParseNewLine => match ch == b'\n' {
-                true => state = ParseState::ParseRobot,
-                false => {
+            ParseState::ParseNewLine => match ch {
+                b'\n' => state = ParseState::ParseRobot,
+                ch => {
+                    if ch == ROBOT {
+                        start_row = rows;
+                        start_col = 0;
+                    }
+
                     grid.push(ch);
                     state = ParseState::ParseGrid;
                 }
