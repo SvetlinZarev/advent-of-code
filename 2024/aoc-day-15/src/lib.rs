@@ -203,18 +203,7 @@ pub fn part_two(input: &Input) -> u32 {
                     continue;
                 }
 
-                let cell_kind = grid[r * cols + c];
-
                 push_box(&mut grid, cols, direction, row, col);
-                grid[row * cols + col] = DOT;
-
-                if direction == Direction::Up || direction == Direction::Down {
-                    if cell_kind == LB {
-                        grid[r * cols + c + 1] = DOT;
-                    } else {
-                        grid[r * cols + c - 1] = DOT;
-                    }
-                }
             }
 
             _ => unreachable!("{}", grid[r * cols + c] as char),
