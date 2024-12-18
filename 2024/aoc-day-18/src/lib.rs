@@ -4,27 +4,37 @@ use std::collections::VecDeque;
 use std::error::Error;
 
 const SIDE: usize = 71;
-const TAKE: usize = 1024;
+const TAKE_PART_1: usize = 1024;
 
 const UNVISITED: u8 = 0u8;
 const WALL: u8 = 1u8;
 const VISITED: u8 = 2u8;
 
 pub fn parse_input(input: &str) -> Result<Vec<(usize, usize)>, Box<dyn Error>> {
-    let mut parsed = vec![];
-    for line in input.lines() {
-        let Some((a, b)) = line.split_once(',') else {
-            return Err(format!("Invalid input: {}", line).into());
-        };
+    let mut parsed = Vec::with_capacity(3500);
 
-        parsed.push((b.trim().parse()?, a.trim().parse()?));
+    let mut a = 0;
+    let mut b = 0;
+
+    for ch in input.bytes() {
+        if ch.is_ascii_digit() {
+            a *= 10;
+            a += (ch - b'0') as usize;
+        } else if ch == b'\n' {
+            parsed.push((a, b));
+            a = 0;
+            b = 0;
+        } else {
+            b = a;
+            a = 0;
+        }
     }
 
     Ok(parsed)
 }
 
 pub fn part_one(input: &[(usize, usize)]) -> u32 {
-    min_cost(&input, SIDE, TAKE).unwrap()
+    min_cost(&input, SIDE, TAKE_PART_1).unwrap()
 }
 
 // Binary search with BFS
@@ -41,7 +51,7 @@ fn binary_search<B: Fn(&[(usize, usize)], usize) -> bool>(
     input: &[(usize, usize)],
     larger: B,
 ) -> (usize, usize) {
-    let mut lo = 1024; // because of part-1 we know that 1024 is a safe number
+    let mut lo = TAKE_PART_1; // because of part-1 we know that 1024 is a safe number
     let mut hi = input.len();
 
     while lo < hi {
@@ -65,7 +75,7 @@ fn min_cost(blocks: &[(usize, usize)], side: usize, take: usize) -> Option<u32> 
     let mut grid = vec![UNVISITED; side * side];
 
     for (r, c) in blocks.iter().copied().take(take) {
-        grid[r * SIDE + c] = WALL;
+        grid[r * side + c] = WALL;
     }
 
     let mut queue = VecDeque::new();
