@@ -90,7 +90,7 @@ fn min_cost(blocks: &[(usize, usize)], side: usize, take: usize) -> Option<u32> 
     None
 }
 
-// Binary Search with bidirectional BFS
+// Binary Search with DFS instead of BFS
 pub fn part_two_v2(input: &[(usize, usize)]) -> (usize, usize) {
     let mut lo = 0;
     let mut hi = input.len();
@@ -113,47 +113,33 @@ pub fn part_two_v2(input: &[(usize, usize)]) -> (usize, usize) {
 }
 
 fn is_reachable(blocks: &[(usize, usize)], side: usize, take: usize) -> bool {
-    const VISITED_A: u8 = 33u8;
-    const VISITED_B: u8 = 77u8;
-
     let mut grid = vec![UNVISITED; side * side];
 
     for (r, c) in blocks.iter().copied().take(take) {
         grid[r * SIDE + c] = WALL;
     }
 
-    let mut a = VecDeque::new();
-    a.push_back((0isize, 0isize));
+    let mut stack = vec![];
+    stack.push((0isize, 0isize));
 
-    let mut b = VecDeque::new();
-    b.push_back((SIDE as isize - 1, SIDE as isize - 1));
-
-    let mut mark_a = VISITED_A;
-    let mut mark_b = VISITED_B;
-
-    while a.len() > 0 || b.len() > 0 {
-        if a.is_empty() || (a.len() > b.len() && !b.is_empty()) {
-            std::mem::swap(&mut a, &mut b);
-            std::mem::swap(&mut mark_a, &mut mark_b);
-        }
-
-        for _ in 0..a.len() {
-            let (r, c) = a.pop_front().unwrap();
-
-            for (dr, dc) in DIR4 {
-                let y = r + dr;
-                let x = c + dc;
-                if !(0..side as isize).contains(&x) || !(0..side as isize).contains(&y) {
-                    continue;
-                }
-
-                if grid[y as usize * side + x as usize] == UNVISITED {
-                    grid[y as usize * side + x as usize] = mark_a;
-                    a.push_back((y, x));
-                } else if grid[y as usize * side + x as usize] == mark_b {
-                    return true;
-                }
+    while let Some((r, c)) = stack.pop() {
+        for (dr, dc) in DIR4 {
+            let y = r + dr;
+            let x = c + dc;
+            if !(0..side as isize).contains(&x) || !(0..side as isize).contains(&y) {
+                continue;
             }
+
+            if grid[y as usize * side + x as usize] != UNVISITED {
+                continue;
+            }
+            grid[y as usize * side + x as usize] = VISITED;
+
+            if (y as usize, x as usize) == (side - 1, side - 1) {
+                return true;
+            }
+
+            stack.push((y, x));
         }
     }
 
