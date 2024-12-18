@@ -29,16 +29,28 @@ pub fn part_one(input: &[(usize, usize)]) -> u32 {
 
 // Binary search with BFS
 pub fn part_two_v1(input: &[(usize, usize)]) -> (usize, usize) {
-    let mut lo = 0;
+    binary_search(input, |input, take| min_cost(input, SIDE, take).is_some())
+}
+
+// Binary Search with DFS instead of BFS
+pub fn part_two_v2(input: &[(usize, usize)]) -> (usize, usize) {
+    binary_search(input, |input, take| is_reachable(input, SIDE, take))
+}
+
+fn binary_search<B: Fn(&[(usize, usize)], usize) -> bool>(
+    input: &[(usize, usize)],
+    larger: B,
+) -> (usize, usize) {
+    let mut lo = 1024; // because of part-1 we know that 1024 is a safe number
     let mut hi = input.len();
 
     while lo < hi {
         let mid = lo + (hi - lo) / 2;
 
         // We use `mid+1` here because we specify how many elements to take,
-        // instead of up to which element (inclusive) to go. Thus if `mid=0`
+        // instead of up to which element (inclusive) to go. Thus, if `mid=0`
         // we'll take no elements, be we want to take the 0th element instead.
-        if min_cost(input, SIDE, mid + 1).is_some() {
+        if larger(input, mid + 1) {
             lo = mid + 1;
         } else {
             hi = mid;
@@ -88,28 +100,6 @@ fn min_cost(blocks: &[(usize, usize)], side: usize, take: usize) -> Option<u32> 
     }
 
     None
-}
-
-// Binary Search with DFS instead of BFS
-pub fn part_two_v2(input: &[(usize, usize)]) -> (usize, usize) {
-    let mut lo = 0;
-    let mut hi = input.len();
-
-    while lo < hi {
-        let mid = lo + (hi - lo) / 2;
-
-        // We use `mid+1` here because we specify how many elements to take,
-        // instead of up to which element (inclusive) to go. Thus if `mid=0`
-        // we'll take no elements, be we want to take the 0th element instead.
-        if is_reachable(input, SIDE, mid + 1) {
-            lo = mid + 1;
-        } else {
-            hi = mid;
-        }
-    }
-
-    let block = input[hi];
-    (block.1, block.0)
 }
 
 fn is_reachable(blocks: &[(usize, usize)], side: usize, take: usize) -> bool {

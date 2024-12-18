@@ -44,7 +44,7 @@ fn benchmark_part_two(c: &mut Criterion) {
         b.iter(|| part_two_v3(black_box(&parsed)));
     });
 
-    c.bench_function("part-2/of-fwd", |b| {
+    c.bench_function("part-2/uf-fwd", |b| {
         b.iter(|| part_two_v4(black_box(&parsed)));
     });
 }
