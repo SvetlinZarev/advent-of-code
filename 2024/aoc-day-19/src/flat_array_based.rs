@@ -13,11 +13,11 @@ pub fn part_one(patterns: &[&str], lines: &[&str]) -> usize {
         .into_iter()
         .for_each(|&pattern| insert(&mut trie, &mut node_ptr, pattern.as_bytes()));
 
-    lines
+    towels
         .into_iter()
-        .filter(|l| {
-            let mut failed = BitSet::new(l.len());
-            contains(&trie, l.as_bytes(), &mut failed)
+        .filter(|t| {
+            let mut failed = BitSet::new(t.len());
+            contains(&trie, t.as_bytes(), &mut failed)
         })
         .count()
 }
@@ -55,7 +55,7 @@ fn contains(trie: &[([NodeInt; 5], bool)], word: &[u8], failed: &mut BitSet) -> 
     false
 }
 
-pub fn part_two(patterns: &[&str], lines: &[&str]) -> u64 {
+pub fn part_two(patterns: &[&str], towels: &[&str]) -> u64 {
     let mut trie = [([0; 5], false); MAX_NODES];
     let mut node_ptr = 0;
 
@@ -63,16 +63,16 @@ pub fn part_two(patterns: &[&str], lines: &[&str]) -> u64 {
         .into_iter()
         .for_each(|&pattern| insert(&mut trie, &mut node_ptr, pattern.as_bytes()));
 
-    lines
+    towels
         .into_iter()
-        .map(|l| {
-            let mut counts = vec![-1; l.len() + 1];
-            contains_ways(&trie, l.as_bytes(), &mut counts)
+        .map(|t| {
+            let mut counts = vec![-1; t.len() + 1];
+            count_ways(&trie, t.as_bytes(), &mut counts)
         })
         .sum::<i64>() as u64
 }
 
-fn contains_ways(trie: &[([NodeInt; 5], bool)], word: &[u8], cache: &mut [i64]) -> i64 {
+fn count_ways(trie: &[([NodeInt; 5], bool)], word: &[u8], cache: &mut [i64]) -> i64 {
     let mut node = 0;
     let mut ways = 0;
 
@@ -95,7 +95,7 @@ fn contains_ways(trie: &[([NodeInt; 5], bool)], word: &[u8], cache: &mut [i64]) 
             ways += if cache[remaining.len()] >= 0 {
                 cache[remaining.len()]
             } else {
-                contains_ways(trie, remaining, cache)
+                count_ways(trie, remaining, cache)
             };
         }
     }

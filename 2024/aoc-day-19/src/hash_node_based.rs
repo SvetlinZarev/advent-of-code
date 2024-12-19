@@ -70,23 +70,23 @@ fn contains(trie: &Node, word: &[u8], failed: &mut BitSet) -> bool {
     false
 }
 
-pub fn part_two(patterns: &[&str], lines: &[&str]) -> u64 {
+pub fn part_two(patterns: &[&str], towels: &[&str]) -> u64 {
     let mut trie = Node::default();
 
     patterns
         .into_iter()
         .for_each(|&pattern| trie.insert(pattern.as_bytes()));
 
-    lines
+    towels
         .into_iter()
-        .map(|l| {
-            let mut counts = vec![-1; l.len() + 1];
-            contains_ways(&trie, l.as_bytes(), &mut counts)
+        .map(|t| {
+            let mut counts = vec![-1; t.len() + 1];
+            count_ways(&trie, t.as_bytes(), &mut counts)
         })
         .sum::<i64>() as u64
 }
 
-fn contains_ways(trie: &Node, word: &[u8], cache: &mut [i64]) -> i64 {
+fn count_ways(trie: &Node, word: &[u8], cache: &mut [i64]) -> i64 {
     let mut node = trie;
     let mut ways = 0;
 
@@ -107,7 +107,7 @@ fn contains_ways(trie: &Node, word: &[u8], cache: &mut [i64]) -> i64 {
                     ways += if cache[remaining.len()] >= 0 {
                         cache[remaining.len()]
                     } else {
-                        contains_ways(trie, remaining, cache)
+                        count_ways(trie, remaining, cache)
                     };
                 }
             }
