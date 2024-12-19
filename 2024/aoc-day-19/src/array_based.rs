@@ -23,7 +23,7 @@ impl Node {
     }
 
     fn index(&self, ch: u8) -> usize {
-        (((ch as usize * 25) >> 3) + 7) % 8
+        ((((ch as usize & 31) * 7) >> 4) + 1) % 8
     }
 }
 
