@@ -1,11 +1,13 @@
-use aoc_shared::util::BitSet;
-
-type NodeInt = u16;
+// What type of integer to use for storing the index of the child nodes
+type NodeInt = u32;
 
 // My input leads to 795 trie nodes
 const MAX_NODES: usize = 1000;
 
-pub fn part_one(patterns: &[&str], lines: &[&str]) -> usize {
+// My input does not have strings longer than 64
+const MAX_LEN: usize = 64;
+
+pub fn part_one(patterns: &[&str], towels: &[&str]) -> usize {
     let mut trie = [([0; 5], false); MAX_NODES];
     let mut node_ptr = 0;
 
@@ -15,14 +17,11 @@ pub fn part_one(patterns: &[&str], lines: &[&str]) -> usize {
 
     towels
         .into_iter()
-        .filter(|t| {
-            let mut failed = BitSet::new(t.len());
-            contains(&trie, t.as_bytes(), &mut failed)
-        })
+        .filter(|t| contains(&trie, t.as_bytes(), &mut 0)) // the negative cache is fit in a single u64
         .count()
 }
 
-fn contains(trie: &[([NodeInt; 5], bool)], word: &[u8], failed: &mut BitSet) -> bool {
+fn contains(trie: &[([NodeInt; 5], bool)], word: &[u8], failed: &mut u64) -> bool {
     let mut node = 0;
 
     for (idx, &ch) in word.iter().enumerate() {
@@ -40,7 +39,8 @@ fn contains(trie: &[([NodeInt; 5], bool)], word: &[u8], failed: &mut BitSet) -> 
                 return true;
             }
 
-            if failed.is_set(remaining.len() - 1) {
+            let bit_idx = remaining.len() - 1;
+            if *failed & (1 << bit_idx) != 0 {
                 continue;
             }
 
@@ -48,7 +48,7 @@ fn contains(trie: &[([NodeInt; 5], bool)], word: &[u8], failed: &mut BitSet) -> 
                 return true;
             }
 
-            failed.set(remaining.len() - 1);
+            *failed |= 1 << bit_idx;
         }
     }
 
@@ -66,7 +66,7 @@ pub fn part_two(patterns: &[&str], towels: &[&str]) -> u64 {
     towels
         .into_iter()
         .map(|t| {
-            let mut counts = vec![-1; t.len() + 1];
+            let mut counts = [-1; MAX_LEN];
             count_ways(&trie, t.as_bytes(), &mut counts)
         })
         .sum::<i64>() as u64
