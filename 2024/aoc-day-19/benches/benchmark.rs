@@ -1,7 +1,9 @@
 use aoc_shared::input::load_text_input_from_file;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-use aoc_day_19::{parse_input, part_one_v1, part_one_v2, part_two_v1, part_two_v2};
+use aoc_day_19::{
+    parse_input, part_one_v1, part_one_v2, part_one_v3, part_two_v1, part_two_v2, part_two_v3,
+};
 
 criterion_group!(
     benches,
@@ -23,12 +25,16 @@ fn benchmark_part_one(c: &mut Criterion) {
     let input = load_text_input_from_file("inputs/input.txt");
     let (patterns, lines) = parse_input(&input).unwrap();
 
-    c.bench_function("part-1/hash", |b| {
+    c.bench_function("part-1/hash_node", |b| {
         b.iter(|| part_one_v1(black_box(&patterns), black_box(&lines)));
     });
 
-    c.bench_function("part-1/array", |b| {
+    c.bench_function("part-1/array_node", |b| {
         b.iter(|| part_one_v2(black_box(&patterns), black_box(&lines)));
+    });
+
+    c.bench_function("part-1/flat_array", |b| {
+        b.iter(|| part_one_v3(black_box(&patterns), black_box(&lines)));
     });
 }
 
@@ -36,11 +42,15 @@ fn benchmark_part_two(c: &mut Criterion) {
     let input = load_text_input_from_file("inputs/input.txt");
     let (patterns, lines) = parse_input(&input).unwrap();
 
-    c.bench_function("part-2/hash", |b| {
+    c.bench_function("part-2/hash_node", |b| {
         b.iter(|| part_two_v1(black_box(&patterns), black_box(&lines)));
     });
 
-    c.bench_function("part-2/array", |b| {
+    c.bench_function("part-2/array_node", |b| {
         b.iter(|| part_two_v2(black_box(&patterns), black_box(&lines)));
+    });
+
+    c.bench_function("part-2/flat_array", |b| {
+        b.iter(|| part_two_v3(black_box(&patterns), black_box(&lines)));
     });
 }

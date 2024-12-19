@@ -126,7 +126,7 @@ fn contains_ways(trie: &Node, word: &[u8], cache: &mut [i64]) -> i64 {
 
 #[cfg(test)]
 mod tests {
-    use crate::array_based::{part_one, part_two};
+    use super::*;
     use crate::parse_input;
     use crate::tests::{PART_1_ANSWER, PART_2_ANSWER};
     use aoc_shared::input::load_text_input_from_file;

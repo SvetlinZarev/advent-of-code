@@ -3,8 +3,9 @@ use std::error::Error;
 // The array based solution works only because there are 5 different letters
 // in the input and will not work for any general input.
 // The hash based solution can work with everything
-mod array_based;
-mod hash_based;
+mod flat_array_based;
+mod hash_node_based;
+mod array_node_based;
 
 #[cfg(test)]
 pub mod tests {
@@ -30,17 +31,25 @@ pub fn parse_input(input: &str) -> Result<(Vec<&str>, Vec<&str>), Box<dyn Error>
 }
 
 pub fn part_one_v1(patterns: &[&str], lines: &[&str]) -> usize {
-    hash_based::part_one(patterns, lines)
+    hash_node_based::part_one(patterns, lines)
 }
 
 pub fn part_two_v1(patterns: &[&str], lines: &[&str]) -> u64 {
-    hash_based::part_two(patterns, lines)
+    hash_node_based::part_two(patterns, lines)
 }
 
 pub fn part_one_v2(patterns: &[&str], lines: &[&str]) -> usize {
-    array_based::part_one(patterns, lines)
+    array_node_based::part_one(patterns, lines)
 }
 
 pub fn part_two_v2(patterns: &[&str], lines: &[&str]) -> u64 {
-    array_based::part_two(patterns, lines)
+    array_node_based::part_two(patterns, lines)
+}
+
+pub fn part_one_v3(patterns: &[&str], lines: &[&str]) -> usize {
+    flat_array_based::part_one(patterns, lines)
+}
+
+pub fn part_two_v3(patterns: &[&str], lines: &[&str]) -> u64 {
+    flat_array_based::part_two(patterns, lines)
 }
